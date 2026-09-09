@@ -1,0 +1,18 @@
+{
+  "name": "Flutter",
+  "image": "matspfeiffer/flutter:beta",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dart-code.dart-code",
+        "dart-code.flutter",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "files.eol": "\n"
+      }
+    }
+  },
+  "postCreateCommand": "flutter pub get"
+}

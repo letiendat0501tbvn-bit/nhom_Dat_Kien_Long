@@ -2,108 +2,326 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
 
+class FoodCategory {
+  final String id;
+  final String name;
+  final IconData icon;
+
+  const FoodCategory({
+    required this.id,
+    required this.name,
+    required this.icon,
+  });
+}
+
+class FoodItem {
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final String imageUrl;
+  final FoodCategory category;  
+
+  const FoodItem({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.imageUrl,
+    required this.category,
+  });
+}
+
+class OrderItem {
+  final FoodItem food;
+  int quantity;
+
+  OrderItem({required this.food, this.quantity = 1});
+
+  double get totalPrice => food.price * quantity;
+}
+
+class Cart {
+  final List<OrderItem> items = [];
+
+  void addItem(FoodItem food) {
+    final existingIndex = items.indexWhere((item) => item.food.id == food.id);
+    if (existingIndex >= 0) {
+      items[existingIndex].quantity += 1;
+    } else {
+      items.add(OrderItem(food: food));
+    }
+  }
+
+  int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
+
+  double get totalPrice => items.fold(0.0, (sum, item) => sum + item.totalPrice);
+}
+
+class Restaurant {
+  final String name;
+  final String address;
+  final double deliveryFee;
+
+  const Restaurant({
+    required this.name,
+    required this.address,
+    required this.deliveryFee,
+  });
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Food Order App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in a Flutter IDE). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
+        scaffoldBackgroundColor: const Color(0xFFF9F9F9),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const FoodHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class FoodHomePage extends StatefulWidget {
+  const FoodHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<FoodHomePage> createState() => _FoodHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _FoodHomePageState extends State<FoodHomePage> {
+  final restaurant = const Restaurant(
+    name: 'FoodGo',
+    address: 'Yên Nghĩa, Hà Đông, Hà Nội',
+    deliveryFee: 15000,
+  );
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  final categories = const [
+    FoodCategory(id: 'all', name: 'Tất cả', icon: Icons.grid_view_rounded),
+    FoodCategory(id: 'bun', name: 'Bún', icon: Icons.ramen_dining),
+    FoodCategory(id: 'pizza', name: 'Pizza', icon: Icons.local_pizza),
+    FoodCategory(id: 'drink', name: 'Nước', icon: Icons.local_drink),
+  ];
+
+  final foods = const [
+    FoodItem(
+      id: 'bun-bo',
+      name: 'Bún bò Huế',
+      description: 'Nước dùng đậm vị, thịt bò và chả giò',
+      price: 59000,
+      imageUrl: '',
+      category: FoodCategory(id: 'bun', name: 'Bún', icon: Icons.ramen_dining),
+    ),
+    FoodItem(
+      id: 'pizza-margherita',
+      name: 'Pizza Margherita',
+      description: 'Sốt cà chua, phô mai mozzarella',
+      price: 99000,
+      imageUrl: '',
+      category: FoodCategory(id: 'pizza', name: 'Pizza', icon: Icons.local_pizza),
+    ),
+    FoodItem(
+      id: 'tra-da',
+      name: 'Trà đá sữa',
+      description: 'Giải nhiệt, thơm ngon và mát lạnh',
+      price: 25000,
+      imageUrl: '',
+      category: FoodCategory(id: 'drink', name: 'Nước', icon: Icons.local_drink),
+    ),
+  ];
+
+  final cart = Cart();
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+        title: const Text('Đặt đồ ăn'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: Text(
+                '${cart.totalQuantity} món',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                restaurant.name,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.location_on_outlined, size: 18, color: Colors.grey),
+                  const SizedBox(width: 6),
+                  Text(restaurant.address),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 56,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return Chip(
+                      avatar: Icon(category.icon, size: 18),
+                      label: Text(category.name),
+                      backgroundColor: index == 0 ? Colors.orange.shade100 : Colors.white,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: foods.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final food = foods[index];
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              food.category.icon,
+                              size: 30,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  food.name,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  food.description,
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '${food.price.toStringAsFixed(0)}₫',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton(
+                            key: ValueKey('add-food-${food.id}'),
+                            onPressed: () {
+                              setState(() {
+                                cart.addItem(food);
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Thêm'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Tổng thanh toán',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        Text(
+                          '${cart.totalPrice.toStringAsFixed(0)}₫',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: cart.items.isEmpty ? null : () {},
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white.withOpacity(0.16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      child: const Text('Đặt hàng'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

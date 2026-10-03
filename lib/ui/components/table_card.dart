@@ -20,6 +20,7 @@ class TableCard extends StatelessWidget {
     required this.restaurant,
     required this.joinState,
     required this.onJoin,
+    this.onOpen,
     this.joining = false,
   });
 
@@ -28,6 +29,7 @@ class TableCard extends StatelessWidget {
   final Restaurant? restaurant;
   final TableJoinState joinState;
   final VoidCallback onJoin;
+  final VoidCallback? onOpen; // bấm cả thẻ để xem chi tiết bàn
   final bool joining; // đang gửi yêu cầu tham gia
 
   @override
@@ -43,89 +45,104 @@ class TableCard extends StatelessWidget {
       table.startAt.month,
       table.startAt.day,
     );
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0x1F000000)),
+        side: const BorderSide(color: Color(0x1F000000)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onOpen,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: 72, child: _image()),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      dish?.name ?? t(StrKey.noDishChosen),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: 72, child: _image()),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          dish?.name ?? t(StrKey.noDishChosen),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Tên quán là dữ liệu, không dịch
+                        _IconText(
+                          icon: Icons.storefront_outlined,
+                          text: restaurant?.name ?? '',
+                          style: muted,
+                        ),
+                        const SizedBox(height: 2),
+                        _IconText(
+                          icon: Icons.schedule,
+                          text:
+                              '${t.timeRange(table.startAt, table.durationMin)} · ${t.dayLabel(day, today)}',
+                          style: muted,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    // Tên quán là dữ liệu, không dịch
-                    _IconText(
-                      icon: Icons.storefront_outlined,
-                      text: restaurant?.name ?? '',
-                      style: muted,
-                    ),
-                    const SizedBox(height: 2),
-                    _IconText(
-                      icon: Icons.schedule,
-                      text:
-                          '${t.timeRange(table.startAt, table.durationMin)} · ${t.dayLabel(day, today)}',
-                      style: muted,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          if (table.note.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              table.note,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: muted.copyWith(fontStyle: FontStyle.italic),
-            ),
-          ],
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _Avatars(memberIds: table.memberIds),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  t.seatsLabel(table.seatsLeft, table.capacity),
+              if (table.note.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  table.note,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: table.isFull
-                        ? AppColors.text.withValues(alpha: 0.6)
-                        : AppColors.text,
-                  ),
+                  style: muted.copyWith(fontStyle: FontStyle.italic),
                 ),
+              ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _Avatars(memberIds: table.memberIds),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      t.seatsLabel(table.seatsLeft, table.capacity),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: table.isFull
+                            ? AppColors.text.withValues(alpha: 0.6)
+                            : AppColors.text,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: _joinButton(t),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 150),
-                child: _joinButton(t),
-              ),
+              if (joinState == TableJoinState.joined && onOpen != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  t(StrKey.tdJoinedHint),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: muted.copyWith(fontSize: 13),
+                ),
+              ],
             ],
           ),
-        ],
+        ),
       ),
     );
   }

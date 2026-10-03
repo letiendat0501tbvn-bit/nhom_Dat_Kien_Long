@@ -15,9 +15,9 @@ class MockTableRepository implements TableRepository {
     required List<Area> areas,
     this.now = systemClock,
     this.latency = randomLatency,
-  })  : _tables = List.of(tables),
-        _restaurants = {for (final r in restaurants) r.id: r},
-        _areas = {for (final a in areas) a.id: a};
+  }) : _tables = List.of(tables),
+       _restaurants = {for (final r in restaurants) r.id: r},
+       _areas = {for (final a in areas) a.id: a};
 
   final Clock now;
   final Latency latency;
@@ -157,7 +157,10 @@ class MockTableRepository implements TableRepository {
     final remaining = t.memberIds.where((m) => m != userId).toList();
     // Chủ bàn rời mà không còn ai: bàn tự huỷ
     if (remaining.isEmpty) {
-      return _save(i, t.copyWith(memberIds: remaining, status: TableStatus.cancelled));
+      return _save(
+        i,
+        t.copyWith(memberIds: remaining, status: TableStatus.cancelled),
+      );
     }
     // Chủ bàn rời: chuyển quyền cho người vào bàn sớm nhất (đứng đầu danh sách còn lại)
     final newHost = userId == t.hostId ? remaining.first : t.hostId;
@@ -177,6 +180,7 @@ class MockTableRepository implements TableRepository {
     final i = _indexOf(tableId);
     final t = _tables[i];
     if (t.hostId != userId) throw const TableException(TableError.notHost);
+    _ensureOpenForChange(t);
     return _save(i, t.copyWith(status: TableStatus.cancelled));
   }
 }

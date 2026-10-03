@@ -64,6 +64,47 @@ TableJoinState joinStateOf(DiningTable table, String? userId) {
 // Bàn đã bắt đầu (hoặc đã qua) thì không tham gia/rời được nữa.
 bool hasStarted(DiningTable t, DateTime now) => !t.startAt.isAfter(now);
 
+// Trạng thái hiển thị của bàn ở màn Chi tiết bàn.
+enum TableDisplayStatus { upcoming, full, started, cancelled, ended }
+
+// Bàn đã huỷ/kết thúc thì giữ nguyên; còn hiệu lực mà đã đến giờ thì "đã bắt đầu";
+// còn lại là "đã đầy" hoặc "sắp diễn ra".
+TableDisplayStatus displayStatusOf(DiningTable t, DateTime now) {
+  if (t.status == TableStatus.cancelled) return TableDisplayStatus.cancelled;
+  if (t.status == TableStatus.ended) return TableDisplayStatus.ended;
+  if (hasStarted(t, now)) return TableDisplayStatus.started;
+  return t.isFull ? TableDisplayStatus.full : TableDisplayStatus.upcoming;
+}
+
+// Các thao tác một người được làm với bàn (userId null = khách).
+class TableActions {
+  const TableActions({
+    this.canJoin = false,
+    this.canLeave = false,
+    this.canCancel = false,
+    this.showFull = false,
+  });
+
+  final bool canJoin; // khách cũng thấy; bấm thì mở bảng đăng nhập
+  final bool canLeave; // thành viên (kể cả chủ bàn)
+  final bool canCancel; // chỉ chủ bàn
+  final bool showFull; // hết chỗ và chưa tham gia: chỉ hiện nút "Đã đầy"
+
+  bool get none => !canJoin && !canLeave && !canCancel && !showFull;
+}
+
+// Bàn đã huỷ, đã kết thúc hoặc đã bắt đầu thì không có thao tác nào.
+TableActions tableActionsOf(DiningTable t, String? userId, DateTime now) {
+  if (!isActive(t) || hasStarted(t, now)) return const TableActions();
+  final member = userId != null && t.memberIds.contains(userId);
+  return TableActions(
+    canJoin: !member && !t.isFull,
+    canLeave: member,
+    canCancel: member && t.hostId == userId,
+    showFull: !member && t.isFull,
+  );
+}
+
 // Kiểm tra thông tin khi mở bàn; trả về lỗi đầu tiên hoặc null nếu hợp lệ.
 TableError? validateNewTable({
   required DateTime now,

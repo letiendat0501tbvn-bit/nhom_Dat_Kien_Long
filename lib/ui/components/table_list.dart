@@ -9,6 +9,7 @@ import '../../data/repositories/table_repository.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
+import '../screens/table_detail_screen.dart';
 import 'login_sheet.dart';
 import 'status_view.dart';
 import 'table_card.dart';
@@ -36,12 +37,11 @@ class _TableListState extends State<TableList> {
   var _dishes = <String, Dish>{};
   final _joining = <String>{}; // id các bàn đang gửi yêu cầu tham gia
   var _requestId = 0; // bỏ kết quả của lần tải cũ
+  var _version = 0; // tablesVersion đã dùng cho lần tải gần nhất
   Object? _queryKey; // bộ lọc đã dùng cho lần tải gần nhất
 
   // Chỉ lấy những thứ cần so sánh để biết bộ lọc có đổi không.
-  // tablesVersion đổi (vừa mở bàn mới...) thì cũng tải lại.
-  Object _keyOf(TableQuery q, int version) => (
-    version,
+  Object _keyOf(TableQuery q) => (
     q.areaId,
     q.dishId,
     q.radiusM,
@@ -55,13 +55,15 @@ class _TableListState extends State<TableList> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final app = AppScope.of(context);
-    final key = _keyOf(
-      app.tableQuery(dishId: widget.dishId),
-      app.tablesVersion,
-    );
+    final key = _keyOf(app.tableQuery(dishId: widget.dishId));
     if (key != _queryKey) {
       _queryKey = key;
+      _version = app.tablesVersion;
       _load();
+    } else if (app.tablesVersion != _version) {
+      // Dữ liệu bàn đổi ở nơi khác (mở bàn, tham gia, rời, huỷ...): tải lại âm thầm
+      _version = app.tablesVersion;
+      _load(quiet: true);
     }
   }
 
@@ -118,6 +120,7 @@ class _TableListState extends State<TableList> {
         _tables = [for (final x in _tables) x.id == updated.id ? updated : x];
       });
       _toast(context.strings(StrKey.joinSuccess));
+      app.notifyTablesChanged(); // các màn khác (chi tiết bàn...) làm mới theo
     } on TableException catch (e) {
       if (!mounted) return;
       _toast(context.strings.tableError(e.error));
@@ -152,6 +155,7 @@ class _TableListState extends State<TableList> {
               joinState: joinStateOf(table, userId),
               joining: _joining.contains(table.id),
               onJoin: () => _join(table),
+              onOpen: () => openTableDetail(context, table.id),
             ),
             const SizedBox(height: 12),
           ],

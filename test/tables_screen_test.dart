@@ -820,6 +820,11 @@ void main() {
 
         await tester.pumpAndSettle();
         expect(inCard('ta', 'Đã tham gia'), findsOneWidget);
+        // Sau khi tham gia, danh sách tự tải lại âm thầm (mỗi bước 500 ms): chờ cho xong
+        for (var i = 0; i < 4; i++) {
+          await tester.pump(const Duration(milliseconds: 600));
+        }
+        expect(inCard('ta', 'Đã tham gia'), findsOneWidget);
       },
       size: tall,
     );

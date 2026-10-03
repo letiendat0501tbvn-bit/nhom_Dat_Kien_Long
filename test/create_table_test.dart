@@ -15,6 +15,7 @@ import 'package:giua_ki_app/ui/components/new_table_fields.dart';
 import 'package:giua_ki_app/ui/components/table_card.dart';
 import 'package:giua_ki_app/ui/screens/create_table_screen.dart';
 import 'package:giua_ki_app/ui/screens/dish_detail_screen.dart';
+import 'package:giua_ki_app/ui/screens/table_detail_screen.dart';
 
 import 'test_helpers.dart';
 
@@ -679,9 +680,16 @@ void main() {
         await tester.tap(openButton);
         await tester.pumpAndSettle();
 
-        // Đóng màn, quay về tab Bàn ăn, có thông báo
+        // Chuyển thẳng sang chi tiết bàn vừa tạo (form đã bị thay thế), có thông báo
         expect(find.byType(CreateTableScreen), findsNothing);
+        expect(find.byType(TableDetailScreen), findsOneWidget);
         expect(find.text('Đã mở bàn! Bạn là chủ bàn.'), findsOneWidget);
+
+        // Back về đúng nơi đã mở màn tạo bàn (tab Bàn ăn), không quay lại form
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+        expect(find.byType(TableDetailScreen), findsNothing);
+        expect(find.byType(CreateTableScreen), findsNothing);
         expect(find.text('Bàn còn chỗ'), findsOneWidget);
 
         // Danh sách tự làm mới: thấy thêm một bàn, bàn mới "Đã tham gia", còn 3/4
@@ -767,8 +775,11 @@ void main() {
         await tester.tap(openButton);
         await tester.pumpAndSettle();
 
-        // Về màn chi tiết món, danh sách tự làm mới và có bàn mới của món này
+        // Sang chi tiết bàn mới; Back về màn chi tiết món, danh sách tự làm mới
         expect(find.byType(CreateTableScreen), findsNothing);
+        expect(find.byType(TableDetailScreen), findsOneWidget);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
         expect(find.byType(DishDetailScreen), findsOneWidget);
         expect(find.text('Mở bàn mới với món này'), findsNothing);
         final cards = tester

@@ -13,6 +13,7 @@ import '../components/option_chips.dart';
 import '../components/status_view.dart';
 import '../components/table_filters.dart';
 import '../theme/app_theme.dart';
+import 'table_detail_screen.dart';
 import '../components/new_table_fields.dart';
 
 // Màn "Mở bàn mới" (mục 4.4 và 7 SPEC; chưa có ảnh thiết kế). Màn toàn trang, không phải tab.
@@ -196,7 +197,7 @@ class _CreateTableScreenState extends State<CreateTableScreen> {
     if (restaurant == null || startAt == null) return;
     setState(() => _submitting = true);
     try {
-      await app.tableRepository.createTable(
+      final created = await app.tableRepository.createTable(
         hostId: user.id,
         dishId: _dish?.id,
         restaurantId: restaurant.id,
@@ -208,7 +209,14 @@ class _CreateTableScreenState extends State<CreateTableScreen> {
       app.notifyTablesChanged(); // danh sách bàn ở nơi mở màn tự làm mới
       if (!mounted) return;
       _toast(context.strings(StrKey.tableCreated));
-      Navigator.of(context).pop(true);
+      // Chuyển thẳng sang chi tiết bàn vừa tạo, thay chỗ của form: Back sẽ về nơi đã mở
+      // màn tạo bàn chứ không quay lại form.
+      Navigator.of(context).pushReplacement<bool, bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => TableDetailScreen(tableId: created.id),
+        ),
+        result: true,
+      );
     } on TableException catch (e) {
       if (!mounted) return;
       final t = context.strings;

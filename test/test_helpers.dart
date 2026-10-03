@@ -206,6 +206,7 @@ class ThrowingTableRepository implements TableRepository {
   int listCalls = 0;
   int joinCalls = 0;
   int createCalls = 0;
+  int getCalls = 0; // số lần getTable
   final TableError? createError; // lỗi createTable ném ra (null: lỗi chung bất ngờ)
   TableQuery? lastQuery; // truy vấn của lần getTables gần nhất
 
@@ -226,7 +227,14 @@ class ThrowingTableRepository implements TableRepository {
   }
 
   @override
-  Future<DiningTable?> getTable(String id) async => null;
+  Future<DiningTable?> getTable(String id) async {
+    getCalls++;
+    if (failList) throw Exception('Không có mạng');
+    for (final t in tables) {
+      if (t.id == id) return t;
+    }
+    return null;
+  }
 
   @override
   Future<List<DiningTable>> getMyTables(String userId) async => [];

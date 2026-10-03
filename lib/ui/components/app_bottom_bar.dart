@@ -50,20 +50,26 @@ class AppBottomBar extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: GestureDetector(
-                    onTap: onCreate,
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black26, blurRadius: 6),
-                        ],
+                  child: Semantics(
+                    button: true,
+                    label: 'Tạo bàn mới',
+                    excludeSemantics: true,
+                    child: GestureDetector(
+                      onTap: onCreate,
+                      child: Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 6),
+                          ],
+                        ),
+                        child:
+                            const Icon(Icons.add, color: Colors.white, size: 30),
                       ),
-                      child: const Icon(Icons.add, color: Colors.white, size: 30),
                     ),
                   ),
                 ),

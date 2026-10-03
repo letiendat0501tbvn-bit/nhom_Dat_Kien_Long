@@ -39,18 +39,22 @@ class AppTopBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(child: showLocation ? _locationButton() : _title()),
           const SizedBox(width: 8),
+          // Đổi ngôn ngữ và lắc món: sẽ nối chức năng ở các giai đoạn sau
           _circleButton(
+            label: 'Đổi ngôn ngữ',
             onTap: onLanguageTap,
             child: const Text('EN', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
           _circleButton(
+            label: 'Lắc món',
             onTap: onDiceTap,
             color: AppColors.accent,
             child: const Icon(Icons.casino_outlined, color: AppColors.text),
           ),
           const SizedBox(width: 8),
           _circleButton(
+            label: 'Hồ sơ',
             onTap: onProfileTap,
             child: const Icon(Icons.person_outline),
           ),
@@ -103,24 +107,31 @@ class AppTopBar extends StatelessWidget {
     );
   }
 
+  // Nút tròn 48x48 (đủ vùng bấm tối thiểu), có nhãn cho trình đọc màn hình.
   Widget _circleButton({
     required Widget child,
+    required String label,
     VoidCallback? onTap,
     Color color = Colors.white,
   }) {
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Container(
-        width: 44,
-        height: 44,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(color: const Color(0x1F000000)),
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Container(
+          width: 48,
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0x1F000000)),
+          ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }

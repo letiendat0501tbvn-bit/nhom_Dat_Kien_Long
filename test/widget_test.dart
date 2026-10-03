@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:giua_ki_app/main.dart';
+import 'package:giua_ki_app/ui/screens/profile_screen.dart';
 
 void main() {
   testWidgets('Bottom bar switches tabs', (WidgetTester tester) async {
@@ -36,6 +37,21 @@ void main() {
     await tester.tap(find.text('Bàn của tôi'));
     await tester.pump();
     expect(find.text('Bàn ăn của bạn'), findsOneWidget);
+    expect(find.text('Khách ghé chơi'), findsNothing);
+  });
+
+  testWidgets('Lịch hẹn and Tôi share one profile screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.text('Lịch hẹn'));
+    await tester.pump();
+    final first = tester.state(find.byType(ProfileScreen));
+
+    await tester.tap(find.text('Tôi'));
+    await tester.pump();
+    // Cùng một State: không dựng lại màn hình khi đổi giữa hai tab
+    expect(tester.state(find.byType(ProfileScreen)), same(first));
   });
 
   testWidgets('Explore shows dishes and filters by search',

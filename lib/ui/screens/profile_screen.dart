@@ -5,17 +5,19 @@ import '../theme/app_theme.dart';
 
 // Màn "Hồ sơ của bạn" với 2 tab: Bàn của tôi (0) và Tài khoản (1).
 // Tab Lịch hẹn ở thanh dưới mở tab 0, tab Tôi mở tab 1.
+// Tab hiện tại do MainShell giữ (controlled) để thanh dưới luôn đồng bộ.
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, this.initialTab = 1});
+  const ProfileScreen({super.key, required this.tab, required this.onTabChanged});
 
-  final int initialTab;
+  final int tab; // 0: Bàn của tôi, 1: Tài khoản
+  final ValueChanged<int> onTabChanged;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late int _tab = widget.initialTab;
+  int get _tab => widget.tab;
 
   // Chưa có đăng nhập thật (giai đoạn 2), nên luôn là khách.
   final bool _loggedIn = false;
@@ -44,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _TabSwitcher(
                   labels: const ['Bàn của tôi', 'Tài khoản'],
                   selected: _tab,
-                  onChanged: (i) => setState(() => _tab = i),
+                  onChanged: widget.onTabChanged,
                 ),
                 const SizedBox(height: 20),
                 if (_tab == 0) _myTables() else _account(),

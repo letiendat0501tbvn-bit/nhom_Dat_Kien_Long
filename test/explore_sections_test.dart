@@ -288,7 +288,7 @@ void main() {
 
       await tester.tap(find.text('Bún bò Huế'));
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
+      expect(find.text('Bàn ăn cho món này'), findsOneWidget);
     });
 
     phoneTest('hiện bằng tiếng Anh khi chọn EN', (tester) async {
@@ -362,7 +362,7 @@ void main() {
 
       await tester.tap(find.text('Bún chả'));
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
+      expect(find.text('Bàn ăn cho món này'), findsOneWidget);
       expect(
         find.text(
           'Thịt nướng thơm lừng, bún tươi và bát nước chấm — một nét quen của Hà Nội.',
@@ -610,7 +610,7 @@ void main() {
 
       await tester.tap(find.text('#HanoiClassic'));
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
+      expect(find.text('Bàn ăn cho món này'), findsOneWidget);
     }, size: tall);
   });
 

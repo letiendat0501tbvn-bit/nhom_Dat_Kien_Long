@@ -17,8 +17,13 @@ import 'table_card.dart';
 // Tự tải lại khi khu vực/bán kính/buổi ăn/khung giờ/ngày đổi.
 // Nút Tham gia: khách thì mở bảng đăng nhập và KHÔNG tự tham gia sau khi đăng nhập;
 // thành viên thì gọi repository, báo thành công hoặc đúng lỗi của TableError.
+// dishId: chỉ lấy bàn của món này (màn Chi tiết món); khi đó trạng thái rỗng dùng câu
+// riêng và thêm nút "Mở bàn mới với món này" nếu có onOpenTable.
 class TableList extends StatefulWidget {
-  const TableList({super.key});
+  const TableList({super.key, this.dishId, this.onOpenTable});
+
+  final String? dishId;
+  final VoidCallback? onOpenTable;
 
   @override
   State<TableList> createState() => _TableListState();
@@ -34,13 +39,20 @@ class _TableListState extends State<TableList> {
   Object? _queryKey; // bộ lọc đã dùng cho lần tải gần nhất
 
   // Chỉ lấy những thứ cần so sánh để biết bộ lọc có đổi không.
-  Object _keyOf(TableQuery q) =>
-      (q.areaId, q.radiusM, q.mealTime, q.date, q.fromMinute, q.toMinute);
+  Object _keyOf(TableQuery q) => (
+    q.areaId,
+    q.dishId,
+    q.radiusM,
+    q.mealTime,
+    q.date,
+    q.fromMinute,
+    q.toMinute,
+  );
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final key = _keyOf(AppScope.of(context).tableQuery());
+    final key = _keyOf(AppScope.of(context).tableQuery(dishId: widget.dishId));
     if (key != _queryKey) {
       _queryKey = key;
       _load();
@@ -53,20 +65,21 @@ class _TableListState extends State<TableList> {
     if (!quiet) setState(() => _status = LoadStatus.loading);
     try {
       final app = AppScope.of(context, listen: false);
-      final query = app.tableQuery();
-      final (tables, restaurants, dishes) = await (
+      final query = app.tableQuery(dishId: widget.dishId);
+      final (tables, restaurants) = await (
         app.tableRepository.getTables(query),
         app.locationRepository.getRestaurants(areaId: query.areaId),
-        // Tên món chỉ cần nạp một lần
-        _dishes.isEmpty
-            ? app.dishRepository.getDishes()
-            : Future.value(_dishes.values.toList()),
       ).wait;
+      // Chỉ lấy những món có trong các bàn này (AppState đệm theo id)
+      final dishes = await app.dishesByIds([
+        for (final tb in tables)
+          if (tb.dishId != null) tb.dishId!,
+      ]);
       if (!mounted || id != _requestId) return;
       setState(() {
         _tables = tables;
         _restaurants = {for (final r in restaurants) r.id: r};
-        _dishes = {for (final d in dishes) d.id: d};
+        _dishes = dishes;
         _status = LoadStatus.ready;
       });
     } catch (_) {
@@ -157,7 +170,11 @@ class _TableListState extends State<TableList> {
       child: Column(
         children: [
           Text(
-            t(StrKey.tablesEmpty),
+            t(
+              widget.dishId == null
+                  ? StrKey.tablesEmpty
+                  : StrKey.dishTablesEmpty,
+            ),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16),
           ),
@@ -192,6 +209,28 @@ class _TableListState extends State<TableList> {
                 ),
                 child: Text(
                   t.widenRadiusLabel(widerRadius.first),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+          if (widget.onOpenTable != null) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: OutlinedButton.icon(
+                onPressed: widget.onOpenTable,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: const StadiumBorder(),
+                ),
+                icon: const Icon(Icons.add, size: 20),
+                label: Text(
+                  t(StrKey.openTableWithDish),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.bold),

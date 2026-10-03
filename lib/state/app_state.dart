@@ -6,6 +6,7 @@ import '../data/mock_dishes.dart';
 import '../data/models/app_settings.dart';
 import '../data/models/enums.dart';
 import '../data/models/area.dart';
+import '../data/models/dish.dart';
 import '../data/models/user.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/chat_repository.dart';
@@ -74,6 +75,7 @@ class AppState extends ChangeNotifier {
   User? _currentUser; // null = khách ghé chơi
   var _areas = <Area>[];
   var _signingIn = false;
+  final _dishCache = <String, Dish>{}; // món đã lấy theo id
 
   // Bộ lọc theo ngày/khung giờ (không thuộc AppSettings vì không cần nhớ giữa các lần mở app).
   // _date == null nghĩa là "Hôm nay".
@@ -131,6 +133,25 @@ class AppState extends ChangeNotifier {
     await authRepository.signOut();
     _currentUser = null;
     notifyListeners();
+  }
+
+  // ---------- Món (đệm theo id) ----------
+
+  // Lấy các món theo id, chỉ gọi repository cho id chưa có trong bộ đệm.
+  // Id không tồn tại thì bỏ qua (không có trong kết quả).
+  Future<Map<String, Dish>> dishesByIds(Iterable<String> ids) async {
+    final wanted = ids.toSet();
+    final missing = wanted.where((id) => !_dishCache.containsKey(id)).toList();
+    if (missing.isNotEmpty) {
+      final found = await Future.wait(missing.map(dishRepository.getDish));
+      for (final dish in found) {
+        if (dish != null) _dishCache[dish.id] = dish;
+      }
+    }
+    return {
+      for (final id in wanted)
+        if (_dishCache[id] != null) id: _dishCache[id]!,
+    };
   }
 
   // ---------- Khu vực ----------

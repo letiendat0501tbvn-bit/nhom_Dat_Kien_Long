@@ -114,7 +114,8 @@ class _RegionSectionState extends State<RegionSection> {
           width: cardWidth,
           child: _RegionCard(
             dish: _dishes[i],
-            onTap: () => openDishDetail(context, _dishes[i]),
+            onTap: () =>
+                openDishDetail(context, _dishes[i], scrollToTables: true),
           ),
         ),
       ),

@@ -127,7 +127,8 @@ class _DishPickerState extends State<DishPicker> {
                 dish: items[i],
                 // Tạm thời mở chi tiết món (chưa có thiết kế); danh sách bàn theo món làm ở GĐ D
                 onTap: () => openDishDetail(context, items[i]),
-                onFindTable: () => openDishDetail(context, items[i]),
+                onFindTable: () =>
+                    openDishDetail(context, items[i], scrollToTables: true),
               ),
             );
           },

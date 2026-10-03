@@ -63,6 +63,7 @@ class FakeDishRepository implements DishRepository {
   bool fail;
   int calls = 0;
   int regionalCalls = 0;
+  int getDishCalls = 0;
   Taste? lastTaste;
   Mood? lastMood;
   bool lastOnlyTrending = false;
@@ -94,7 +95,13 @@ class FakeDishRepository implements DishRepository {
   }
 
   @override
-  Future<Dish?> getDish(String id) async => null;
+  Future<Dish?> getDish(String id) async {
+    getDishCalls++;
+    for (final d in [...dishes, ...regional]) {
+      if (d.id == id) return d;
+    }
+    return null;
+  }
 
   @override
   Future<List<String>> getCategories() async => const [];
@@ -157,12 +164,13 @@ AppState makeAppStateWithTables(
   Clock? now,
   Latency latency = noLatency,
   TableRepository? tableRepository,
+  DishRepository? dishRepository,
 }) {
   final data = MockData.build(testNow);
   final clock = now ?? () => testNow;
   return AppState(
     now: clock,
-    dishRepository: MockDishRepository(latency: latency),
+    dishRepository: dishRepository ?? MockDishRepository(latency: latency),
     tableRepository: tableRepository ??
         MockTableRepository(
           tables: tables,
@@ -196,10 +204,12 @@ class ThrowingTableRepository implements TableRepository {
   bool failList; // true: getTables báo lỗi (để thử trạng thái lỗi + Thử lại)
   int listCalls = 0;
   int joinCalls = 0;
+  TableQuery? lastQuery; // truy vấn của lần getTables gần nhất
 
   @override
   Future<List<DiningTable>> getTables(TableQuery query) async {
     listCalls++;
+    lastQuery = query;
     if (failList) throw Exception('Không có mạng');
     return tables;
   }

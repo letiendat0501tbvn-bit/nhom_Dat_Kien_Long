@@ -282,21 +282,21 @@ void main() {
       expect(find.text('Phở chay'), findsOneWidget);
     });
 
-    phoneTest('bấm thẻ món mở màn chi tiết món (tạm), bấm Back quay lại',
+    phoneTest('bấm thẻ món mở màn chi tiết món , bấm Back quay lại',
         (WidgetTester tester) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Phở'));
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
+      expect(find.text('Bàn ăn cho món này'), findsOneWidget);
       expect(find.text('Phở'), findsNWidgets(2)); // tiêu đề AppBar + tên món
       expect(find.text('Nước dùng thơm, bánh phở mềm, một tô thật ấm bụng.'),
           findsOneWidget);
 
       await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsNothing);
+      expect(find.text('Bàn ăn cho món này'), findsNothing);
       expect(find.text('Chọn món để lên kèo'), findsOneWidget);
     });
 
@@ -307,7 +307,7 @@ void main() {
 
       await tester.tap(find.text('Tìm bàn ăn').first);
       await tester.pumpAndSettle();
-      expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
+      expect(find.text('Bàn ăn cho món này'), findsOneWidget);
     });
 
     phoneTest('thẻ món không đọc lặp tên món và không đọc emoji',

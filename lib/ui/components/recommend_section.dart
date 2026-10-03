@@ -165,7 +165,8 @@ class _RecommendSectionState extends State<RecommendSection> {
           child: DishCard(
             dish: _dishes[i],
             onTap: () => openDishDetail(context, _dishes[i]),
-            onFindTable: () => openDishDetail(context, _dishes[i]),
+            onFindTable: () =>
+                openDishDetail(context, _dishes[i], scrollToTables: true),
           ),
         ),
       ),

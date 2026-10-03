@@ -1,5 +1,6 @@
 import '../data/models/enums.dart';
 import '../data/repositories/table_repository.dart';
+import 'formatters.dart';
 
 // Toàn bộ chuỗi chữ của giao diện nằm ở file này. QUY TẮC: không viết cứng chữ
 // trong widget; thêm một StrKey mới thì phải thêm cả bản VI và bản EN
@@ -30,12 +31,11 @@ enum StrKey {
   exploreTitle,
   exploreSubtitle,
   searchHint,
-  filterByCategory,
-  all,
   dishesEmpty,
   dishesError,
   retry,
   findTable,
+  dishDetailPending,
   catNoodles,
   catSavoryCakes,
   catRolls,
@@ -43,6 +43,32 @@ enum StrKey {
   catHotpot,
   catSnacks,
   catDrinks,
+  // Bảng "Bộ lọc & giờ ăn"
+  filterTitle,
+  filterMealTime,
+  mealMorning,
+  mealNoon,
+  mealAfternoon,
+  mealEvening,
+  mealLateNight,
+  filterRadius,
+  filterTimeWindow,
+  filterFrom,
+  filterTo,
+  filterAnyTime,
+  filterTimeNote,
+  filterDate,
+  today,
+  tomorrow,
+  weekdayMon,
+  weekdayTue,
+  weekdayWed,
+  weekdayThu,
+  weekdayFri,
+  weekdaySat,
+  weekdaySun,
+  filterApply,
+  filterReset,
   // Bàn ăn
   tablesTitle,
   tablesSubtitle,
@@ -102,13 +128,12 @@ const Map<StrKey, String> viStrings = {
   StrKey.exploreTitle: 'Chọn món để lên kèo',
   StrKey.exploreSubtitle: 'Chọn món → Xem quán và giờ hẹn → Xác nhận tham gia.',
   StrKey.searchHint: 'Tìm món ăn…',
-  StrKey.filterByCategory: 'Lọc theo danh mục',
-  StrKey.all: 'Tất cả',
   StrKey.dishesEmpty: 'Không tìm thấy món phù hợp.',
   StrKey.dishesError:
       'Không tải được danh sách món. Kiểm tra mạng rồi thử lại nhé.',
   StrKey.retry: 'Thử lại',
   StrKey.findTable: 'Tìm bàn ăn',
+  StrKey.dishDetailPending: 'Chi tiết món: chưa có thiết kế.',
   StrKey.catNoodles: 'Bún & mì',
   StrKey.catSavoryCakes: 'Bánh mặn',
   StrKey.catRolls: 'Cuốn & bánh',
@@ -116,6 +141,31 @@ const Map<StrKey, String> viStrings = {
   StrKey.catHotpot: 'Món lẩu',
   StrKey.catSnacks: 'Ăn vặt',
   StrKey.catDrinks: 'Đồ uống',
+  StrKey.filterTitle: 'Bộ lọc & giờ ăn',
+  StrKey.filterMealTime: 'Buổi ăn',
+  StrKey.mealMorning: 'Sáng',
+  StrKey.mealNoon: 'Trưa',
+  StrKey.mealAfternoon: 'Xế',
+  StrKey.mealEvening: 'Tối',
+  StrKey.mealLateNight: 'Khuya',
+  StrKey.filterRadius: 'Bán kính tới quán',
+  StrKey.filterTimeWindow: 'Khung giờ',
+  StrKey.filterFrom: 'Từ',
+  StrKey.filterTo: 'Đến',
+  StrKey.filterAnyTime: 'Bất kỳ',
+  StrKey.filterTimeNote: 'Giờ Việt Nam · 30–120 phút · khung 15 phút',
+  StrKey.filterDate: 'Ngày',
+  StrKey.today: 'Hôm nay',
+  StrKey.tomorrow: 'Ngày mai',
+  StrKey.weekdayMon: 'T2',
+  StrKey.weekdayTue: 'T3',
+  StrKey.weekdayWed: 'T4',
+  StrKey.weekdayThu: 'T5',
+  StrKey.weekdayFri: 'T6',
+  StrKey.weekdaySat: 'T7',
+  StrKey.weekdaySun: 'CN',
+  StrKey.filterApply: 'Áp dụng',
+  StrKey.filterReset: 'Đặt lại',
   StrKey.tablesTitle: 'Bàn còn chỗ',
   StrKey.tablesSubtitle: 'Chọn điểm hẹn tại quán và giờ ăn phù hợp.',
   StrKey.chooseArea: 'Chọn khu vực',
@@ -176,13 +226,12 @@ const Map<StrKey, String> enStrings = {
   StrKey.exploreSubtitle:
       'Pick a dish → See venues and times → Confirm to join.',
   StrKey.searchHint: 'Search dishes…',
-  StrKey.filterByCategory: 'Filter by category',
-  StrKey.all: 'All',
   StrKey.dishesEmpty: 'No matching dishes found.',
   StrKey.dishesError:
       "Couldn't load the dishes. Check your connection and try again.",
   StrKey.retry: 'Try again',
   StrKey.findTable: 'Find a table',
+  StrKey.dishDetailPending: 'Dish details: no design yet.',
   StrKey.catNoodles: 'Noodles',
   StrKey.catSavoryCakes: 'Savory cakes',
   StrKey.catRolls: 'Rolls & pancakes',
@@ -190,6 +239,31 @@ const Map<StrKey, String> enStrings = {
   StrKey.catHotpot: 'Hot pot',
   StrKey.catSnacks: 'Snacks',
   StrKey.catDrinks: 'Drinks',
+  StrKey.filterTitle: 'Filters & meal time',
+  StrKey.filterMealTime: 'Meal time',
+  StrKey.mealMorning: 'Morning',
+  StrKey.mealNoon: 'Noon',
+  StrKey.mealAfternoon: 'Afternoon',
+  StrKey.mealEvening: 'Evening',
+  StrKey.mealLateNight: 'Late night',
+  StrKey.filterRadius: 'Distance to venue',
+  StrKey.filterTimeWindow: 'Time window',
+  StrKey.filterFrom: 'From',
+  StrKey.filterTo: 'To',
+  StrKey.filterAnyTime: 'Any',
+  StrKey.filterTimeNote: 'Vietnam time · 30–120 min · 15-minute steps',
+  StrKey.filterDate: 'Date',
+  StrKey.today: 'Today',
+  StrKey.tomorrow: 'Tomorrow',
+  StrKey.weekdayMon: 'Mon',
+  StrKey.weekdayTue: 'Tue',
+  StrKey.weekdayWed: 'Wed',
+  StrKey.weekdayThu: 'Thu',
+  StrKey.weekdayFri: 'Fri',
+  StrKey.weekdaySat: 'Sat',
+  StrKey.weekdaySun: 'Sun',
+  StrKey.filterApply: 'Apply',
+  StrKey.filterReset: 'Reset',
   StrKey.tablesTitle: 'Tables with seats',
   StrKey.tablesSubtitle: 'Choose a venue and a time that suit you.',
   StrKey.chooseArea: 'Choose area',
@@ -248,6 +322,30 @@ class Strings {
     return key == null ? category : call(key);
   }
 
+  // Nhãn buổi ăn: Sáng, Trưa, Xế, Tối, Khuya.
+  String mealTimeLabel(MealTime meal) {
+    return call(switch (meal) {
+      MealTime.morning => StrKey.mealMorning,
+      MealTime.noon => StrKey.mealNoon,
+      MealTime.afternoon => StrKey.mealAfternoon,
+      MealTime.evening => StrKey.mealEvening,
+      MealTime.lateNight => StrKey.mealLateNight,
+    });
+  }
+
+  // Nhãn ngày kèm ngày thực tế: "Hôm nay · 05/10", "Ngày mai · 06/10", "T4 · 07/10".
+  String dayLabel(DateTime date, DateTime today) {
+    final String name;
+    if (isSameDay(date, today)) {
+      name = call(StrKey.today);
+    } else if (isSameDay(date, today.add(const Duration(days: 1)))) {
+      name = call(StrKey.tomorrow);
+    } else {
+      name = call(_weekdayKeys[date.weekday - 1]);
+    }
+    return '$name · ${formatDayMonth(date)}';
+  }
+
   // Thông báo cho từng lý do lỗi khi thao tác với bàn.
   String tableError(TableError error) {
     return call(switch (error) {
@@ -265,6 +363,17 @@ class Strings {
     });
   }
 }
+
+// Thứ trong tuần theo DateTime.weekday (1 = thứ Hai ... 7 = Chủ nhật).
+const _weekdayKeys = [
+  StrKey.weekdayMon,
+  StrKey.weekdayTue,
+  StrKey.weekdayWed,
+  StrKey.weekdayThu,
+  StrKey.weekdayFri,
+  StrKey.weekdaySat,
+  StrKey.weekdaySun,
+];
 
 // Dữ liệu món lưu tên danh mục bằng tiếng Việt; bảng này nối sang khoá chuỗi.
 const _categoryKeys = <String, StrKey>{

@@ -74,7 +74,8 @@ class AppState extends ChangeNotifier {
   User? _currentUser; // null = khách ghé chơi
   var _signingIn = false;
 
-  // Bộ lọc theo ngày/khung giờ (không thuộc AppSettings vì không cần nhớ giữa các lần mở app)
+  // Bộ lọc theo ngày/khung giờ (không thuộc AppSettings vì không cần nhớ giữa các lần mở app).
+  // _date == null nghĩa là "Hôm nay".
   DateTime? _date;
   int? _fromMinute;
   int? _toMinute;
@@ -153,11 +154,73 @@ class AppState extends ChangeNotifier {
 
   // ---------- Bộ lọc bàn ----------
 
+  static const defaultRadiusM = 1000; // mặc định 1 km
+
   MealTime? get mealTime => _settings.mealTime;
   int get radiusM => _settings.radiusM;
-  DateTime? get date => _date;
   int? get fromMinute => _fromMinute;
   int? get toMinute => _toMinute;
+
+  // Ngày lọc. Chưa chọn thì là "Hôm nay" (mục 4.8 SPEC), tính theo đồng hồ `now`
+  // nên qua nửa đêm vẫn đúng.
+  DateTime get date => _date ?? _dateOnly(now());
+
+  // true khi đang dùng ngày mặc định "Hôm nay".
+  bool get isDateDefault => _date == null;
+
+  // Có bộ lọc nào khác mặc định không (để tô sáng nút lọc).
+  bool get hasActiveFilters =>
+      mealTime != null ||
+      radiusM != defaultRadiusM ||
+      _date != null ||
+      _fromMinute != null ||
+      _toMinute != null;
+
+  static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  // Kiểm tra giá trị bộ lọc; ném ArgumentError nếu sai.
+  static void _validate(int radiusM, int? fromMinute, int? toMinute) {
+    if (!radiusOptionsM.contains(radiusM)) {
+      throw ArgumentError.value(
+          radiusM, 'radiusM', 'phải là một trong $radiusOptionsM');
+    }
+    for (final m in [fromMinute, toMinute]) {
+      if (m != null && (m < 0 || m > 1439)) {
+        throw ArgumentError.value(m, 'minute', 'phải trong 0–1439');
+      }
+    }
+    if (fromMinute != null && toMinute != null && fromMinute > toMinute) {
+      throw ArgumentError('Giờ bắt đầu phải trước giờ kết thúc');
+    }
+  }
+
+  // Đặt cả bộ lọc trong một lần (nút "Áp dụng" của bảng lọc), chỉ báo thay đổi một lần.
+  // date null hoặc đúng hôm nay = ngày mặc định.
+  void applyFilters({
+    MealTime? mealTime,
+    required int radiusM,
+    DateTime? date,
+    int? fromMinute,
+    int? toMinute,
+  }) {
+    _validate(radiusM, fromMinute, toMinute);
+    _settings = _settings.copyWith(
+      radiusM: radiusM,
+      mealTime: mealTime,
+      clearMealTime: mealTime == null,
+    );
+    _date = _storedDate(date);
+    _fromMinute = fromMinute;
+    _toMinute = toMinute;
+    notifyListeners();
+  }
+
+  // Hôm nay lưu là null để "Hôm nay" luôn đúng, không bị cũ sau nửa đêm.
+  DateTime? _storedDate(DateTime? date) {
+    if (date == null) return null;
+    final d = _dateOnly(date);
+    return d == _dateOnly(now()) ? null : d;
+  }
 
   // null = bỏ lọc theo buổi ăn.
   void setMealTime(MealTime? mealTime) {
@@ -168,29 +231,20 @@ class AppState extends ChangeNotifier {
   }
 
   void setRadius(int radiusM) {
-    if (!radiusOptionsM.contains(radiusM)) {
-      throw ArgumentError.value(radiusM, 'radiusM', 'phải là một trong $radiusOptionsM');
-    }
+    _validate(radiusM, _fromMinute, _toMinute);
     _settings = _settings.copyWith(radiusM: radiusM);
     notifyListeners();
   }
 
-  // Chỉ giữ phần ngày; null = bỏ lọc theo ngày.
+  // Chỉ giữ phần ngày; null (hoặc hôm nay) = ngày mặc định.
   void setDate(DateTime? date) {
-    _date = date == null ? null : DateTime(date.year, date.month, date.day);
+    _date = _storedDate(date);
     notifyListeners();
   }
 
   // Khung giờ trong ngày, tính bằng phút (0–1439). null = không giới hạn đầu đó.
   void setTimeWindow({int? fromMinute, int? toMinute}) {
-    for (final m in [fromMinute, toMinute]) {
-      if (m != null && (m < 0 || m > 1439)) {
-        throw ArgumentError.value(m, 'minute', 'phải trong 0–1439');
-      }
-    }
-    if (fromMinute != null && toMinute != null && fromMinute > toMinute) {
-      throw ArgumentError('Giờ bắt đầu phải trước giờ kết thúc');
-    }
+    _validate(radiusM, fromMinute, toMinute);
     _fromMinute = fromMinute;
     _toMinute = toMinute;
     notifyListeners();
@@ -198,7 +252,7 @@ class AppState extends ChangeNotifier {
 
   // Đặt lại bộ lọc về mặc định. Giữ nguyên ngôn ngữ và khu vực đã chọn.
   void resetFilters() {
-    _settings = _settings.copyWith(clearMealTime: true, radiusM: 1000);
+    _settings = _settings.copyWith(clearMealTime: true, radiusM: defaultRadiusM);
     _date = null;
     _fromMinute = null;
     _toMinute = null;
@@ -210,7 +264,7 @@ class AppState extends ChangeNotifier {
         areaId: _settings.selectedAreaId,
         dishId: dishId,
         mealTime: _settings.mealTime,
-        date: _date,
+        date: date,
         fromMinute: _fromMinute,
         toMinute: _toMinute,
         radiusM: _settings.radiusM,

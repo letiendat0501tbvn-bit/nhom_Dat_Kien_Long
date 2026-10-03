@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/dish.dart';
+import '../../data/models/enums.dart';
 import '../../data/repositories/dish_repository.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
+import '../screens/dish_detail_screen.dart';
 import '../theme/app_theme.dart';
 import 'dish_card.dart';
+import 'filter_sheet.dart';
 
 // Khối "ô tìm kiếm + nút lọc + lưới món 2 cột", dùng chung cho màn Khám phá và Bàn ăn.
 // Không tự cuộn: đặt bên trong một widget cuộn của màn hình cha.
+// Tìm kiếm không phân biệt dấu; buổi ăn trong bảng lọc lọc món theo mealTimes.
 class DishPicker extends StatefulWidget {
   // repository: truyền vào khi test; mặc định lấy từ AppState.
   const DishPicker({super.key, this.repository});
@@ -26,39 +30,46 @@ class _DishPickerState extends State<DishPicker> {
   late final DishRepository _repository = widget.repository ??
       AppScope.of(context, listen: false).dishRepository;
   String _query = '';
-  String? _category; // null = tất cả
   var _status = _Status.loading;
   var _dishes = <Dish>[];
-  var _categories = <String>[];
   var _requestId = 0; // bỏ kết quả của lần gọi cũ khi người dùng gõ tiếp
+  var _started = false;
+  MealTime? _mealTime; // buổi ăn đã dùng cho lần tải gần nhất
 
+  // Tải lần đầu, và tải lại khi buổi ăn trong bộ lọc đổi.
   @override
-  void initState() {
-    super.initState();
-    _load();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final meal = AppScope.of(context).mealTime;
+    if (!_started || meal != _mealTime) {
+      _started = true;
+      _mealTime = meal;
+      _load();
+    }
   }
 
   Future<void> _load() async {
     final id = ++_requestId;
     setState(() => _status = _Status.loading);
     try {
-      final categoriesFuture = _categories.isEmpty
-          ? _repository.getCategories()
-          : Future.value(_categories);
-      final (dishes, categories) = await (
-        _repository.getDishes(query: _query, category: _category),
-        categoriesFuture,
-      ).wait;
+      final dishes =
+          await _repository.getDishes(query: _query, mealTime: _mealTime);
       if (!mounted || id != _requestId) return;
       setState(() {
         _dishes = dishes;
-        _categories = categories;
         _status = _Status.ready;
       });
     } catch (_) {
       if (!mounted || id != _requestId) return;
       setState(() => _status = _Status.error);
     }
+  }
+
+  // Tạm thời mở màn chi tiết món (chưa có thiết kế); danh sách bàn theo món làm ở GĐ D.
+  void _openDish(Dish dish) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => DishDetailScreen(dish: dish)),
+    );
   }
 
   @override
@@ -71,7 +82,7 @@ class _DishPickerState extends State<DishPicker> {
           children: [
             Expanded(child: _searchBox(t)),
             const SizedBox(width: 10),
-            _filterButton(t),
+            _filterButton(t, active: context.appState.hasActiveFilters),
           ],
         ),
         const SizedBox(height: 16),
@@ -105,7 +116,11 @@ class _DishPickerState extends State<DishPicker> {
                   mainAxisExtent: itemWidth * 3 / 4 + 100,
                 ),
                 itemCount: _dishes.length,
-                itemBuilder: (_, i) => DishCard(dish: _dishes[i]),
+                itemBuilder: (_, i) => DishCard(
+                  dish: _dishes[i],
+                  onTap: () => _openDish(_dishes[i]),
+                  onFindTable: () => _openDish(_dishes[i]),
+                ),
               );
             },
           ),
@@ -158,38 +173,36 @@ class _DishPickerState extends State<DishPicker> {
         borderSide: BorderSide(color: color),
       );
 
-  // Nút lọc danh mục: bấm để chọn danh mục
-  Widget _filterButton(Strings t) {
-    return PopupMenuButton<String?>(
-      tooltip: t(StrKey.filterByCategory),
-      onSelected: (v) {
-        _category = v;
-        _load();
-      },
-      itemBuilder: (_) => [
-        PopupMenuItem<String?>(value: null, child: Text(t(StrKey.all))),
-        for (final c in _categories)
-          PopupMenuItem<String?>(value: c, child: Text(t.categoryLabel(c))),
-      ],
-      child: Container(
-        height: 52,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: _category == null ? Colors.white : AppColors.selectedBg,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: _category == null
-                ? const Color(0x1F000000)
-                : AppColors.primary,
+  // Nút mở bảng "Bộ lọc & giờ ăn". Tô sáng khi đang có bộ lọc khác mặc định.
+  Widget _filterButton(Strings t, {required bool active}) {
+    return Semantics(
+      button: true,
+      label: t(StrKey.filterTitle),
+      excludeSemantics: true,
+      child: Material(
+        color: active ? AppColors.selectedBg : Colors.white,
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: active ? AppColors.primary : const Color(0x1F000000),
           ),
         ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.tune),
-            SizedBox(width: 4),
-            Icon(Icons.keyboard_arrow_down, size: 20),
-          ],
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: () => showFilterSheet(context),
+          child: const SizedBox(
+            height: 52,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.tune),
+                  SizedBox(width: 4),
+                  Icon(Icons.keyboard_arrow_down, size: 20),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

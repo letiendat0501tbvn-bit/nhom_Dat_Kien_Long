@@ -111,6 +111,8 @@ class AppBottomBar extends StatelessWidget {
             ),
             Text(
               t(labelKey),
+              maxLines: 1, // nhãn dài (ví dụ bản EN) không được xuống dòng làm tràn
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
                 color: color,

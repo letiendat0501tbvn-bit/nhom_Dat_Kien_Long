@@ -14,6 +14,12 @@ const minDurationMin = 30;
 const maxDurationMin = 120;
 const slotMinutes = 15; // khung 15 phút
 
+// Các mốc giờ trong ngày theo bước 15 phút (phút tính từ 00:00), nằm trong [min, max].
+List<int> timeSlots({int min = 0, int max = 1439}) => [
+      for (var m = 0; m < 24 * 60; m += slotMinutes)
+        if (m >= min && m <= max) m,
+    ];
+
 // Buổi ăn theo giờ bắt đầu: Sáng 05–10, Trưa 11–13, Xế 14–16, Tối 17–21, Khuya 22–04.
 MealTime mealTimeOfHour(int hour) {
   if (hour >= 5 && hour <= 10) return MealTime.morning;

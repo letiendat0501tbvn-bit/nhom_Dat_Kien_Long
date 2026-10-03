@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:giua_ki_app/data/mock/mock_support.dart';
 import 'package:giua_ki_app/data/models/app_settings.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
 import 'package:giua_ki_app/data/models/user.dart';
@@ -154,7 +155,7 @@ void main() {
       final q = app.tableQuery();
       expect(q.areaId, isNull);
       expect(q.mealTime, isNull);
-      expect(q.date, isNull);
+      expect(q.date, DateTime(2026, 10, 5)); // mặc định "Hôm nay"
       expect(q.fromMinute, isNull);
       expect(q.toMinute, isNull);
       expect(q.radiusM, 1000);
@@ -195,13 +196,14 @@ void main() {
       expect(app.toMinute, isNull);
     });
 
-    test('bỏ lọc buổi ăn và ngày bằng null', () {
+    test('bỏ lọc buổi ăn bằng null, ngày null trở về hôm nay', () {
       app.setMealTime(MealTime.noon);
       app.setDate(DateTime(2026, 10, 6));
       app.setMealTime(null);
       app.setDate(null);
       expect(app.mealTime, isNull);
-      expect(app.date, isNull);
+      expect(app.date, DateTime(2026, 10, 5));
+      expect(app.isDateDefault, isTrue);
     });
 
     test('resetFilters đặt lại bộ lọc nhưng giữ ngôn ngữ và khu vực', () {
@@ -216,9 +218,11 @@ void main() {
 
       expect(app.mealTime, isNull);
       expect(app.radiusM, 1000);
-      expect(app.date, isNull);
+      expect(app.date, DateTime(2026, 10, 5));
+      expect(app.isDateDefault, isTrue);
       expect(app.fromMinute, isNull);
       expect(app.toMinute, isNull);
+      expect(app.hasActiveFilters, isFalse);
       expect(app.language, AppLanguage.en);
       expect(app.selectedAreaId, 'hn-hoan-kiem');
     });
@@ -235,6 +239,108 @@ void main() {
       for (final t in afternoon) {
         expect(t.startAt.hour, inInclusiveRange(14, 16));
       }
+    });
+  });
+
+  group('ngày lọc mặc định là "Hôm nay"', () {
+    test('lúc đầu là hôm nay theo đồng hồ truyền vào', () {
+      expect(app.isDateDefault, isTrue);
+      expect(app.date, DateTime(2026, 10, 5));
+    });
+
+    test('chọn đúng hôm nay (dù kèm giờ) vẫn là ngày mặc định', () {
+      app.setDate(DateTime(2026, 10, 5, 18, 45));
+      expect(app.isDateDefault, isTrue);
+      expect(app.hasActiveFilters, isFalse);
+    });
+
+    test('chọn ngày khác thì không còn là mặc định', () {
+      app.setDate(DateTime(2026, 10, 6));
+      expect(app.isDateDefault, isFalse);
+      expect(app.date, DateTime(2026, 10, 6));
+      expect(app.hasActiveFilters, isTrue);
+    });
+
+    test('ngày mặc định đi theo đồng hồ, qua nửa đêm vẫn là "hôm nay"', () {
+      var current = DateTime(2026, 10, 5, 23, 50);
+      final a = AppState.mock(now: () => current, latency: noLatency);
+      addTearDown(a.dispose);
+      expect(a.date, DateTime(2026, 10, 5));
+      current = DateTime(2026, 10, 6, 0, 10);
+      expect(a.date, DateTime(2026, 10, 6));
+    });
+
+    test('ngày đã chọn rõ ràng thì không bị đổi theo đồng hồ', () {
+      var current = DateTime(2026, 10, 5, 10);
+      final a = AppState.mock(now: () => current, latency: noLatency);
+      addTearDown(a.dispose);
+      a.setDate(DateTime(2026, 10, 7));
+      current = DateTime(2026, 10, 6, 9);
+      expect(a.date, DateTime(2026, 10, 7));
+    });
+  });
+
+  group('applyFilters (nút Áp dụng)', () {
+    test('đặt cả bộ lọc trong một lần và chỉ báo thay đổi một lần', () {
+      final n = countNotifications(
+        app,
+        () => app.applyFilters(
+          mealTime: MealTime.evening,
+          radiusM: 500,
+          date: DateTime(2026, 10, 6),
+          fromMinute: 17 * 60,
+          toMinute: 21 * 60,
+        ),
+      );
+      expect(n, 1);
+      expect(app.mealTime, MealTime.evening);
+      expect(app.radiusM, 500);
+      expect(app.date, DateTime(2026, 10, 6));
+      expect(app.fromMinute, 1020);
+      expect(app.toMinute, 1260);
+      expect(app.hasActiveFilters, isTrue);
+    });
+
+    test('mealTime null bỏ lọc buổi ăn đã đặt trước đó', () {
+      app.setMealTime(MealTime.noon);
+      app.applyFilters(radiusM: 1000);
+      expect(app.mealTime, isNull);
+      expect(app.hasActiveFilters, isFalse);
+    });
+
+    test('giá trị sai thì ném lỗi và KHÔNG đổi gì', () {
+      app.applyFilters(mealTime: MealTime.noon, radiusM: 500);
+      var n = 0;
+      app.addListener(() => n++);
+
+      expect(() => app.applyFilters(radiusM: 2000), throwsArgumentError);
+      expect(
+        () => app.applyFilters(radiusM: 100, fromMinute: 700, toMinute: 600),
+        throwsArgumentError,
+      );
+      expect(() => app.applyFilters(radiusM: 100, toMinute: 2000), throwsArgumentError);
+
+      expect(n, 0);
+      expect(app.mealTime, MealTime.noon);
+      expect(app.radiusM, 500);
+    });
+
+    test('giữ nguyên ngôn ngữ và khu vực', () {
+      app.setLanguage(AppLanguage.en);
+      app.selectArea('hcm-q1');
+      app.applyFilters(mealTime: MealTime.morning, radiusM: 100);
+      expect(app.language, AppLanguage.en);
+      expect(app.selectedAreaId, 'hcm-q1');
+    });
+
+    test('hasActiveFilters bật khi khác mặc định ở bất kỳ mục nào', () {
+      expect(app.hasActiveFilters, isFalse);
+      app.setRadius(500);
+      expect(app.hasActiveFilters, isTrue);
+      app.setRadius(1000);
+      expect(app.hasActiveFilters, isFalse);
+      app.setTimeWindow(toMinute: 600);
+      expect(app.hasActiveFilters, isTrue);
     });
   });
 

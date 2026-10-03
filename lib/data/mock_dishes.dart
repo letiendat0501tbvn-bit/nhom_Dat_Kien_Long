@@ -1,3 +1,4 @@
+import 'logic/text_search.dart';
 import 'mock/mock_support.dart';
 import 'models/dish.dart';
 import 'models/enums.dart';
@@ -294,9 +295,9 @@ class MockDishRepository implements DishRepository {
     MealTime? mealTime,
   }) async {
     await Future<void>.delayed(latency());
-    final q = query.trim().toLowerCase();
     return _dishes.where((d) {
-      final okName = q.isEmpty || d.name.toLowerCase().contains(q);
+      // Không phân biệt dấu/hoa thường: "pho" ra "Phở", "banh xeo" ra "Bánh xèo"
+      final okName = matchesQuery(d.name, query);
       final okCategory = category == null || d.category == category;
       final okMeal = mealTime == null || d.mealTimes.contains(mealTime);
       return okName && okCategory && okMeal;

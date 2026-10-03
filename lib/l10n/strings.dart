@@ -36,6 +36,38 @@ enum StrKey {
   retry,
   findTable,
   dishDetailPending,
+  seeAllDishes, // có {n}
+  allDishesTitle,
+  // Gợi ý cho bạn
+  suggestTitle,
+  suggestSubtitle,
+  tabTaste,
+  tabMood,
+  tabHot,
+  suggestPickTaste,
+  suggestPickMood,
+  tasteSpicy,
+  tasteGrilled,
+  tasteVegetarian,
+  tasteNoodleSoup,
+  tasteRice,
+  tasteSeafood,
+  tasteSweet,
+  tasteCoffee,
+  moodCozy,
+  moodLight,
+  moodSocial,
+  moodEnergetic,
+  moodSweetTooth,
+  moodRefreshing,
+  // Gói trọn hương vị ba miền
+  regionsTitle,
+  regionsSubtitle,
+  regionsMore,
+  regionHanoi,
+  regionCentral,
+  regionSaigonNight,
+  regionThreeRegions,
   catNoodles,
   catSavoryCakes,
   catRolls,
@@ -134,6 +166,37 @@ const Map<StrKey, String> viStrings = {
   StrKey.retry: 'Thử lại',
   StrKey.findTable: 'Tìm bàn ăn',
   StrKey.dishDetailPending: 'Chi tiết món: chưa có thiết kế.',
+  StrKey.seeAllDishes: 'Xem tất cả {n} món ngon',
+  StrKey.allDishesTitle: 'Tất cả món ngon',
+  StrKey.suggestTitle: 'Gợi ý cho bạn',
+  StrKey.suggestSubtitle:
+      'Chọn theo khẩu vị, tâm trạng hoặc xem món đang được thèm.',
+  StrKey.tabTaste: 'Hợp vị',
+  StrKey.tabMood: 'Tâm trạng',
+  StrKey.tabHot: 'Đang hot',
+  StrKey.suggestPickTaste: 'Chọn một khẩu vị để xem món gợi ý.',
+  StrKey.suggestPickMood: 'Chọn một tâm trạng để xem món gợi ý.',
+  StrKey.tasteSpicy: 'Cay tê',
+  StrKey.tasteGrilled: 'Thịt nướng',
+  StrKey.tasteVegetarian: 'Chay thanh đạm',
+  StrKey.tasteNoodleSoup: 'Sợi / Nước dùng',
+  StrKey.tasteRice: 'Cơm dẻo',
+  StrKey.tasteSeafood: 'Hải sản',
+  StrKey.tasteSweet: 'Chè ngọt',
+  StrKey.tasteCoffee: 'Cà phê đậm',
+  StrKey.moodCozy: 'Ấm bụng',
+  StrKey.moodLight: 'Nhẹ nhàng',
+  StrKey.moodSocial: 'Tụ tập',
+  StrKey.moodEnergetic: 'Cần năng lượng',
+  StrKey.moodSweetTooth: 'Thèm ngọt',
+  StrKey.moodRefreshing: 'Giải nhiệt',
+  StrKey.regionsTitle: 'Gói trọn hương vị ba miền',
+  StrKey.regionsSubtitle: 'Không chỉ là ăn ngon, mà còn là câu chuyện văn hoá.',
+  StrKey.regionsMore: 'Khám phá thêm món Việt',
+  StrKey.regionHanoi: 'Hà Nội',
+  StrKey.regionCentral: 'Miền Trung',
+  StrKey.regionSaigonNight: 'Sài Gòn đêm',
+  StrKey.regionThreeRegions: 'Hương vị ba miền',
   StrKey.catNoodles: 'Bún & mì',
   StrKey.catSavoryCakes: 'Bánh mặn',
   StrKey.catRolls: 'Cuốn & bánh',
@@ -187,8 +250,7 @@ const Map<StrKey, String> viStrings = {
   StrKey.reportsSent: 'Báo cáo đã gửi',
   StrKey.blockList: 'Danh sách chặn',
   StrKey.loginTitle: 'Vào hội thôi!',
-  StrKey.loginBody:
-      'Đăng nhập để xem thành viên, tham gia bàn và trò chuyện. Đăng nhập không tự tham gia hay mở bàn.',
+  StrKey.loginBody: 'Đăng nhập để xem thành viên, tham gia bàn và trò chuyện. Đăng nhập không tự tham gia hay mở bàn.',
   StrKey.continueWithGoogle: 'Tiếp tục với Google',
   StrKey.loginNote: 'Không cần mật khẩu. Chỉ cần một chiếc bụng đói.',
   StrKey.privacyPolicy: 'Chính sách quyền riêng tư',
@@ -200,8 +262,7 @@ const Map<StrKey, String> viStrings = {
   StrKey.errTableCancelled: 'Bàn này đã bị huỷ.',
   StrKey.errTableEnded: 'Bàn này đã kết thúc.',
   StrKey.errTableOverlap: 'Bạn đã có một bàn khác trùng khung giờ này.',
-  StrKey.errTableInvalidTime:
-      'Giờ chưa hợp lệ: phải ở tương lai, theo bước 15 phút, kéo dài 30–120 phút.',
+  StrKey.errTableInvalidTime: 'Giờ chưa hợp lệ: phải ở tương lai, theo bước 15 phút, kéo dài 30–120 phút.',
   StrKey.errTableInvalidCapacity: 'Số chỗ phải từ 2 đến 8.',
   StrKey.errTableAlreadyMember: 'Bạn đã ở trong bàn này rồi.',
   StrKey.errTableNotMember: 'Bạn không ở trong bàn này.',
@@ -232,6 +293,37 @@ const Map<StrKey, String> enStrings = {
   StrKey.retry: 'Try again',
   StrKey.findTable: 'Find a table',
   StrKey.dishDetailPending: 'Dish details: no design yet.',
+  StrKey.seeAllDishes: 'See all {n} dishes',
+  StrKey.allDishesTitle: 'All dishes',
+  StrKey.suggestTitle: 'Picks for you',
+  StrKey.suggestSubtitle:
+      'Pick by taste, by mood, or see what everyone is craving.',
+  StrKey.tabTaste: 'By taste',
+  StrKey.tabMood: 'By mood',
+  StrKey.tabHot: 'Trending',
+  StrKey.suggestPickTaste: 'Pick a taste to see suggested dishes.',
+  StrKey.suggestPickMood: 'Pick a mood to see suggested dishes.',
+  StrKey.tasteSpicy: 'Spicy & numbing',
+  StrKey.tasteGrilled: 'Grilled meat',
+  StrKey.tasteVegetarian: 'Light & vegetarian',
+  StrKey.tasteNoodleSoup: 'Noodles & broth',
+  StrKey.tasteRice: 'Fluffy rice',
+  StrKey.tasteSeafood: 'Seafood',
+  StrKey.tasteSweet: 'Sweet desserts',
+  StrKey.tasteCoffee: 'Strong coffee',
+  StrKey.moodCozy: 'Warm & cozy',
+  StrKey.moodLight: 'Light & easy',
+  StrKey.moodSocial: 'Hanging out',
+  StrKey.moodEnergetic: 'Need energy',
+  StrKey.moodSweetTooth: 'Sweet tooth',
+  StrKey.moodRefreshing: 'Cool down',
+  StrKey.regionsTitle: 'Flavors of three regions',
+  StrKey.regionsSubtitle: 'More than good food, a story of culture.',
+  StrKey.regionsMore: 'Discover more Vietnamese dishes',
+  StrKey.regionHanoi: 'Hanoi',
+  StrKey.regionCentral: 'Central Vietnam',
+  StrKey.regionSaigonNight: 'Saigon at night',
+  StrKey.regionThreeRegions: 'Tastes of every region',
   StrKey.catNoodles: 'Noodles',
   StrKey.catSavoryCakes: 'Savory cakes',
   StrKey.catRolls: 'Rolls & pancakes',
@@ -269,7 +361,8 @@ const Map<StrKey, String> enStrings = {
   StrKey.chooseArea: 'Choose area',
   StrKey.chooseAreaHint: 'Use your location to find meeting spots nearby.',
   StrKey.profileTitle: 'Your profile',
-  StrKey.profileSubtitle: 'Tables, private feedback, reports and your block list.',
+  StrKey.profileSubtitle:
+      'Tables, private feedback, reports and your block list.',
   StrKey.tabMyTables: 'My tables',
   StrKey.tabAccount: 'Account',
   StrKey.myTablesHeading: 'Your tables',
@@ -284,8 +377,7 @@ const Map<StrKey, String> enStrings = {
   StrKey.reportsSent: 'Reports sent',
   StrKey.blockList: 'Block list',
   StrKey.loginTitle: "Let's get in!",
-  StrKey.loginBody:
-      'Sign in to see members, join tables and chat. Signing in never joins or opens a table for you.',
+  StrKey.loginBody: 'Sign in to see members, join tables and chat. Signing in never joins or opens a table for you.',
   StrKey.continueWithGoogle: 'Continue with Google',
   StrKey.loginNote: 'No password needed. Just an empty stomach.',
   StrKey.privacyPolicy: 'Privacy Policy',
@@ -297,8 +389,7 @@ const Map<StrKey, String> enStrings = {
   StrKey.errTableCancelled: 'This table was cancelled.',
   StrKey.errTableEnded: 'This table has ended.',
   StrKey.errTableOverlap: 'You already have another table at this time.',
-  StrKey.errTableInvalidTime:
-      'Invalid time: it must be in the future, on a 15-minute step, lasting 30–120 minutes.',
+  StrKey.errTableInvalidTime: 'Invalid time: it must be in the future, on a 15-minute step, lasting 30–120 minutes.',
   StrKey.errTableInvalidCapacity: 'Seats must be between 2 and 8.',
   StrKey.errTableAlreadyMember: "You're already at this table.",
   StrKey.errTableNotMember: "You're not at this table.",
@@ -315,6 +406,41 @@ class Strings {
       language == AppLanguage.vi ? viStrings : enStrings;
 
   String call(StrKey key) => _table[key] ?? key.name;
+
+  // Chuỗi có chỗ trống dạng {n}: seeAll(56) -> "Xem tất cả 56 món ngon".
+  String seeAllDishesLabel(int count) =>
+      call(StrKey.seeAllDishes).replaceAll('{n}', '$count');
+
+  // Nhãn khẩu vị và tâm trạng (chip ở mục "Gợi ý cho bạn").
+  String tasteLabel(Taste taste) {
+    return call(switch (taste) {
+      Taste.spicy => StrKey.tasteSpicy,
+      Taste.grilled => StrKey.tasteGrilled,
+      Taste.vegetarian => StrKey.tasteVegetarian,
+      Taste.noodleSoup => StrKey.tasteNoodleSoup,
+      Taste.rice => StrKey.tasteRice,
+      Taste.seafood => StrKey.tasteSeafood,
+      Taste.sweet => StrKey.tasteSweet,
+      Taste.coffee => StrKey.tasteCoffee,
+    });
+  }
+
+  String moodLabel(Mood mood) {
+    return call(switch (mood) {
+      Mood.cozy => StrKey.moodCozy,
+      Mood.light => StrKey.moodLight,
+      Mood.social => StrKey.moodSocial,
+      Mood.energetic => StrKey.moodEnergetic,
+      Mood.sweetTooth => StrKey.moodSweetTooth,
+      Mood.refreshing => StrKey.moodRefreshing,
+    });
+  }
+
+  // Tên vùng ở dải "ba miền" (dữ liệu lưu tiếng Việt). Vùng lạ giữ nguyên.
+  String regionLabel(String region) {
+    final key = _regionKeys[region];
+    return key == null ? region : call(key);
+  }
 
   // Tên danh mục món đã dịch. Danh mục lạ (không có trong bảng) giữ nguyên.
   String categoryLabel(String category) {
@@ -374,6 +500,14 @@ const _weekdayKeys = [
   StrKey.weekdaySat,
   StrKey.weekdaySun,
 ];
+
+// Dữ liệu món lưu tên vùng bằng tiếng Việt; bảng này nối sang khoá chuỗi.
+const _regionKeys = <String, StrKey>{
+  'Hà Nội': StrKey.regionHanoi,
+  'Miền Trung': StrKey.regionCentral,
+  'Sài Gòn đêm': StrKey.regionSaigonNight,
+  'Hương vị ba miền': StrKey.regionThreeRegions,
+};
 
 // Dữ liệu món lưu tên danh mục bằng tiếng Việt; bảng này nối sang khoá chuỗi.
 const _categoryKeys = <String, StrKey>{

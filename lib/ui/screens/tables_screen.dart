@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../components/dish_picker.dart';
+import 'all_dishes_screen.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
 
@@ -25,9 +26,8 @@ class TablesScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _AreaCard(
             // Chưa có chức năng chọn khu vực, sẽ làm ở giai đoạn D
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(t(StrKey.notBuiltYet))),
-            ),
+            onPressed: () => ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(t(StrKey.notBuiltYet)))),
           ),
           const SizedBox(height: 28),
           SectionHeading(
@@ -35,7 +35,10 @@ class TablesScreen extends StatelessWidget {
             subtitle: t(StrKey.exploreSubtitle),
           ),
           const SizedBox(height: 16),
-          const DishPicker(),
+          DishPicker(
+            maxItems: dishPreviewCount,
+            onSeeAll: () => openAllDishes(context),
+          ),
         ],
       ),
     );
@@ -68,8 +71,11 @@ class _AreaCard extends StatelessWidget {
               color: AppColors.selectedBg,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.location_on_outlined,
-                color: AppColors.primary, size: 28),
+            child: const Icon(
+              Icons.location_on_outlined,
+              color: AppColors.primary,
+              size: 28,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -78,7 +84,10 @@ class _AreaCard extends StatelessWidget {
               children: [
                 Text(
                   t(StrKey.chooseArea),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(

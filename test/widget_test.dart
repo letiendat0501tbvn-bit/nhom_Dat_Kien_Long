@@ -3,47 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:giua_ki_app/data/mock/mock_support.dart';
 import 'package:giua_ki_app/data/mock_dishes.dart';
-import 'package:giua_ki_app/data/models/dish.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
-import 'package:giua_ki_app/data/repositories/dish_repository.dart';
 import 'package:giua_ki_app/main.dart';
 import 'package:giua_ki_app/state/app_state.dart';
+import 'package:giua_ki_app/ui/components/dish_card.dart';
 import 'package:giua_ki_app/ui/components/dish_picker.dart';
 import 'package:giua_ki_app/ui/screens/profile_screen.dart';
 
 import 'test_helpers.dart';
-
-// Repository giả luôn báo lỗi, để thử trạng thái lỗi + nút "Thử lại".
-class _FailingDishRepository implements DishRepository {
-  int calls = 0;
-
-  @override
-  Future<List<Dish>> getDishes({
-    String query = '',
-    String? category,
-    MealTime? mealTime,
-  }) async {
-    calls++;
-    throw Exception('Không có mạng');
-  }
-
-  @override
-  Future<Dish?> getDish(String id) async => null;
-
-  @override
-  Future<List<String>> getCategories() async => const [];
-}
-
-// Giống testWidgets nhưng với khung nhìn cỡ điện thoại (412x915), để thanh dưới
-// không che mất nội dung như ở khung 800x600 mặc định của test.
-void phoneTest(String description, Future<void> Function(WidgetTester) body) {
-  testWidgets(description, (tester) async {
-    tester.view.physicalSize = const Size(412, 915);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-    await body(tester);
-  });
-}
 
 void main() {
   testWidgets('Bottom bar switches tabs', (WidgetTester tester) async {
@@ -100,8 +67,8 @@ void main() {
     await tester.pumpWidget(const MyApp());
     expect(find.text('Chọn món để lên kèo'), findsOneWidget);
 
-    // Vừa mở: đang tải, chưa có món
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // Vừa mở: đang tải (khối chọn món và dải ba miền), chưa có món
+    expect(find.byType(CircularProgressIndicator), findsWidgets);
     expect(find.text('Phở'), findsNothing);
 
     await tester.pumpAndSettle();
@@ -115,7 +82,7 @@ void main() {
   });
 
   testWidgets('DishPicker shows error and retries', (WidgetTester tester) async {
-    final repo = _FailingDishRepository();
+    final repo = FakeDishRepository(fail: true);
     await tester.pumpWidget(wrapWithApp(DishPicker(repository: repo)));
     await tester.pumpAndSettle();
 
@@ -343,12 +310,17 @@ void main() {
       expect(find.text('Chi tiết món: chưa có thiết kế.'), findsOneWidget);
     });
 
-    phoneTest('thẻ món có ảnh placeholder gắn nhãn tên món cho trình đọc màn hình',
+    phoneTest('thẻ món không đọc lặp tên món và không đọc emoji',
         (WidgetTester tester) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
       final semantics = tester.ensureSemantics(); // bật cây ngữ nghĩa trong test
-      expect(find.bySemanticsLabel(RegExp('Phở')), findsWidgets);
+
+      final label = tester.getSemantics(find.byType(DishCard).first).label;
+      expect('Phở'.allMatches(label).length, 1, reason: label); // tên món đúng một lần
+      expect(label, isNot(contains('🍜')), reason: label); // emoji không bị đọc
+      expect(label, contains('Bún & mì')); // nhãn danh mục vẫn được đọc
+
       semantics.dispose();
     });
   });

@@ -13,8 +13,12 @@ class DishImage extends StatelessWidget {
     this.radius = 24,
     this.emojiSize = 64,
     this.overlay,
+    this.excludeFromSemantics = false,
   });
 
+  // excludeFromSemantics: true khi ảnh nằm cạnh tên món (như trong thẻ món) để trình
+  // đọc màn hình không đọc lặp tên; ảnh đứng một mình thì giữ nhãn là tên món.
+  final bool excludeFromSemantics;
   final Dish dish;
   final double aspectRatio;
   final double radius;
@@ -31,19 +35,44 @@ class DishImage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Semantics(
-              image: true,
-              label: dish.name,
-              excludeSemantics: true,
+              image: !excludeFromSemantics,
+              label: excludeFromSemantics ? null : dish.name,
+              excludeSemantics: true, // luôn bỏ emoji khỏi trình đọc màn hình
               child: ColoredBox(
                 color: Color(dish.tint),
                 child: Center(
-                  child: Text(dish.emoji, style: TextStyle(fontSize: emojiSize)),
+                  child: Text(
+                    dish.emoji,
+                    style: TextStyle(fontSize: emojiSize),
+                  ),
                 ),
               ),
             ),
             ?overlay,
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Nhãn viên thuốc trắng đặt ở góc ảnh (nhãn danh mục, nhãn vùng...).
+class ImageLabel extends StatelessWidget {
+  const ImageLabel(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }

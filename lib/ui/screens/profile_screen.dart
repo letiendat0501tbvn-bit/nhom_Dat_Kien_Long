@@ -4,6 +4,7 @@ import '../../data/models/user.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../components/login_sheet.dart';
+import '../components/pill_tabs.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
 
@@ -11,7 +12,11 @@ import '../theme/app_theme.dart';
 // Tab Lịch hẹn ở thanh dưới mở tab 0, tab Tôi mở tab 1.
 // Tab hiện tại do MainShell giữ (controlled) để thanh dưới luôn đồng bộ.
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key, required this.tab, required this.onTabChanged});
+  const ProfileScreen({
+    super.key,
+    required this.tab,
+    required this.onTabChanged,
+  });
 
   final int tab; // 0: Bàn của tôi, 1: Tài khoản
   final ValueChanged<int> onTabChanged;
@@ -49,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   subtitle: t(StrKey.profileSubtitle),
                 ),
                 const SizedBox(height: 20),
-                _TabSwitcher(
+                PillTabs(
                   labels: [t(StrKey.tabMyTables), t(StrKey.tabAccount)],
                   selected: _tab,
                   onChanged: widget.onTabChanged,
@@ -170,7 +175,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       user.displayName,
                       style: const TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       user.email,
@@ -223,61 +230,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-// Thanh chuyển tab dạng viên thuốc; mục đang chọn là nút trắng nổi lên.
-class _TabSwitcher extends StatelessWidget {
-  const _TabSwitcher({
-    required this.labels,
-    required this.selected,
-    required this.onChanged,
-  });
-
-  final List<String> labels;
-  final int selected;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: const Color(0x1F000000)),
-      ),
-      child: Row(
-        children: [
-          for (var i = 0; i < labels.length; i++)
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onChanged(i),
-                child: Container(
-                  height: 46,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: i == selected ? Colors.white : Colors.transparent,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: i == selected
-                        ? const [BoxShadow(color: Colors.black12, blurRadius: 6)]
-                        : null,
-                  ),
-                  child: Text(
-                    labels[i],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: i == selected
-                          ? AppColors.text
-                          : AppColors.text.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 // Khối thương hiệu ở cuối trang, ngay trên thanh dưới (như trong ảnh).
 class _BrandFooter extends StatelessWidget {
   const _BrandFooter();
@@ -300,13 +252,19 @@ class _BrandFooter extends StatelessWidget {
               const CircleAvatar(
                 radius: 16,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.ramen_dining,
-                    size: 18, color: AppColors.primary),
+                child: Icon(
+                  Icons.ramen_dining,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
                 t(StrKey.appName),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

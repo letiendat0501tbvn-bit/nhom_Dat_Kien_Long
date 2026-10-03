@@ -61,6 +61,61 @@ void main() {
     });
   });
 
+  group('nhãn khẩu vị, tâm trạng, vùng và "Xem tất cả"', () {
+    test('mỗi khẩu vị có nhãn riêng ở cả hai ngôn ngữ, khác nhau giữa VI và EN', () {
+      const vi = Strings(AppLanguage.vi);
+      const en = Strings(AppLanguage.en);
+      expect(Taste.values.map(vi.tasteLabel), [
+        'Cay tê',
+        'Thịt nướng',
+        'Chay thanh đạm',
+        'Sợi / Nước dùng',
+        'Cơm dẻo',
+        'Hải sản',
+        'Chè ngọt',
+        'Cà phê đậm',
+      ]);
+      expect(Taste.values.map(en.tasteLabel).toSet().length, Taste.values.length);
+      for (final taste in Taste.values) {
+        expect(en.tasteLabel(taste), isNot(vi.tasteLabel(taste)), reason: taste.name);
+      }
+    });
+
+    test('mỗi tâm trạng có nhãn riêng ở cả hai ngôn ngữ', () {
+      const vi = Strings(AppLanguage.vi);
+      const en = Strings(AppLanguage.en);
+      expect(Mood.values.map(vi.moodLabel).toSet().length, Mood.values.length);
+      expect(Mood.values.map(en.moodLabel).toSet().length, Mood.values.length);
+      for (final mood in Mood.values) {
+        expect(en.moodLabel(mood), isNot(vi.moodLabel(mood)), reason: mood.name);
+      }
+    });
+
+    test('regionLabel dịch 4 vùng, vùng lạ giữ nguyên', () {
+      const vi = Strings(AppLanguage.vi);
+      const en = Strings(AppLanguage.en);
+      expect(vi.regionLabel('Hà Nội'), 'Hà Nội');
+      expect(en.regionLabel('Hà Nội'), 'Hanoi');
+      expect(en.regionLabel('Miền Trung'), 'Central Vietnam');
+      expect(en.regionLabel('Sài Gòn đêm'), 'Saigon at night');
+      expect(en.regionLabel('Hương vị ba miền'), 'Tastes of every region');
+      expect(en.regionLabel('Vùng lạ'), 'Vùng lạ');
+    });
+
+    test('seeAllDishesLabel thay số vào chỗ trống', () {
+      const vi = Strings(AppLanguage.vi);
+      const en = Strings(AppLanguage.en);
+      expect(vi.seeAllDishesLabel(56), 'Xem tất cả 56 món ngon');
+      expect(en.seeAllDishesLabel(56), 'See all 56 dishes');
+      expect(vi.seeAllDishesLabel(0), 'Xem tất cả 0 món ngon');
+    });
+
+    test('khoá có chỗ trống {n} ở cả hai ngôn ngữ', () {
+      expect(viStrings[StrKey.seeAllDishes], contains('{n}'));
+      expect(enStrings[StrKey.seeAllDishes], contains('{n}'));
+    });
+  });
+
   group('nhãn danh mục', () {
     test('dịch 7 danh mục, danh mục lạ giữ nguyên', () {
       const vi = Strings(AppLanguage.vi);

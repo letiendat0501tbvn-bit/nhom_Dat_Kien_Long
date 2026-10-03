@@ -37,7 +37,10 @@ class DishDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(dish.description, style: const TextStyle(fontSize: 16, height: 1.4)),
+          Text(
+            dish.description,
+            style: const TextStyle(fontSize: 16, height: 1.4),
+          ),
           const SizedBox(height: 24),
           Text(
             t(StrKey.dishDetailPending),
@@ -47,4 +50,11 @@ class DishDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// Mở màn chi tiết món. Dùng chung cho thẻ món ở mọi nơi.
+void openDishDetail(BuildContext context, Dish dish) {
+  Navigator.of(
+    context,
+  ).push(MaterialPageRoute<void>(builder: (_) => DishDetailScreen(dish: dish)));
 }

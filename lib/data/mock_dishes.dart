@@ -8,23 +8,23 @@ import 'repositories/dish_repository.dart';
 // Bánh xèo, Cơm tấm, Mì Quảng, Lẩu, Ốc, Bún chả) lấy theo web gốc; các món còn lại
 // là mô tả TỰ SOẠN. Sau này thay bằng API/Firebase chỉ cần viết lớp Repository khác.
 
-// Khẩu vị (trùng các chip ở mục "Gợi ý cho bạn")
-const _cay = 'Cay tê';
-const _nuong = 'Thịt nướng';
-const _chay = 'Chay thanh đạm';
-const _soi = 'Sợi / Nước dùng';
-const _com = 'Cơm dẻo';
-const _hai = 'Hải sản';
-const _che = 'Chè ngọt';
-const _cf = 'Cà phê đậm';
+// Khẩu vị (ứng với 8 chip ở mục "Gợi ý cho bạn")
+const _cay = Taste.spicy;
+const _nuong = Taste.grilled;
+const _chay = Taste.vegetarian;
+const _soi = Taste.noodleSoup;
+const _com = Taste.rice;
+const _hai = Taste.seafood;
+const _che = Taste.sweet;
+const _cf = Taste.coffee;
 
 // Tâm trạng
-const _am = 'Ấm bụng';
-const _nhe = 'Nhẹ nhàng';
-const _tu = 'Tụ tập';
-const _nangLuong = 'Cần năng lượng';
-const _ngot = 'Thèm ngọt';
-const _giai = 'Giải nhiệt';
+const _am = Mood.cozy;
+const _nhe = Mood.light;
+const _tu = Mood.social;
+const _nangLuong = Mood.energetic;
+const _ngot = Mood.sweetTooth;
+const _giai = Mood.refreshing;
 
 // Màu nền ảnh tạm theo danh mục
 const _tints = <String, int>{
@@ -67,8 +67,8 @@ Dish _dish(
   String description,
   String emoji, {
   String? group,
-  List<String> tastes = const [],
-  List<String> moods = const [],
+  List<Taste> tastes = const [],
+  List<Mood> moods = const [],
   String meals = '',
   bool hot = false,
   String? region,
@@ -91,7 +91,7 @@ Dish _dish(
   );
 }
 
-final List<Dish> kMockDishes = [
+final List<Dish> _dishCatalog = [
   // ---------- Bún & mì (14) ----------
   _dish('pho', 'Phở', 'Bún & mì',
       'Nước dùng thơm, bánh phở mềm, một tô thật ấm bụng.', '🍜',
@@ -280,6 +280,27 @@ final List<Dish> kMockDishes = [
       tastes: [], moods: [_giai, _nhe], meals: 'XO'),
 ];
 
+// Thứ tự hiển thị: 9 món đã biết đứng đầu theo thứ tự ở ảnh thiết kế và SPEC
+// (Phở, Bánh mì chảo, Bún bò Huế, Bánh xèo, ...), các món còn lại giữ nguyên thứ tự
+// khai báo. Màn Khám phá chỉ hiện 8 món đầu nên thứ tự này cần khớp thiết kế.
+const _featuredOrder = [
+  'pho',
+  'banh-mi-chao',
+  'bun-bo-hue',
+  'banh-xeo',
+  'com-tam',
+  'mi-quang',
+  'lau',
+  'oc',
+  'bun-cha',
+];
+
+final List<Dish> kMockDishes = [
+  for (final id in _featuredOrder) _dishCatalog.firstWhere((d) => d.id == id),
+  for (final d in _dishCatalog)
+    if (!_featuredOrder.contains(d.id)) d,
+];
+
 // Bản mock của DishRepository: dữ liệu trong bộ nhớ, có độ trễ giả.
 class MockDishRepository implements DishRepository {
   MockDishRepository({this.latency = randomLatency, List<Dish>? dishes})
@@ -293,6 +314,9 @@ class MockDishRepository implements DishRepository {
     String query = '',
     String? category,
     MealTime? mealTime,
+    Taste? taste,
+    Mood? mood,
+    bool onlyTrending = false,
   }) async {
     await Future<void>.delayed(latency());
     return _dishes.where((d) {
@@ -300,8 +324,24 @@ class MockDishRepository implements DishRepository {
       final okName = matchesQuery(d.name, query);
       final okCategory = category == null || d.category == category;
       final okMeal = mealTime == null || d.mealTimes.contains(mealTime);
-      return okName && okCategory && okMeal;
+      final okTaste = taste == null || d.tastes.contains(taste);
+      final okMood = mood == null || d.moods.contains(mood);
+      final okTrending = !onlyTrending || d.isTrending;
+      return okName && okCategory && okMeal && okTaste && okMood && okTrending;
     }).toList();
+  }
+
+  // Thứ tự các thẻ ở dải "ba miền": Bắc, Trung, Sài Gòn đêm, rồi "ba miền".
+  static const _regionalOrder = ['bun-cha', 'mi-quang', 'oc', 'banh-xeo'];
+
+  @override
+  Future<List<Dish>> getRegionalDishes() async {
+    await Future<void>.delayed(latency());
+    return [
+      for (final id in _regionalOrder)
+        for (final d in _dishes)
+          if (d.id == id && d.region != null) d,
+    ];
   }
 
   @override

@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../components/dish_picker.dart';
+import '../components/recommend_section.dart';
+import '../components/region_section.dart';
 import '../components/section_heading.dart';
+import 'all_dishes_screen.dart';
 
-// Màn Khám phá: tiêu đề + khối chọn món (tìm kiếm, lọc, lưới 2 cột).
+// Màn Khám phá (mục 4.1 SPEC): chọn món (tìm kiếm, lọc, lưới 2 cột, "Xem tất cả"),
+// Gợi ý cho bạn, Gói trọn hương vị ba miền.
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
 
@@ -22,7 +26,14 @@ class ExploreScreen extends StatelessWidget {
             subtitle: t(StrKey.exploreSubtitle),
           ),
           const SizedBox(height: 16),
-          const DishPicker(),
+          DishPicker(
+            maxItems: dishPreviewCount,
+            onSeeAll: () => openAllDishes(context),
+          ),
+          const SizedBox(height: 32),
+          const RecommendSection(),
+          const SizedBox(height: 32),
+          RegionSection(onMore: () => openAllDishes(context)),
         ],
       ),
     );

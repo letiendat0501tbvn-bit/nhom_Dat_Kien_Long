@@ -28,8 +28,8 @@ class Dish {
   final int tint; // màu nền ảnh tạm (ARGB)
 
   final String group; // nhóm ở khối giới thiệu: Món nước & sợi, ...
-  final List<String> tastes; // khẩu vị: cay tê, thịt nướng, ...
-  final List<String> moods; // tâm trạng
+  final List<Taste> tastes; // khẩu vị
+  final List<Mood> moods; // tâm trạng
   final String? region; // vùng, dùng cho mục "ba miền"
   final String? hashtag; // ví dụ #HanoiClassic
   final bool isTrending; // tab "Đang hot"

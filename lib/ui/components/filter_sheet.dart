@@ -8,6 +8,7 @@ import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../../state/app_state.dart';
 import '../theme/app_theme.dart';
+import 'option_chips.dart';
 
 // Bảng "Bộ lọc & giờ ăn" (mục 4.8 SPEC): buổi ăn, bán kính, khung giờ, ngày.
 // Người dùng chỉnh trên bản nháp; bấm "Áp dụng" mới ghi vào AppState.
@@ -55,12 +56,12 @@ class _FilterSheetState extends State<_FilterSheet> {
       minute == null ? null : minute - minute % slotMinutes;
 
   void _reset() => setState(() {
-        _meal = null;
-        _radius = AppState.defaultRadiusM;
-        _date = _today;
-        _from = null;
-        _to = null;
-      });
+    _meal = null;
+    _radius = AppState.defaultRadiusM;
+    _date = _today;
+    _from = null;
+    _to = null;
+  });
 
   void _apply() {
     _app.applyFilters(
@@ -95,7 +96,7 @@ class _FilterSheetState extends State<_FilterSheet> {
               children: [
                 _Section(
                   title: t(StrKey.filterMealTime),
-                  child: _OptionChips<MealTime>(
+                  child: OptionChips<MealTime>(
                     options: [
                       for (final m in MealTime.values) (m, t.mealTimeLabel(m)),
                     ],
@@ -106,7 +107,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ),
                 _Section(
                   title: t(StrKey.filterRadius),
-                  child: _OptionChips<int>(
+                  child: OptionChips<int>(
                     options: [
                       for (final r in radiusOptionsM) (r, formatRadius(r)),
                     ],
@@ -157,7 +158,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ),
                 _Section(
                   title: t(StrKey.filterDate),
-                  child: _OptionChips<DateTime>(
+                  child: OptionChips<DateTime>(
                     // 7 ngày kể từ hôm nay
                     options: [
                       for (var i = 0; i < 7; i++)
@@ -249,52 +250,6 @@ class _Section extends StatelessWidget {
   }
 }
 
-// Hàng chip chọn một giá trị. allowClear: bấm lại chip đang chọn thì bỏ chọn (null).
-class _OptionChips<T> extends StatelessWidget {
-  const _OptionChips({
-    required this.options,
-    required this.selected,
-    required this.onChanged,
-    this.allowClear = false,
-  });
-
-  final List<(T, String)> options;
-  final T? selected;
-  final ValueChanged<T?> onChanged;
-  final bool allowClear;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final (value, label) in options)
-          ChoiceChip(
-            label: Text(label),
-            selected: value == selected,
-            showCheckmark: false,
-            backgroundColor: Colors.white,
-            selectedColor: AppColors.selectedBg,
-            shape: StadiumBorder(
-              side: BorderSide(
-                color: value == selected
-                    ? AppColors.primary
-                    : const Color(0x1F000000),
-              ),
-            ),
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: value == selected ? AppColors.primary : AppColors.text,
-            ),
-            onSelected: (_) =>
-                onChanged(allowClear && value == selected ? null : value),
-          ),
-      ],
-    );
-  }
-}
-
 // Ô chọn giờ theo bước 15 phút, có lựa chọn "Bất kỳ" (null).
 class _TimeDropdown extends StatelessWidget {
   const _TimeDropdown({
@@ -329,7 +284,10 @@ class _TimeDropdown extends StatelessWidget {
           items: [
             DropdownMenuItem<int?>(value: null, child: Text(anyLabel)),
             for (final m in slots)
-              DropdownMenuItem<int?>(value: m, child: Text(formatMinuteOfDay(m))),
+              DropdownMenuItem<int?>(
+                value: m,
+                child: Text(formatMinuteOfDay(m)),
+              ),
           ],
           onChanged: onChanged,
         ),

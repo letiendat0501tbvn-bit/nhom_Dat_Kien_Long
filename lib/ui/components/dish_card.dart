@@ -28,10 +28,11 @@ class DishCard extends StatelessWidget {
           children: [
             DishImage(
               dish: dish,
+              excludeFromSemantics: true, // tên món đã có ngay bên dưới
               overlay: Positioned(
                 top: 8,
                 left: 8,
-                child: _CategoryLabel(t.categoryLabel(dish.category)),
+                child: ImageLabel(t.categoryLabel(dish.category)),
               ),
             ),
             const SizedBox(height: 8),
@@ -55,7 +56,7 @@ class DishCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: AppColors.text.withValues(alpha: 0.7),
                     ),
                   ),
@@ -91,28 +92,6 @@ class DishCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Nhãn danh mục (viên thuốc trắng) ở góc ảnh.
-class _CategoryLabel extends StatelessWidget {
-  const _CategoryLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }

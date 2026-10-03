@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
+import '../../data/models/area.dart';
 import '../theme/app_theme.dart';
+import 'area_sheet.dart';
 
 // Thanh trên cùng dùng chung: logo | vị trí hoặc tên app | EN | xúc xắc | hồ sơ.
 class AppTopBar extends StatelessWidget {
@@ -39,7 +41,11 @@ class AppTopBar extends StatelessWidget {
             child: Icon(Icons.ramen_dining, color: AppColors.primary),
           ),
           const SizedBox(width: 8),
-          Expanded(child: showLocation ? _locationButton(t) : _title(t)),
+          Expanded(
+            child: showLocation
+                ? _locationButton(context, t, app.selectedArea)
+                : _title(t),
+          ),
           const SizedBox(width: 8),
           // Nút đổi ngôn ngữ: hiện mã của ngôn ngữ sẽ chuyển sang
           _circleButton(
@@ -77,12 +83,13 @@ class AppTopBar extends StatelessWidget {
     );
   }
 
-  // Nút viên thuốc: ghim + "Chọn vị trí" + mũi tên xổ xuống
-  Widget _locationButton(Strings t) {
+  // Nút viên thuốc: ghim + tên khu vực đã chọn (hoặc "Chọn vị trí") + mũi tên xổ xuống.
+  // Bấm vào mở bảng chọn khu vực.
+  Widget _locationButton(BuildContext context, Strings t, Area? area) {
     return Align(
       alignment: Alignment.centerLeft,
       child: InkWell(
-        onTap: onLocationTap,
+        onTap: onLocationTap ?? () => showAreaSheet(context),
         borderRadius: BorderRadius.circular(24),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -99,7 +106,7 @@ class AppTopBar extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  t(StrKey.chooseLocation),
+                  area?.district ?? t(StrKey.chooseLocation),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.w600),

@@ -48,6 +48,18 @@ bool tablesOverlap(DiningTable a, DiningTable b) =>
 bool isActive(DiningTable t) =>
     t.status == TableStatus.open || t.status == TableStatus.full;
 
+// Trạng thái nút ở thẻ bàn: Tham gia / Đã đầy / Đã tham gia.
+enum TableJoinState { canJoin, full, joined }
+
+// Đã ở trong bàn thì luôn là "Đã tham gia" (kể cả bàn đã đầy); chưa tham gia mà
+// hết chỗ thì "Đã đầy"; còn lại là "Tham gia". Khách (userId == null) chưa bao giờ "đã tham gia".
+TableJoinState joinStateOf(DiningTable table, String? userId) {
+  if (userId != null && table.memberIds.contains(userId)) {
+    return TableJoinState.joined;
+  }
+  return table.isFull ? TableJoinState.full : TableJoinState.canJoin;
+}
+
 // Bàn đã bắt đầu (hoặc đã qua) thì không tham gia/rời được nữa.
 bool hasStarted(DiningTable t, DateTime now) => !t.startAt.isAfter(now);
 

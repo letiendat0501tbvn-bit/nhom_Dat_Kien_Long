@@ -101,6 +101,30 @@ enum StrKey {
   weekdaySun,
   filterApply,
   filterReset,
+  // Chọn vị trí / khu vực
+  areaSheetTitle,
+  areaSheetBody,
+  allowLocation,
+  maybeLater,
+  areaOrChoose,
+  areaCenterNote,
+  locationComingSoon,
+  areaClear,
+  changeArea,
+  // Danh sách bàn và nút tham gia
+  tablesError,
+  tablesEmpty,
+  seeTomorrow,
+  seeToday,
+  widenRadius, // có {radius}
+  joinTable,
+  tableFull,
+  tableJoined,
+  seatsLeft, // có {left}, {total}
+  seatsFull, // có {total}
+  noDishChosen,
+  joinSuccess,
+  joinFailed,
   // Bàn ăn
   tablesTitle,
   tablesSubtitle,
@@ -229,6 +253,30 @@ const Map<StrKey, String> viStrings = {
   StrKey.weekdaySun: 'CN',
   StrKey.filterApply: 'Áp dụng',
   StrKey.filterReset: 'Đặt lại',
+  StrKey.areaSheetTitle: 'Vị trí của bạn',
+  StrKey.areaSheetBody:
+      'Cho phép vị trí để tìm điểm hẹn tại quán gần đây. Vị trí không được dùng để ghép người và không hiển thị cho người khác.',
+  StrKey.allowLocation: 'Cho phép vị trí',
+  StrKey.maybeLater: 'Để sau',
+  StrKey.areaOrChoose: 'Hoặc chọn khu vực',
+  StrKey.areaCenterNote: 'Dùng tâm khu vực đã chọn để tìm kiếm.',
+  StrKey.locationComingSoon: 'Tính năng này sẽ có ở bản sau.',
+  StrKey.areaClear: 'Bỏ chọn khu vực',
+  StrKey.changeArea: 'Đổi',
+  StrKey.tablesError:
+      'Không tải được danh sách bàn. Kiểm tra mạng rồi thử lại nhé.',
+  StrKey.tablesEmpty: 'Chưa có bàn nào quanh đây. Mở bàn mới nhé?',
+  StrKey.seeTomorrow: 'Xem ngày mai',
+  StrKey.seeToday: 'Xem hôm nay',
+  StrKey.widenRadius: 'Nới bán kính lên {radius}',
+  StrKey.joinTable: 'Tham gia',
+  StrKey.tableFull: 'Đã đầy',
+  StrKey.tableJoined: 'Đã tham gia',
+  StrKey.seatsLeft: 'Còn {left}/{total} chỗ',
+  StrKey.seatsFull: 'Đủ {total}/{total} chỗ',
+  StrKey.noDishChosen: 'Chưa chọn món',
+  StrKey.joinSuccess: 'Đã tham gia bàn. Hẹn gặp bạn tại quán!',
+  StrKey.joinFailed: 'Chưa tham gia được bàn. Thử lại nhé.',
   StrKey.tablesTitle: 'Bàn còn chỗ',
   StrKey.tablesSubtitle: 'Chọn điểm hẹn tại quán và giờ ăn phù hợp.',
   StrKey.chooseArea: 'Chọn khu vực',
@@ -356,6 +404,30 @@ const Map<StrKey, String> enStrings = {
   StrKey.weekdaySun: 'Sun',
   StrKey.filterApply: 'Apply',
   StrKey.filterReset: 'Reset',
+  StrKey.areaSheetTitle: 'Your location',
+  StrKey.areaSheetBody:
+      'Allow location to find nearby meeting spots. Your location is never used to match people and is never shown to others.',
+  StrKey.allowLocation: 'Allow location',
+  StrKey.maybeLater: 'Not now',
+  StrKey.areaOrChoose: 'Or choose an area',
+  StrKey.areaCenterNote: "We'll search around the center of the area you pick.",
+  StrKey.locationComingSoon: 'This feature will be available in a later version.',
+  StrKey.areaClear: 'Clear area',
+  StrKey.changeArea: 'Change',
+  StrKey.tablesError:
+      "Couldn't load the tables. Check your connection and try again.",
+  StrKey.tablesEmpty: 'No tables around here yet. Why not open a new one?',
+  StrKey.seeTomorrow: 'See tomorrow',
+  StrKey.seeToday: 'See today',
+  StrKey.widenRadius: 'Widen radius to {radius}',
+  StrKey.joinTable: 'Join',
+  StrKey.tableFull: 'Full',
+  StrKey.tableJoined: 'Joined',
+  StrKey.seatsLeft: '{left}/{total} seats left',
+  StrKey.seatsFull: '{total}/{total} seats taken',
+  StrKey.noDishChosen: 'No dish chosen yet',
+  StrKey.joinSuccess: "You're in! See you at the table.",
+  StrKey.joinFailed: "Couldn't join the table. Please try again.",
   StrKey.tablesTitle: 'Tables with seats',
   StrKey.tablesSubtitle: 'Choose a venue and a time that suit you.',
   StrKey.chooseArea: 'Choose area',
@@ -406,6 +478,47 @@ class Strings {
       language == AppLanguage.vi ? viStrings : enStrings;
 
   String call(StrKey key) => _table[key] ?? key.name;
+
+  // Điền chỗ trống dạng {tên} trong một chuỗi: fill(StrKey.seatsLeft, {'left': '2', 'total': '4'}).
+  String fill(StrKey key, Map<String, Object> params) {
+    var text = call(key);
+    params.forEach((name, value) => text = text.replaceAll('{$name}', '$value'));
+    return text;
+  }
+
+  // "Còn 2/4 chỗ"; bàn đầy thì "Đủ 4/4 chỗ".
+  String seatsLabel(int left, int total) => left <= 0
+      ? fill(StrKey.seatsFull, {'total': total})
+      : fill(StrKey.seatsLeft, {'left': left, 'total': total});
+
+  // "Nới bán kính lên 10 km".
+  String widenRadiusLabel(int radiusM) =>
+      fill(StrKey.widenRadius, {'radius': formatRadius(radiusM)});
+
+  // Khoảng giờ của bàn theo ngôn ngữ: "11:30–12:30" (VI) hoặc "11:30 AM–12:30 PM" (EN).
+  String timeRange(DateTime start, int durationMin) {
+    final end = start.add(Duration(minutes: durationMin));
+    return '${formatClockTime(start, language)}–${formatClockTime(end, language)}';
+  }
+
+  // Tóm tắt bộ lọc đang dùng, ví dụ "1 km · Hôm nay · 05/10 · Tối · 17:00–21:00".
+  String filterSummary({
+    required int radiusM,
+    required DateTime date,
+    required DateTime today,
+    MealTime? mealTime,
+    int? fromMinute,
+    int? toMinute,
+  }) {
+    final parts = [
+      formatRadius(radiusM),
+      dayLabel(date, today),
+      if (mealTime != null) mealTimeLabel(mealTime),
+      if (fromMinute != null || toMinute != null)
+        '${fromMinute == null ? '' : formatMinuteOfDay(fromMinute)}–${toMinute == null ? '' : formatMinuteOfDay(toMinute)}',
+    ];
+    return parts.join(' · ');
+  }
 
   // Chuỗi có chỗ trống dạng {n}: seeAll(56) -> "Xem tất cả 56 món ngon".
   String seeAllDishesLabel(int count) =>

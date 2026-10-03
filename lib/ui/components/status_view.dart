@@ -17,6 +17,7 @@ class StatusView extends StatelessWidget {
     required this.onRetry,
     required this.builder,
     this.emptyKey = StrKey.dishesEmpty,
+    this.emptyBuilder,
     this.errorKey = StrKey.dishesError,
     this.padding = const EdgeInsets.symmetric(vertical: 40),
   });
@@ -26,6 +27,8 @@ class StatusView extends StatelessWidget {
   final VoidCallback onRetry;
   final WidgetBuilder builder; // dựng nội dung khi có dữ liệu
   final StrKey emptyKey;
+  // Nếu có, dùng thay cho câu rỗng mặc định (để thêm nút hành động).
+  final WidgetBuilder? emptyBuilder;
   final StrKey errorKey;
   final EdgeInsets padding;
 
@@ -58,6 +61,7 @@ class StatusView extends StatelessWidget {
         );
       case LoadStatus.ready:
         if (isEmpty) {
+          if (emptyBuilder != null) return emptyBuilder!(context);
           return Padding(
             padding: padding,
             child: Center(

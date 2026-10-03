@@ -72,6 +72,7 @@ class AppState extends ChangeNotifier {
 
   AppSettings _settings;
   User? _currentUser; // null = khách ghé chơi
+  var _areas = <Area>[];
   var _signingIn = false;
 
   // Bộ lọc theo ngày/khung giờ (không thuộc AppSettings vì không cần nhớ giữa các lần mở app).
@@ -101,11 +102,14 @@ class AppState extends ChangeNotifier {
   bool get isLoggedIn => _currentUser != null;
   bool get isSigningIn => _signingIn;
 
-  // Nạp người dùng đang đăng nhập khi mở app.
+  // Nạp người dùng đang đăng nhập và danh sách khu vực khi mở app.
   Future<void> load() async {
-    final user = await authRepository.getCurrentUser();
-    if (user == _currentUser) return;
+    final (user, areas) = await (
+      authRepository.getCurrentUser(),
+      locationRepository.getAreas(),
+    ).wait;
     _currentUser = user;
+    _areas = areas;
     notifyListeners();
   }
 
@@ -132,6 +136,19 @@ class AppState extends ChangeNotifier {
   // ---------- Khu vực ----------
 
   String? get selectedAreaId => _settings.selectedAreaId;
+
+  // Danh sách khu vực (nạp ở load()); rỗng cho tới khi nạp xong.
+  List<Area> get areas => _areas;
+
+  // Khu vực đang chọn, null nếu chưa chọn (hoặc danh sách khu vực chưa nạp xong).
+  Area? get selectedArea {
+    final id = selectedAreaId;
+    if (id == null) return null;
+    for (final a in _areas) {
+      if (a.id == id) return a;
+    }
+    return null;
+  }
 
   // null = bỏ chọn khu vực.
   void selectArea(String? areaId) {
@@ -164,6 +181,9 @@ class AppState extends ChangeNotifier {
   // Ngày lọc. Chưa chọn thì là "Hôm nay" (mục 4.8 SPEC), tính theo đồng hồ `now`
   // nên qua nửa đêm vẫn đúng.
   DateTime get date => _date ?? _dateOnly(now());
+
+  // Hôm nay (bỏ phần giờ), theo đồng hồ `now`.
+  DateTime get today => _dateOnly(now());
 
   // true khi đang dùng ngày mặc định "Hôm nay".
   bool get isDateDefault => _date == null;

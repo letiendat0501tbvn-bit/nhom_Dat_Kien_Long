@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
 
 // Thanh dưới 5 mục: Khám phá · Bàn ăn · [+] · Lịch hẹn · Tôi.
@@ -17,14 +19,15 @@ class AppBottomBar extends StatelessWidget {
   final VoidCallback onCreate;
 
   static const _items = [
-    (Icons.explore_outlined, 'Khám phá'),
-    (Icons.restaurant_outlined, 'Bàn ăn'),
-    (Icons.calendar_month_outlined, 'Lịch hẹn'),
-    (Icons.person_outline, 'Tôi'),
+    (Icons.explore_outlined, StrKey.tabExplore),
+    (Icons.restaurant_outlined, StrKey.tabTables),
+    (Icons.calendar_month_outlined, StrKey.tabSchedule),
+    (Icons.person_outline, StrKey.tabMe),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return Material(
       color: Colors.white,
       elevation: 8,
@@ -37,11 +40,11 @@ class AppBottomBar extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _tab(0),
-                  _tab(1),
+                  _tab(t, 0),
+                  _tab(t, 1),
                   const Expanded(child: SizedBox()), // chỗ cho nút +
-                  _tab(2),
-                  _tab(3),
+                  _tab(t, 2),
+                  _tab(t, 3),
                 ],
               ),
               // Nút + đỏ tròn nổi ở giữa
@@ -52,7 +55,7 @@ class AppBottomBar extends StatelessWidget {
                 child: Center(
                   child: Semantics(
                     button: true,
-                    label: 'Tạo bàn mới',
+                    label: t(StrKey.createTable),
                     excludeSemantics: true,
                     child: GestureDetector(
                       onTap: onCreate,
@@ -81,10 +84,10 @@ class AppBottomBar extends StatelessWidget {
     );
   }
 
-  Widget _tab(int index) {
+  Widget _tab(Strings t, int index) {
     final selected = index == currentIndex;
     final color = selected ? AppColors.primary : AppColors.text;
-    final (icon, label) = _items[index];
+    final (icon, labelKey) = _items[index];
     return Expanded(
       child: InkWell(
         onTap: () => onTap(index),
@@ -107,7 +110,7 @@ class AppBottomBar extends StatelessWidget {
               child: Icon(icon, color: color),
             ),
             Text(
-              label,
+              t(labelKey),
               style: TextStyle(
                 fontSize: 12,
                 color: color,

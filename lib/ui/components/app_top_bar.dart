@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
 
 // Thanh trên cùng dùng chung: logo | vị trí hoặc tên app | EN | xúc xắc | hồ sơ.
@@ -8,7 +10,6 @@ class AppTopBar extends StatelessWidget {
     super.key,
     this.showLocation = true,
     this.onLocationTap,
-    this.onLanguageTap,
     this.onDiceTap,
     this.onProfileTap,
   });
@@ -16,12 +17,13 @@ class AppTopBar extends StatelessWidget {
   // true: hiện nút "Chọn vị trí"; false: hiện tên app (như màn Hồ sơ).
   final bool showLocation;
   final VoidCallback? onLocationTap;
-  final VoidCallback? onLanguageTap;
   final VoidCallback? onDiceTap;
   final VoidCallback? onProfileTap;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
+    final app = context.appState;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: const BoxDecoration(
@@ -37,24 +39,27 @@ class AppTopBar extends StatelessWidget {
             child: Icon(Icons.ramen_dining, color: AppColors.primary),
           ),
           const SizedBox(width: 8),
-          Expanded(child: showLocation ? _locationButton() : _title()),
+          Expanded(child: showLocation ? _locationButton(t) : _title(t)),
           const SizedBox(width: 8),
-          // Đổi ngôn ngữ và lắc món: sẽ nối chức năng ở các giai đoạn sau
+          // Nút đổi ngôn ngữ: hiện mã của ngôn ngữ sẽ chuyển sang
           _circleButton(
-            label: 'Đổi ngôn ngữ',
-            onTap: onLanguageTap,
-            child: const Text('EN', style: TextStyle(fontWeight: FontWeight.bold)),
+            label: t(StrKey.semLanguage),
+            onTap: app.toggleLanguage,
+            child: Text(
+              languageButtonLabel(app.language),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(width: 8),
           _circleButton(
-            label: 'Lắc món',
+            label: t(StrKey.semDice), // chức năng lắc món: giai đoạn H
             onTap: onDiceTap,
             color: AppColors.accent,
             child: const Icon(Icons.casino_outlined, color: AppColors.text),
           ),
           const SizedBox(width: 8),
           _circleButton(
-            label: 'Hồ sơ',
+            label: t(StrKey.semProfile),
             onTap: onProfileTap,
             child: const Icon(Icons.person_outline),
           ),
@@ -63,17 +68,17 @@ class AppTopBar extends StatelessWidget {
     );
   }
 
-  Widget _title() {
-    return const Text(
-      'Ăn Gì Đây Ta? 👀',
+  Widget _title(Strings t) {
+    return Text(
+      t(StrKey.appNameWithEyes),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     );
   }
 
   // Nút viên thuốc: ghim + "Chọn vị trí" + mũi tên xổ xuống
-  Widget _locationButton() {
+  Widget _locationButton(Strings t) {
     return Align(
       alignment: Alignment.centerLeft,
       child: InkWell(
@@ -86,20 +91,21 @@ class AppTopBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: const Color(0x1F000000)),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.location_on_outlined, color: AppColors.primary, size: 20),
-              SizedBox(width: 4),
+              const Icon(Icons.location_on_outlined,
+                  color: AppColors.primary, size: 20),
+              const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  'Chọn vị trí',
+                  t(StrKey.chooseLocation),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
-              Icon(Icons.keyboard_arrow_down, size: 20),
+              const Icon(Icons.keyboard_arrow_down, size: 20),
             ],
           ),
         ),

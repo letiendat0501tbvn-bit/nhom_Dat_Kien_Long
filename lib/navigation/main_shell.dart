@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/strings.dart';
+import '../state/app_scope.dart';
 import '../ui/components/app_bottom_bar.dart';
 import '../ui/components/app_top_bar.dart';
 import '../ui/screens/explore_screen.dart';
@@ -38,10 +40,13 @@ class _MainShellState extends State<MainShell> {
   void _openCreateTable() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(title: const Text('Tạo bàn mới')),
-          body: const PlaceholderScreen(title: 'Tạo bàn mới'),
-        ),
+        builder: (context) {
+          final title = context.strings(StrKey.createTable);
+          return Scaffold(
+            appBar: AppBar(title: Text(title)),
+            body: PlaceholderScreen(title: title),
+          );
+        },
       ),
     );
   }

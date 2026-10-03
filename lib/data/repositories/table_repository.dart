@@ -26,7 +26,9 @@ class TableQuery {
 enum TableError {
   notFound,
   full,
-  alreadyStarted,
+  alreadyStarted, // bàn còn hiệu lực nhưng đã đến giờ bắt đầu
+  cancelled, // chủ bàn đã huỷ bàn
+  ended, // bàn đã kết thúc
   overlap, // trùng khung giờ với bàn khác của người này
   invalidTime, // quá khứ, sai bước 15 phút hoặc thời lượng ngoài 30–120
   invalidCapacity, // ngoài 2–8 chỗ

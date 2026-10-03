@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../data/mock_dishes.dart';
 import '../../data/models/dish.dart';
 import '../../data/repositories/dish_repository.dart';
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
 import 'dish_card.dart';
 
 // Khối "ô tìm kiếm + nút lọc + lưới món 2 cột", dùng chung cho màn Khám phá và Bàn ăn.
 // Không tự cuộn: đặt bên trong một widget cuộn của màn hình cha.
 class DishPicker extends StatefulWidget {
-  // repository: truyền vào khi test; mặc định dùng dữ liệu mẫu.
+  // repository: truyền vào khi test; mặc định lấy từ AppState.
   const DishPicker({super.key, this.repository});
 
   final DishRepository? repository;
@@ -21,8 +22,9 @@ class DishPicker extends StatefulWidget {
 enum _Status { loading, ready, error }
 
 class _DishPickerState extends State<DishPicker> {
-  late final DishRepository _repository =
-      widget.repository ?? MockDishRepository();
+  // Chỉ lấy repository, không cần dựng lại khi AppState đổi (listen: false).
+  late final DishRepository _repository = widget.repository ??
+      AppScope.of(context, listen: false).dishRepository;
   String _query = '';
   String? _category; // null = tất cả
   var _status = _Status.loading;
@@ -61,14 +63,15 @@ class _DishPickerState extends State<DishPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Expanded(child: _searchBox()),
+            Expanded(child: _searchBox(t)),
             const SizedBox(width: 10),
-            _filterButton(),
+            _filterButton(t),
           ],
         ),
         const SizedBox(height: 16),
@@ -79,12 +82,12 @@ class _DishPickerState extends State<DishPicker> {
             child: Center(child: CircularProgressIndicator()),
           )
         else if (_status == _Status.error)
-          _errorView()
+          _errorView(t)
         else if (_dishes.isEmpty)
           // Trường hợp danh sách rỗng
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(child: Text('Không tìm thấy món phù hợp.')),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 40),
+            child: Center(child: Text(t(StrKey.dishesEmpty))),
           )
         else
           LayoutBuilder(
@@ -111,13 +114,12 @@ class _DishPickerState extends State<DishPicker> {
   }
 
   // Lỗi tải (ví dụ không có mạng): báo và cho thử lại
-  Widget _errorView() {
+  Widget _errorView(Strings t) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
-          const Text('Không tải được danh sách món. Kiểm tra mạng rồi thử lại nhé.',
-              textAlign: TextAlign.center),
+          Text(t(StrKey.dishesError), textAlign: TextAlign.center),
           const SizedBox(height: 12),
           FilledButton(
             onPressed: _load,
@@ -125,7 +127,7 @@ class _DishPickerState extends State<DishPicker> {
               backgroundColor: AppColors.primary,
               shape: const StadiumBorder(),
             ),
-            child: const Text('Thử lại'),
+            child: Text(t(StrKey.retry)),
           ),
         ],
       ),
@@ -133,14 +135,14 @@ class _DishPickerState extends State<DishPicker> {
   }
 
   // Ô tìm kiếm dạng viên thuốc
-  Widget _searchBox() {
+  Widget _searchBox(Strings t) {
     return TextField(
       onChanged: (v) {
         _query = v;
         _load();
       },
       decoration: InputDecoration(
-        hintText: 'Tìm món ăn…',
+        hintText: t(StrKey.searchHint),
         prefixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: Colors.white,
@@ -157,17 +159,17 @@ class _DishPickerState extends State<DishPicker> {
       );
 
   // Nút lọc danh mục: bấm để chọn danh mục
-  Widget _filterButton() {
+  Widget _filterButton(Strings t) {
     return PopupMenuButton<String?>(
-      tooltip: 'Lọc theo danh mục',
+      tooltip: t(StrKey.filterByCategory),
       onSelected: (v) {
         _category = v;
         _load();
       },
       itemBuilder: (_) => [
-        const PopupMenuItem<String?>(value: null, child: Text('Tất cả')),
+        PopupMenuItem<String?>(value: null, child: Text(t(StrKey.all))),
         for (final c in _categories)
-          PopupMenuItem<String?>(value: c, child: Text(c)),
+          PopupMenuItem<String?>(value: c, child: Text(t.categoryLabel(c))),
       ],
       child: Container(
         height: 52,

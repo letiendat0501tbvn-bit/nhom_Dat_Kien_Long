@@ -34,6 +34,20 @@ class MockTableRepository implements TableRepository {
     return i;
   }
 
+  // Bàn phải còn mở và chưa bắt đầu thì mới tham gia/rời được.
+  // Báo riêng từng lý do để giao diện nói đúng: đã huỷ / đã kết thúc / đã bắt đầu.
+  void _ensureOpenForChange(DiningTable t) {
+    if (t.status == TableStatus.cancelled) {
+      throw const TableException(TableError.cancelled);
+    }
+    if (t.status == TableStatus.ended) {
+      throw const TableException(TableError.ended);
+    }
+    if (hasStarted(t, now())) {
+      throw const TableException(TableError.alreadyStarted);
+    }
+  }
+
   // Cập nhật bàn trong danh sách và trả về bản mới.
   DiningTable _save(int index, DiningTable t) {
     _tables[index] = t;
@@ -110,9 +124,7 @@ class MockTableRepository implements TableRepository {
     await _wait();
     final i = _indexOf(tableId);
     final t = _tables[i];
-    if (!isActive(t) || hasStarted(t, now())) {
-      throw const TableException(TableError.alreadyStarted);
-    }
+    _ensureOpenForChange(t);
     if (t.memberIds.contains(userId)) {
       throw const TableException(TableError.alreadyMember);
     }
@@ -140,9 +152,7 @@ class MockTableRepository implements TableRepository {
     if (!t.memberIds.contains(userId)) {
       throw const TableException(TableError.notMember);
     }
-    if (!isActive(t) || hasStarted(t, now())) {
-      throw const TableException(TableError.alreadyStarted);
-    }
+    _ensureOpenForChange(t);
 
     final remaining = t.memberIds.where((m) => m != userId).toList();
     // Chủ bàn rời mà không còn ai: bàn tự huỷ

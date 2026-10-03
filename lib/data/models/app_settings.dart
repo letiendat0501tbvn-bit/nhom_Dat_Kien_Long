@@ -1,5 +1,8 @@
 import 'enums.dart';
 
+// Các bán kính tới quán được phép chọn (mét): 100 m, 500 m, 1 km, 10 km.
+const radiusOptionsM = [100, 500, 1000, 10000];
+
 // Cài đặt người dùng: ngôn ngữ, khu vực, bộ lọc. Giai đoạn đầu chỉ giữ trong bộ nhớ.
 class AppSettings {
   const AppSettings({

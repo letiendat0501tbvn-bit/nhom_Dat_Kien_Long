@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../components/dish_picker.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
@@ -10,26 +12,27 @@ class TablesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeading(
-            title: 'Bàn còn chỗ',
-            subtitle: 'Chọn điểm hẹn tại quán và giờ ăn phù hợp.',
+          SectionHeading(
+            title: t(StrKey.tablesTitle),
+            subtitle: t(StrKey.tablesSubtitle),
           ),
           const SizedBox(height: 16),
           _AreaCard(
-            // Chưa có chức năng chọn khu vực, sẽ làm ở bước sau
+            // Chưa có chức năng chọn khu vực, sẽ làm ở giai đoạn D
             onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Chọn khu vực: chưa làm')),
+              SnackBar(content: Text(t(StrKey.notBuiltYet))),
             ),
           ),
           const SizedBox(height: 28),
-          const SectionHeading(
-            title: 'Chọn món để lên kèo',
-            subtitle: 'Chọn món → Xem quán và giờ hẹn → Xác nhận tham gia.',
+          SectionHeading(
+            title: t(StrKey.exploreTitle),
+            subtitle: t(StrKey.exploreSubtitle),
           ),
           const SizedBox(height: 16),
           const DishPicker(),
@@ -47,6 +50,7 @@ class _AreaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -72,13 +76,13 @@ class _AreaCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Chọn khu vực',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  t(StrKey.chooseArea),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Dùng vị trí để tìm điểm hẹn tại quán.',
+                  t(StrKey.chooseAreaHint),
                   style: TextStyle(
                     fontSize: 15,
                     color: AppColors.text.withValues(alpha: 0.7),
@@ -94,9 +98,9 @@ class _AreaCard extends StatelessWidget {
                       backgroundColor: AppColors.primary,
                       shape: const StadiumBorder(),
                     ),
-                    child: const Text(
-                      'Chọn khu vực',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Text(
+                      t(StrKey.chooseArea),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

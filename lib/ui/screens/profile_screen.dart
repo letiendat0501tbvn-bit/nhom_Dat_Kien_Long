@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/user.dart';
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
+import '../components/login_sheet.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
 
@@ -19,17 +23,19 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   int get _tab => widget.tab;
 
-  // Chưa có đăng nhập thật (giai đoạn 2), nên luôn là khách.
-  final bool _loggedIn = false;
+  // Mở bảng đăng nhập; xong thì ở lại đúng tab này.
+  void _onLogin() => showLoginSheet(context);
 
-  void _onLogin() {
+  void _notBuilt() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đăng nhập Google: sẽ làm ở giai đoạn 2')),
+      SnackBar(content: Text(context.strings(StrKey.notBuiltYet))),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
+    final user = context.appState.currentUser; // null = khách
     return Column(
       children: [
         Expanded(
@@ -38,18 +44,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SectionHeading(
-                  title: 'Hồ sơ của bạn',
-                  subtitle: 'Bàn ăn, phản hồi riêng tư, báo cáo và danh sách chặn.',
+                SectionHeading(
+                  title: t(StrKey.profileTitle),
+                  subtitle: t(StrKey.profileSubtitle),
                 ),
                 const SizedBox(height: 20),
                 _TabSwitcher(
-                  labels: const ['Bàn của tôi', 'Tài khoản'],
+                  labels: [t(StrKey.tabMyTables), t(StrKey.tabAccount)],
                   selected: _tab,
                   onChanged: widget.onTabChanged,
                 ),
                 const SizedBox(height: 20),
-                if (_tab == 0) _myTables() else _account(),
+                if (_tab == 0) _myTables(t, user) else _account(t, user),
               ],
             ),
           ),
@@ -60,19 +66,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // Tab "Bàn của tôi"
-  Widget _myTables() {
+  Widget _myTables(Strings t, User? user) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Bàn ăn của bạn',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        Text(
+          t(StrKey.myTablesHeading),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 14),
         Text(
-          _loggedIn
-              ? 'Bạn chưa tham gia bàn ăn nào.' // đã đăng nhập nhưng danh sách rỗng
-              : 'Đăng nhập để xem những bàn ăn của bạn.',
+          // Danh sách bàn thật (Sắp tới / Đã qua) làm ở giai đoạn G
+          user != null
+              ? t(StrKey.myTablesMemberPlaceholder)
+              : t(StrKey.myTablesGuest),
           style: TextStyle(
             fontSize: 16,
             color: AppColors.text.withValues(alpha: 0.7),
@@ -83,10 +90,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // Tab "Tài khoản"
-  Widget _account() {
-    if (_loggedIn) {
-      return const Text('Đã đăng nhập'); // sẽ làm khi có đăng nhập thật
-    }
+  Widget _account(Strings t, User? user) {
+    if (user != null) return _memberCard(t, user);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -98,14 +103,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Khách ghé chơi',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            t(StrKey.guestTitle),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Đăng nhập để xem lại bàn, trò chuyện và quản lý phản hồi riêng tư.',
-            style: TextStyle(fontSize: 16, height: 1.4),
+          Text(
+            t(StrKey.guestBody),
+            style: const TextStyle(fontSize: 16, height: 1.4),
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -117,9 +122,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: AppColors.primary,
                 shape: const StadiumBorder(),
               ),
-              child: const Text(
-                'Đăng nhập',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              child: Text(
+                t(StrKey.signIn),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Thẻ thành viên: khung đơn giản. Phản hồi riêng tư, báo cáo, danh sách chặn
+  // chưa có nội dung (làm ở giai đoạn G).
+  Widget _memberCard(Strings t, User user) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0x1F000000)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              // Chưa có ảnh đại diện thật: dùng chữ cái đầu của tên
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: AppColors.selectedBg,
+                child: Text(
+                  user.displayName.characters.first.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user.displayName,
+                      style: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      user.email,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.text.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          for (final key in const [
+            StrKey.privateFeedback,
+            StrKey.reportsSent,
+            StrKey.blockList,
+          ])
+            // Material trong suốt để ListTile vẽ hiệu ứng bấm đúng trên nền thẻ trắng
+            Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(t(key)),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _notBuilt,
+              ),
+            ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: OutlinedButton(
+              onPressed: context.appState.signOut,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                t(StrKey.signOut),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -190,6 +284,7 @@ class _BrandFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20),
@@ -199,25 +294,25 @@ class _BrandFooter extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 16,
                 backgroundColor: Colors.white,
                 child: Icon(Icons.ramen_dining,
                     size: 18, color: AppColors.primary),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
-                'Ăn Gì Đây Ta?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                t(StrKey.appName),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            'Món ngon • Bạn mới • Kết nối thật',
+            t(StrKey.tagline),
             style: TextStyle(
               fontSize: 14,
               color: AppColors.text.withValues(alpha: 0.7),

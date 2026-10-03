@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/dish.dart';
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
 
 // Thẻ món: ảnh bo góc + nhãn danh mục, tên, mô tả 1 dòng, liên kết "Tìm bàn ăn".
@@ -12,6 +14,7 @@ class DishCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.strings;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -40,7 +43,7 @@ class DishCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      dish.category,
+                      t.categoryLabel(dish.category),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -77,19 +80,19 @@ class DishCard extends StatelessWidget {
               const SizedBox(height: 6),
               InkWell(
                 onTap: onFindTable,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Tìm bàn ăn',
-                      style: TextStyle(
+                      t(StrKey.findTable),
+                      style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward,
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward,
                         size: 16, color: AppColors.primary),
                   ],
                 ),

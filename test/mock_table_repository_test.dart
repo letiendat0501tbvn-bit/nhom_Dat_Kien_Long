@@ -80,10 +80,21 @@ void main() {
           repo.joinTable('t', 'a'), failsWith(TableError.alreadyStarted));
     });
 
-    test('bàn đã huỷ thì không tham gia được', () async {
+    test('bàn đã huỷ thì báo lỗi cancelled', () async {
       final repo = repoWith([table('t', at11, status: TableStatus.cancelled)]);
-      await expectLater(
-          repo.joinTable('t', 'a'), failsWith(TableError.alreadyStarted));
+      await expectLater(repo.joinTable('t', 'a'), failsWith(TableError.cancelled));
+    });
+
+    test('bàn đã kết thúc thì báo lỗi ended', () async {
+      final repo = repoWith([table('t', at11, status: TableStatus.ended)]);
+      await expectLater(repo.joinTable('t', 'a'), failsWith(TableError.ended));
+    });
+
+    test('bàn đã huỷ và đã quá giờ: ưu tiên báo đã huỷ', () async {
+      final repo = repoWith([
+        table('t', DateTime(2026, 10, 5, 9, 0), status: TableStatus.cancelled),
+      ]);
+      await expectLater(repo.joinTable('t', 'a'), failsWith(TableError.cancelled));
     });
 
     test('đã là thành viên thì báo lỗi alreadyMember', () async {
@@ -206,6 +217,15 @@ void main() {
       final repo = repoWith([table('t', DateTime(2026, 10, 5, 9, 30), members: ['host', 'a'])]);
       await expectLater(
           repo.leaveTable('t', 'a'), failsWith(TableError.alreadyStarted));
+    });
+
+    test('bàn đã huỷ hoặc đã kết thúc thì không rời được, báo đúng lý do', () async {
+      final repo = repoWith([
+        table('c', at11, members: ['host', 'a'], status: TableStatus.cancelled),
+        table('e', at11, members: ['host', 'a'], status: TableStatus.ended),
+      ]);
+      await expectLater(repo.leaveTable('c', 'a'), failsWith(TableError.cancelled));
+      await expectLater(repo.leaveTable('e', 'a'), failsWith(TableError.ended));
     });
 
     test('sau khi người rời, người khác có thể tham gia lại chỗ đó', () async {

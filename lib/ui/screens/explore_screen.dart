@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/strings.dart';
+import '../../state/app_scope.dart';
 import '../components/dish_picker.dart';
 import '../components/section_heading.dart';
 
@@ -9,17 +11,18 @@ class ExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(16, 20, 16, 16),
+    final t = context.strings;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeading(
-            title: 'Chọn món để lên kèo',
-            subtitle: 'Chọn món → Xem quán và giờ hẹn → Xác nhận tham gia.',
+            title: t(StrKey.exploreTitle),
+            subtitle: t(StrKey.exploreSubtitle),
           ),
-          SizedBox(height: 16),
-          DishPicker(),
+          const SizedBox(height: 16),
+          const DishPicker(),
         ],
       ),
     );

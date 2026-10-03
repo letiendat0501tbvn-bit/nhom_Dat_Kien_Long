@@ -36,23 +36,35 @@ class AppState extends ChangeNotifier {
   });
 
   // Bản dùng dữ liệu mẫu cho cả app. `now`/`latency` truyền vào được để test.
-  factory AppState.mock({Clock now = systemClock, Latency latency = randomLatency}) {
+  // simulateReplies: bật phản hồi giả lập trong chat (CHỈ ĐỂ DEMO); test để tắt.
+  factory AppState.mock({
+    Clock now = systemClock,
+    Latency latency = randomLatency,
+    bool simulateReplies = false,
+  }) {
     final data = MockData.build(now());
+    final tables = MockTableRepository(
+      tables: data.tables,
+      restaurants: data.restaurants,
+      areas: data.areas,
+      now: now,
+      latency: latency,
+    );
     return AppState(
       now: now,
       dishRepository: MockDishRepository(latency: latency),
-      tableRepository: MockTableRepository(
-        tables: data.tables,
-        restaurants: data.restaurants,
-        areas: data.areas,
-        now: now,
-        latency: latency,
-      ),
+      tableRepository: tables,
       authRepository: MockAuthRepository(users: data.users, latency: latency),
       chatRepository: MockChatRepository(
         messages: data.messages,
         now: now,
         latency: latency,
+        autoReply: simulateReplies
+            ? AutoReply(
+                membersOf: (id) async =>
+                    (await tables.getTable(id))?.memberIds ?? const [],
+              )
+            : null,
       ),
       safetyRepository: MockSafetyRepository(now: now, latency: latency),
       locationRepository: MockLocationRepository(
@@ -95,8 +107,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleLanguage() => setLanguage(
-      language == AppLanguage.vi ? AppLanguage.en : AppLanguage.vi);
+  void toggleLanguage() =>
+      setLanguage(language == AppLanguage.vi ? AppLanguage.en : AppLanguage.vi);
 
   // ---------- Người dùng ----------
 
@@ -234,7 +246,10 @@ class AppState extends ChangeNotifier {
   static void _validate(int radiusM, int? fromMinute, int? toMinute) {
     if (!radiusOptionsM.contains(radiusM)) {
       throw ArgumentError.value(
-          radiusM, 'radiusM', 'phải là một trong $radiusOptionsM');
+        radiusM,
+        'radiusM',
+        'phải là một trong $radiusOptionsM',
+      );
     }
     for (final m in [fromMinute, toMinute]) {
       if (m != null && (m < 0 || m > 1439)) {
@@ -304,7 +319,10 @@ class AppState extends ChangeNotifier {
 
   // Đặt lại bộ lọc về mặc định. Giữ nguyên ngôn ngữ và khu vực đã chọn.
   void resetFilters() {
-    _settings = _settings.copyWith(clearMealTime: true, radiusM: defaultRadiusM);
+    _settings = _settings.copyWith(
+      clearMealTime: true,
+      radiusM: defaultRadiusM,
+    );
     _date = null;
     _fromMinute = null;
     _toMinute = null;
@@ -313,12 +331,12 @@ class AppState extends ChangeNotifier {
 
   // Điều kiện lọc bàn hiện tại, truyền thẳng cho TableRepository.getTables.
   TableQuery tableQuery({String? dishId}) => TableQuery(
-        areaId: _settings.selectedAreaId,
-        dishId: dishId,
-        mealTime: _settings.mealTime,
-        date: date,
-        fromMinute: _fromMinute,
-        toMinute: _toMinute,
-        radiusM: _settings.radiusM,
-      );
+    areaId: _settings.selectedAreaId,
+    dishId: dishId,
+    mealTime: _settings.mealTime,
+    date: date,
+    fromMinute: _fromMinute,
+    toMinute: _toMinute,
+    radiusM: _settings.radiusM,
+  );
 }

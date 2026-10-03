@@ -21,7 +21,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late final AppState _appState = widget.appState ?? AppState.mock();
+  late final AppState _appState =
+      widget.appState ?? AppState.mock(simulateReplies: true);
 
   @override
   void initState() {

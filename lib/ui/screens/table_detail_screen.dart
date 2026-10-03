@@ -11,6 +11,7 @@ import '../../state/app_scope.dart';
 import '../components/dish_image.dart';
 import '../components/login_sheet.dart';
 import '../components/status_view.dart';
+import '../components/table_chat.dart';
 import '../theme/app_theme.dart';
 
 // Chi tiết bàn (mục 4.5 SPEC; chưa có ảnh thiết kế, dựng theo phong cách các màn khác).
@@ -281,7 +282,6 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
     final start = table.startAt;
     final day = DateTime(start.year, start.month, start.day);
     final status = displayStatusOf(table, app.now());
-    final isMember = user != null && table.memberIds.contains(user.id);
     final restaurant = _restaurant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,24 +364,65 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
         ],
         const SizedBox(height: 20),
         _members(t, table, user?.id),
-        if (isMember && isActive(table)) ...[
-          const SizedBox(height: 20),
-          // Chỗ để dành cho chat của bàn (giai đoạn F), chưa làm chat giả
-          Text(
-            t(StrKey.tdChatTitle),
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          _Card(
-            child: SizedBox(
-              width: double.infinity,
-              child: Text(t(StrKey.tdChatSoon), style: muted),
-            ),
-          ),
-        ],
+        ..._chat(t, table, user?.id, muted),
         const SizedBox(height: 16),
       ],
     );
+  }
+
+  // Khối trò chuyện theo quyền: thành viên xem/gửi (hoặc chỉ xem), người khác chỉ thấy
+  // lời mời tham gia; bàn đã huỷ hoặc không còn nhận người thì không hiện gì.
+  List<Widget> _chat(
+    Strings t,
+    DiningTable table,
+    String? userId,
+    TextStyle muted,
+  ) {
+    final access = chatAccessOf(table, userId, context.appState.now());
+    if (access == ChatAccess.none) return const [];
+    return [
+      const SizedBox(height: 20),
+      Text(
+        t(StrKey.tdChatTitle),
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 8),
+      if (access == ChatAccess.joinToChat)
+        _Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(t(StrKey.chatJoinToChat), style: muted),
+              if (userId == null) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 46,
+                  child: FilledButton(
+                    onPressed: () => showLoginSheet(context),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Text(
+                      t(StrKey.signIn),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        )
+      else
+        TableChat(
+          // Rời bàn thì widget này bị gỡ: mất quyền xem ngay
+          key: ValueKey('chat-${table.id}'),
+          tableId: table.id,
+          userId: userId!,
+          readOnly: access == ChatAccess.readOnly,
+          nameOf: _nameOf,
+        ),
+    ];
   }
 
   Widget _image() {

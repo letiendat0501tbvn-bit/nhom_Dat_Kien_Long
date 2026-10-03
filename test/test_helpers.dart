@@ -7,6 +7,7 @@ import 'package:giua_ki_app/data/mock_dishes.dart';
 import 'package:giua_ki_app/data/models/dining_table.dart';
 import 'package:giua_ki_app/data/models/dish.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
+import 'package:giua_ki_app/data/repositories/chat_repository.dart';
 import 'package:giua_ki_app/data/repositories/dish_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_auth_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_chat_repository.dart';
@@ -165,6 +166,7 @@ AppState makeAppStateWithTables(
   Latency latency = noLatency,
   TableRepository? tableRepository,
   DishRepository? dishRepository,
+  ChatRepository? chatRepository,
 }) {
   final data = MockData.build(testNow);
   final clock = now ?? () => testNow;
@@ -180,7 +182,8 @@ AppState makeAppStateWithTables(
           latency: latency,
         ),
     authRepository: MockAuthRepository(users: data.users, latency: latency),
-    chatRepository: MockChatRepository(messages: const [], now: clock, latency: latency),
+    chatRepository: chatRepository ??
+        MockChatRepository(messages: const [], now: clock, latency: latency),
     safetyRepository: MockSafetyRepository(now: clock, latency: latency),
     locationRepository: MockLocationRepository(
       areas: data.areas,

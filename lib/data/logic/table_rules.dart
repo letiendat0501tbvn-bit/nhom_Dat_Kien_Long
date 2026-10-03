@@ -105,6 +105,31 @@ TableActions tableActionsOf(DiningTable t, String? userId, DateTime now) {
   );
 }
 
+// ---------- Chat của bàn ----------
+
+const maxChatLength = 500;
+
+// Tin nhắn hợp lệ: không rỗng/toàn khoảng trắng và tối đa 500 ký tự.
+bool isValidChatText(String text) =>
+    text.trim().isNotEmpty && text.length <= maxChatLength;
+
+// Quyền với chat của một bàn.
+enum ChatAccess {
+  none, // không thấy gì (bàn đã huỷ, hoặc không phải thành viên và bàn không còn nhận người)
+  joinToChat, // chưa là thành viên nhưng còn tham gia được: chỉ hiện lời mời
+  write, // thành viên của bàn còn hiệu lực: xem và gửi
+  readOnly, // thành viên của bàn đã bắt đầu/kết thúc: chỉ xem
+}
+
+// Chỉ thành viên mới xem được chat. Bàn đã huỷ thì mất quyền xem ngay.
+ChatAccess chatAccessOf(DiningTable t, String? userId, DateTime now) {
+  if (t.status == TableStatus.cancelled) return ChatAccess.none;
+  final member = userId != null && t.memberIds.contains(userId);
+  final open = isActive(t) && !hasStarted(t, now);
+  if (member) return open ? ChatAccess.write : ChatAccess.readOnly;
+  return open ? ChatAccess.joinToChat : ChatAccess.none;
+}
+
 // Kiểm tra thông tin khi mở bàn; trả về lỗi đầu tiên hoặc null nếu hợp lệ.
 TableError? validateNewTable({
   required DateTime now,

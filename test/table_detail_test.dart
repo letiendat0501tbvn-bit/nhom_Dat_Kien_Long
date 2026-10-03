@@ -311,7 +311,7 @@ void main() {
     ) async {
       await pumpDetail(tester, 'ta');
       expect(find.text('Đăng nhập để xem thành viên.'), findsOneWidget);
-      expect(find.text('Đăng nhập'), findsOneWidget);
+      expect(find.text('Đăng nhập'), findsNWidgets(2)); // ở thành viên và ở trò chuyện
       expect(find.text('Quốc Bảo'), findsNothing);
       expect(find.text('Thu Hà'), findsNothing);
       expect(find.text('Chủ bàn'), findsNothing);
@@ -324,7 +324,7 @@ void main() {
       'đăng nhập từ bàn: ở lại đúng màn, thấy thành viên, KHÔNG tự tham gia',
       (tester) async {
         final app = await pumpDetail(tester, 'ta');
-        await tester.tap(find.text('Đăng nhập'));
+        await tester.tap(find.text('Đăng nhập').first);
         await tester.pumpAndSettle();
         expect(find.text('Vào hội thôi!'), findsOneWidget);
         await tester.tap(find.text('Tiếp tục với Google'));
@@ -382,7 +382,8 @@ void main() {
         expect(button('Tham gia'), findsOneWidget);
         expect(find.text('Rời bàn'), findsNothing);
         expect(find.text('Huỷ bàn'), findsNothing);
-        expect(find.text('Trò chuyện'), findsNothing);
+        expect(find.text('Tham gia bàn để trò chuyện.'), findsOneWidget);
+        expect(find.byType(TextField), findsNothing); // không có nội dung chat
       },
       size: tall,
     );
@@ -412,7 +413,7 @@ void main() {
         find.text('Trò chuyện'),
         findsOneWidget,
       ); // thành viên có khối chat dành sẵn
-      expect(find.text('Trò chuyện của bàn sẽ có ở bản sau.'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget); // thành viên có ô nhập chat
     }, size: tall);
 
     phoneTest(

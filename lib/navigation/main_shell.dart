@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/strings.dart';
-import '../state/app_scope.dart';
 import '../ui/components/app_bottom_bar.dart';
 import '../ui/components/app_top_bar.dart';
 import '../ui/screens/explore_screen.dart';
-import '../ui/screens/placeholder_screen.dart';
+import '../ui/screens/create_table_screen.dart';
 import '../ui/screens/profile_screen.dart';
 import '../ui/screens/tables_screen.dart';
 
@@ -36,20 +34,8 @@ class _MainShellState extends State<MainShell> {
     }
   }
 
-  // Nút + mở màn "Tạo bàn mới" (tạm thời là màn trống).
-  void _openCreateTable() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          final title = context.strings(StrKey.createTable);
-          return Scaffold(
-            appBar: AppBar(title: Text(title)),
-            body: PlaceholderScreen(title: title),
-          );
-        },
-      ),
-    );
-  }
+  // Nút + mở màn "Mở bàn mới" (toàn trang, có nút Back).
+  void _openCreateTable() => openCreateTable(context);
 
   @override
   Widget build(BuildContext context) {

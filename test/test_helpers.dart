@@ -197,6 +197,7 @@ class ThrowingTableRepository implements TableRepository {
     this.tables = const [],
     this.error,
     this.failList = false,
+    this.createError,
   });
 
   List<DiningTable> tables;
@@ -204,6 +205,8 @@ class ThrowingTableRepository implements TableRepository {
   bool failList; // true: getTables báo lỗi (để thử trạng thái lỗi + Thử lại)
   int listCalls = 0;
   int joinCalls = 0;
+  int createCalls = 0;
+  final TableError? createError; // lỗi createTable ném ra (null: lỗi chung bất ngờ)
   TableQuery? lastQuery; // truy vấn của lần getTables gần nhất
 
   @override
@@ -237,7 +240,12 @@ class ThrowingTableRepository implements TableRepository {
     required int durationMin,
     required int capacity,
     String note = '',
-  }) => throw UnimplementedError();
+  }) async {
+    createCalls++;
+    final e = createError;
+    if (e != null) throw TableException(e);
+    throw Exception('Lỗi bất ngờ');
+  }
 
   @override
   Future<DiningTable> leaveTable(String tableId, String userId) =>

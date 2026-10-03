@@ -135,6 +135,17 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------- Làm mới danh sách bàn ----------
+
+  // Tăng mỗi khi dữ liệu bàn đổi (ví dụ vừa mở bàn mới) để các danh sách bàn tự tải lại.
+  var _tablesVersion = 0;
+  int get tablesVersion => _tablesVersion;
+
+  void notifyTablesChanged() {
+    _tablesVersion++;
+    notifyListeners();
+  }
+
   // ---------- Món (đệm theo id) ----------
 
   // Lấy các món theo id, chỉ gọi repository cho id chưa có trong bộ đệm.

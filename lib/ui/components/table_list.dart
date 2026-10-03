@@ -18,7 +18,7 @@ import 'table_card.dart';
 // Nút Tham gia: khách thì mở bảng đăng nhập và KHÔNG tự tham gia sau khi đăng nhập;
 // thành viên thì gọi repository, báo thành công hoặc đúng lỗi của TableError.
 // dishId: chỉ lấy bàn của món này (màn Chi tiết món); khi đó trạng thái rỗng dùng câu
-// riêng và thêm nút "Mở bàn mới với món này" nếu có onOpenTable.
+// riêng. Trạng thái rỗng có nút "Mở bàn mới" (hoặc "...với món này") nếu có onOpenTable.
 class TableList extends StatefulWidget {
   const TableList({super.key, this.dishId, this.onOpenTable});
 
@@ -39,7 +39,9 @@ class _TableListState extends State<TableList> {
   Object? _queryKey; // bộ lọc đã dùng cho lần tải gần nhất
 
   // Chỉ lấy những thứ cần so sánh để biết bộ lọc có đổi không.
-  Object _keyOf(TableQuery q) => (
+  // tablesVersion đổi (vừa mở bàn mới...) thì cũng tải lại.
+  Object _keyOf(TableQuery q, int version) => (
+    version,
     q.areaId,
     q.dishId,
     q.radiusM,
@@ -52,7 +54,11 @@ class _TableListState extends State<TableList> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final key = _keyOf(AppScope.of(context).tableQuery(dishId: widget.dishId));
+    final app = AppScope.of(context);
+    final key = _keyOf(
+      app.tableQuery(dishId: widget.dishId),
+      app.tablesVersion,
+    );
     if (key != _queryKey) {
       _queryKey = key;
       _load();
@@ -230,7 +236,11 @@ class _TableListState extends State<TableList> {
                 ),
                 icon: const Icon(Icons.add, size: 20),
                 label: Text(
-                  t(StrKey.openTableWithDish),
+                  t(
+                    widget.dishId == null
+                        ? StrKey.openTableNew
+                        : StrKey.openTableWithDish,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontWeight: FontWeight.bold),

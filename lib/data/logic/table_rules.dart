@@ -16,9 +16,9 @@ const slotMinutes = 15; // khung 15 phút
 
 // Các mốc giờ trong ngày theo bước 15 phút (phút tính từ 00:00), nằm trong [min, max].
 List<int> timeSlots({int min = 0, int max = 1439}) => [
-      for (var m = 0; m < 24 * 60; m += slotMinutes)
-        if (m >= min && m <= max) m,
-    ];
+  for (var m = 0; m < 24 * 60; m += slotMinutes)
+    if (m >= min && m <= max) m,
+];
 
 // Buổi ăn theo giờ bắt đầu: Sáng 05–10, Trưa 11–13, Xế 14–16, Tối 17–21, Khuya 22–04.
 MealTime mealTimeOfHour(int hour) {
@@ -35,7 +35,8 @@ double distanceMeters(double lat1, double lng1, double lat2, double lng2) {
   double rad(double d) => d * pi / 180;
   final dLat = rad(lat2 - lat1);
   final dLng = rad(lng2 - lng1);
-  final a = pow(sin(dLat / 2), 2) +
+  final a =
+      pow(sin(dLat / 2), 2) +
       cos(rad(lat1)) * cos(rad(lat2)) * pow(sin(dLng / 2), 2);
   return 2 * earthRadius * asin(sqrt(a));
 }
@@ -85,17 +86,71 @@ TableError? validateNewTable({
   return null;
 }
 
+const maxNoteLength = 140;
+
+// Các trường của form mở bàn, để báo lỗi đúng chỗ.
+enum NewTableField { restaurant, time, duration, capacity, note }
+
+enum NewTableIssue {
+  restaurantRequired,
+  timeRequired,
+  timePast,
+  timeStep, // không đúng bước 15 phút
+  durationInvalid,
+  capacityInvalid,
+  noteTooLong,
+  overlap, // trùng giờ với bàn khác của người mở
+}
+
+// Kiểm tra cả form mở bàn, trả về lỗi của TỪNG trường (rỗng = hợp lệ).
+// overlaps: người mở đã ở bàn khác trùng giờ (do nơi gọi tính bằng hasOverlap).
+Map<NewTableField, NewTableIssue> validateNewTableForm({
+  required DateTime now,
+  required String? restaurantId,
+  required DateTime? startAt,
+  required int durationMin,
+  required int capacity,
+  String note = '',
+  bool overlaps = false,
+}) {
+  final issues = <NewTableField, NewTableIssue>{};
+  if (restaurantId == null) {
+    issues[NewTableField.restaurant] = NewTableIssue.restaurantRequired;
+  }
+  if (startAt == null) {
+    issues[NewTableField.time] = NewTableIssue.timeRequired;
+  } else if (!startAt.isAfter(now)) {
+    issues[NewTableField.time] = NewTableIssue.timePast;
+  } else if (startAt.minute % slotMinutes != 0 ||
+      startAt.second != 0 ||
+      startAt.millisecond != 0) {
+    issues[NewTableField.time] = NewTableIssue.timeStep;
+  } else if (overlaps) {
+    issues[NewTableField.time] = NewTableIssue.overlap;
+  }
+  if (durationMin < minDurationMin ||
+      durationMin > maxDurationMin ||
+      durationMin % slotMinutes != 0) {
+    issues[NewTableField.duration] = NewTableIssue.durationInvalid;
+  }
+  if (capacity < minCapacity || capacity > maxCapacity) {
+    issues[NewTableField.capacity] = NewTableIssue.capacityInvalid;
+  }
+  if (note.length > maxNoteLength) {
+    issues[NewTableField.note] = NewTableIssue.noteTooLong;
+  }
+  return issues;
+}
+
 // Người này có đang ở bàn khác trùng giờ với [target] không.
-bool hasOverlap(
-  Iterable<DiningTable> all,
-  String userId,
-  DiningTable target,
-) {
-  return all.any((t) =>
-      t.id != target.id &&
-      isActive(t) &&
-      t.memberIds.contains(userId) &&
-      tablesOverlap(t, target));
+bool hasOverlap(Iterable<DiningTable> all, String userId, DiningTable target) {
+  return all.any(
+    (t) =>
+        t.id != target.id &&
+        isActive(t) &&
+        t.memberIds.contains(userId) &&
+        tablesOverlap(t, target),
+  );
 }
 
 // Lọc bàn theo TableQuery (mục 7.6 SPEC). Chỉ giữ bàn còn hiệu lực và chưa
@@ -118,7 +173,11 @@ List<DiningTable> filterTables({
       if (restaurant == null || area == null) return false;
       if (restaurant.areaId != query.areaId) return false;
       final d = distanceMeters(
-          area.lat, area.lng, restaurant.lat, restaurant.lng);
+        area.lat,
+        area.lng,
+        restaurant.lat,
+        restaurant.lng,
+      );
       if (d > query.radiusM) return false;
     }
 

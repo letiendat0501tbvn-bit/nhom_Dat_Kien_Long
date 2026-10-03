@@ -298,19 +298,6 @@ void main() {
       expect(shown(tester), ['tf']);
     }, size: tall);
 
-    phoneTest('rỗng: "Mở bàn mới với món này" tạm báo sẽ có ở giai đoạn sau', (
-      tester,
-    ) async {
-      await pumpDetail(tester, 'com-tam');
-      await tester.tap(find.text('Mở bàn mới với món này'));
-      await tester.pump();
-      expect(
-        find.text('Tính năng mở bàn sẽ có ở giai đoạn sau.'),
-        findsOneWidget,
-      );
-      expect(find.byType(DishDetailScreen), findsOneWidget); // không đi đâu cả
-    }, size: tall);
-
     phoneTest('trạng thái rỗng bằng tiếng Anh', (tester) async {
       final app = makeAppStateWithTables(standardTables())
         ..setLanguage(AppLanguage.en);
@@ -320,12 +307,6 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Open a new table with this dish'), findsOneWidget);
-      await tester.tap(find.text('Open a new table with this dish'));
-      await tester.pump();
-      expect(
-        find.text('Opening tables will come in a later phase.'),
-        findsOneWidget,
-      );
     }, size: tall);
 
     phoneTest('có bàn thì không hiện nút "Mở bàn mới"', (tester) async {

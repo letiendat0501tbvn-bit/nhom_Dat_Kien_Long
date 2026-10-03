@@ -24,7 +24,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
-    expect(find.text('Tạo bàn mới'), findsWidgets);
+    expect(find.text('Mở bàn mới'), findsWidgets);
   });
 
   testWidgets('Lịch hẹn and Tôi open the right profile tab',

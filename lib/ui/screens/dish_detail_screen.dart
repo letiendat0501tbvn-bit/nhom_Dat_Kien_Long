@@ -9,6 +9,7 @@ import '../components/section_heading.dart';
 import '../components/table_filters.dart';
 import '../components/table_list.dart';
 import '../theme/app_theme.dart';
+import 'create_table_screen.dart';
 
 // Chi tiết món (mục 4.2 SPEC; chưa có ảnh thiết kế, dựng theo phong cách các màn khác).
 // Trên: ảnh, tên, danh mục, mô tả, vùng/hashtag, khẩu vị và tâm trạng.
@@ -46,15 +47,6 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
         );
       });
     }
-  }
-
-  // Màn mở bàn làm ở giai đoạn E; tạm chỉ báo.
-  void _openTableComingSoon() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(context.strings(StrKey.openTableComingSoon))),
-      );
   }
 
   @override
@@ -149,7 +141,10 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
               const SizedBox(height: 12),
               const DayTabs(),
               const SizedBox(height: 12),
-              TableList(dishId: dish.id, onOpenTable: _openTableComingSoon),
+              TableList(
+                dishId: dish.id,
+                onOpenTable: () => openCreateTable(context, dish: dish),
+              ),
             ],
           ],
         ),

@@ -7,6 +7,7 @@ import '../components/dish_picker.dart';
 import '../components/table_filters.dart';
 import '../components/table_list.dart';
 import 'all_dishes_screen.dart';
+import 'create_table_screen.dart';
 import '../components/section_heading.dart';
 
 // Màn Bàn ăn (mục 4.3 SPEC): chưa chọn khu vực thì hiện thẻ "Chọn khu vực"; đã chọn thì
@@ -36,7 +37,7 @@ class TablesScreen extends StatelessWidget {
             const SizedBox(height: 12),
             const DayTabs(),
             const SizedBox(height: 12),
-            const TableList(),
+            TableList(onOpenTable: () => openCreateTable(context)),
           ],
           const SizedBox(height: 28),
           SectionHeading(

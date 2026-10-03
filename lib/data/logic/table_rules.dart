@@ -1,0 +1,127 @@
+import 'dart:math';
+
+import '../models/area.dart';
+import '../models/dining_table.dart';
+import '../models/enums.dart';
+import '../models/restaurant.dart';
+import '../repositories/table_repository.dart';
+
+// Các quy tắc nghiệp vụ về bàn ăn (mục 7 SPEC), viết thành hàm thuần để dễ test.
+
+const minCapacity = 2;
+const maxCapacity = 8;
+const minDurationMin = 30;
+const maxDurationMin = 120;
+const slotMinutes = 15; // khung 15 phút
+
+// Buổi ăn theo giờ bắt đầu: Sáng 05–10, Trưa 11–13, Xế 14–16, Tối 17–21, Khuya 22–04.
+MealTime mealTimeOfHour(int hour) {
+  if (hour >= 5 && hour <= 10) return MealTime.morning;
+  if (hour >= 11 && hour <= 13) return MealTime.noon;
+  if (hour >= 14 && hour <= 16) return MealTime.afternoon;
+  if (hour >= 17 && hour <= 21) return MealTime.evening;
+  return MealTime.lateNight;
+}
+
+// Khoảng cách giữa hai toạ độ (mét), công thức haversine.
+double distanceMeters(double lat1, double lng1, double lat2, double lng2) {
+  const earthRadius = 6371000.0;
+  double rad(double d) => d * pi / 180;
+  final dLat = rad(lat2 - lat1);
+  final dLng = rad(lng2 - lng1);
+  final a = pow(sin(dLat / 2), 2) +
+      cos(rad(lat1)) * cos(rad(lat2)) * pow(sin(dLng / 2), 2);
+  return 2 * earthRadius * asin(sqrt(a));
+}
+
+// Hai bàn có trùng khung giờ không (đầu mút chạm nhau thì không tính là trùng).
+bool tablesOverlap(DiningTable a, DiningTable b) =>
+    a.startAt.isBefore(b.endAt) && b.startAt.isBefore(a.endAt);
+
+// Bàn còn hiệu lực (chưa huỷ, chưa kết thúc).
+bool isActive(DiningTable t) =>
+    t.status == TableStatus.open || t.status == TableStatus.full;
+
+// Bàn đã bắt đầu (hoặc đã qua) thì không tham gia/rời được nữa.
+bool hasStarted(DiningTable t, DateTime now) => !t.startAt.isAfter(now);
+
+// Kiểm tra thông tin khi mở bàn; trả về lỗi đầu tiên hoặc null nếu hợp lệ.
+TableError? validateNewTable({
+  required DateTime now,
+  required DateTime startAt,
+  required int durationMin,
+  required int capacity,
+}) {
+  if (!startAt.isAfter(now) ||
+      startAt.minute % slotMinutes != 0 ||
+      startAt.second != 0 ||
+      startAt.millisecond != 0 ||
+      durationMin < minDurationMin ||
+      durationMin > maxDurationMin ||
+      durationMin % slotMinutes != 0) {
+    return TableError.invalidTime;
+  }
+  if (capacity < minCapacity || capacity > maxCapacity) {
+    return TableError.invalidCapacity;
+  }
+  return null;
+}
+
+// Người này có đang ở bàn khác trùng giờ với [target] không.
+bool hasOverlap(
+  Iterable<DiningTable> all,
+  String userId,
+  DiningTable target,
+) {
+  return all.any((t) =>
+      t.id != target.id &&
+      isActive(t) &&
+      t.memberIds.contains(userId) &&
+      tablesOverlap(t, target));
+}
+
+// Lọc bàn theo TableQuery (mục 7.6 SPEC). Chỉ giữ bàn còn hiệu lực và chưa
+// bắt đầu; bàn đầy vẫn giữ lại để giao diện hiện "Đã đầy". Kết quả xếp theo giờ.
+List<DiningTable> filterTables({
+  required Iterable<DiningTable> tables,
+  required TableQuery query,
+  required Map<String, Restaurant> restaurants,
+  required Map<String, Area> areas,
+  required DateTime now,
+}) {
+  final area = query.areaId == null ? null : areas[query.areaId];
+
+  bool keep(DiningTable t) {
+    if (!isActive(t) || hasStarted(t, now)) return false;
+    if (query.dishId != null && t.dishId != query.dishId) return false;
+
+    final restaurant = restaurants[t.restaurantId];
+    if (query.areaId != null) {
+      if (restaurant == null || area == null) return false;
+      if (restaurant.areaId != query.areaId) return false;
+      final d = distanceMeters(
+          area.lat, area.lng, restaurant.lat, restaurant.lng);
+      if (d > query.radiusM) return false;
+    }
+
+    final s = t.startAt;
+    if (query.mealTime != null && mealTimeOfHour(s.hour) != query.mealTime) {
+      return false;
+    }
+    final date = query.date;
+    if (date != null &&
+        (s.year != date.year || s.month != date.month || s.day != date.day)) {
+      return false;
+    }
+    final minuteOfDay = s.hour * 60 + s.minute;
+    if (query.fromMinute != null && minuteOfDay < query.fromMinute!) {
+      return false;
+    }
+    if (query.toMinute != null && minuteOfDay > query.toMinute!) return false;
+    return true;
+  }
+
+  final result = tables.where(keep).toList()
+    ..sort((a, b) => a.startAt.compareTo(b.startAt));
+  return result;
+}

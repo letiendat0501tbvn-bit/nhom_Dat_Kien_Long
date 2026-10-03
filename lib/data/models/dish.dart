@@ -1,4 +1,4 @@
-import 'models/enums.dart';
+import 'enums.dart';
 
 // Mô hình dữ liệu một món ăn.
 // Các trường từ `group` trở xuống là phần mở rộng theo SPEC, đều có giá trị

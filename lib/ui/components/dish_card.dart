@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/dish.dart';
+import '../../data/models/dish.dart';
 import '../theme/app_theme.dart';
 
 // Thẻ món: ảnh bo góc + nhãn danh mục, tên, mô tả 1 dòng, liên kết "Tìm bàn ăn".

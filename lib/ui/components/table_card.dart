@@ -22,6 +22,7 @@ class TableCard extends StatelessWidget {
     required this.onJoin,
     this.onOpen,
     this.joining = false,
+    this.statusLabel,
   });
 
   final DiningTable table;
@@ -31,6 +32,8 @@ class TableCard extends StatelessWidget {
   final VoidCallback onJoin;
   final VoidCallback? onOpen; // bấm cả thẻ để xem chi tiết bàn
   final bool joining; // đang gửi yêu cầu tham gia
+  // Nếu có: thay nút Tham gia bằng nhãn trạng thái (bàn đã qua: Đã huỷ, Đã kết thúc...).
+  final String? statusLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +134,9 @@ class TableCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (joinState == TableJoinState.joined && onOpen != null) ...[
+              if (joinState == TableJoinState.joined &&
+                  onOpen != null &&
+                  statusLabel == null) ...[
                 const SizedBox(height: 8),
                 Text(
                   t(StrKey.tdJoinedHint),
@@ -173,6 +178,10 @@ class TableCard extends StatelessWidget {
 
   Widget _joinButton(Strings t) {
     const height = 44.0;
+    final status = statusLabel;
+    if (status != null) {
+      return _disabledButton(status, height, AppColors.text);
+    }
     switch (joinState) {
       case TableJoinState.canJoin:
         return SizedBox(

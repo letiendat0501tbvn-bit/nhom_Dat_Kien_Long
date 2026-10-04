@@ -253,7 +253,13 @@ class ThrowingTableRepository implements TableRepository {
   }
 
   @override
-  Future<List<DiningTable>> getMyTables(String userId) async => [];
+  Future<List<DiningTable>> getMyTables(String userId) async {
+    if (failList) throw Exception('Không có mạng');
+    return [
+      for (final t in tables)
+        if (t.memberIds.contains(userId)) t,
+    ];
+  }
 
   @override
   Future<DiningTable> createTable({

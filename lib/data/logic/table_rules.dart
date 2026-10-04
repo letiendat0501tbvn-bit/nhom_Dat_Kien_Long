@@ -64,6 +64,22 @@ TableJoinState joinStateOf(DiningTable table, String? userId) {
 // Bàn đã bắt đầu (hoặc đã qua) thì không tham gia/rời được nữa.
 bool hasStarted(DiningTable t, DateTime now) => !t.startAt.isAfter(now);
 
+// Chia các bàn của một người thành "Sắp tới" (còn hiệu lực, chưa bắt đầu; gần nhất trước)
+// và "Đã qua" (đã bắt đầu, kết thúc hoặc huỷ; mới nhất trước).
+({List<DiningTable> upcoming, List<DiningTable> past}) splitMyTables(
+  Iterable<DiningTable> tables,
+  DateTime now,
+) {
+  final upcoming = <DiningTable>[];
+  final past = <DiningTable>[];
+  for (final t in tables) {
+    (isActive(t) && !hasStarted(t, now) ? upcoming : past).add(t);
+  }
+  upcoming.sort((a, b) => a.startAt.compareTo(b.startAt));
+  past.sort((a, b) => b.startAt.compareTo(a.startAt));
+  return (upcoming: upcoming, past: past);
+}
+
 // Trạng thái hiển thị của bàn ở màn Chi tiết bàn.
 enum TableDisplayStatus { upcoming, full, started, cancelled, ended }
 

@@ -232,6 +232,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Đăng xuất'));
       await tester.pumpAndSettle();
+      // Có hộp xác nhận
+      expect(find.text('Đăng xuất?'), findsOneWidget);
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Đăng xuất'),
+        ),
+      );
+      await tester.pumpAndSettle();
       expect(find.text('Khách ghé chơi'), findsOneWidget);
       expect(find.text('Đăng nhập'), findsOneWidget);
     });
@@ -245,7 +254,8 @@ void main() {
       await tester.tap(find.text('Bàn của tôi'));
       await tester.pumpAndSettle();
       expect(find.text('Đăng nhập để xem những bàn ăn của bạn.'), findsNothing);
-      expect(find.text('Danh sách bàn của bạn sẽ hiện ở đây.'), findsOneWidget);
+      // Thành viên: danh sách bàn thật (u1 có sẵn một bàn sắp tới)
+      expect(find.text('Sắp tới'), findsOneWidget);
     });
 
     testWidgets('bảng đăng nhập hiện bằng tiếng Anh khi đang chọn EN',

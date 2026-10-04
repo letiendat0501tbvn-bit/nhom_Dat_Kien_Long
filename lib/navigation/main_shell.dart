@@ -30,6 +30,7 @@ class _MainShellState extends State<MainShell> {
         return ProfileScreen(
           tab: _index - 2,
           onTabChanged: (t) => setState(() => _index = 2 + t),
+          onFindTables: () => setState(() => _index = 1),
         );
     }
   }

@@ -4,6 +4,7 @@ import '../../data/models/user.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../components/login_sheet.dart';
+import '../components/my_tables.dart';
 import '../components/pill_tabs.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
@@ -18,10 +19,13 @@ class ProfileScreen extends StatefulWidget {
     super.key,
     required this.tab,
     required this.onTabChanged,
+    this.onFindTables,
   });
 
   final int tab; // 0: Bàn của tôi, 1: Tài khoản
   final ValueChanged<int> onTabChanged;
+  final VoidCallback?
+  onFindTables; // nút "Tìm bàn ăn" ở trạng thái rỗng của Bàn của tôi
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -32,6 +36,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Mở bảng đăng nhập; xong thì ở lại đúng tab này.
   void _onLogin() => showLoginSheet(context);
+
+  // Đăng xuất có hộp xác nhận; xong thì về trạng thái khách.
+  Future<void> _confirmSignOut() async {
+    final t = context.strings;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        title: Text(t(StrKey.signOutTitle)),
+        content: Text(t(StrKey.signOutBody)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(t(StrKey.dialogCancel)),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            child: Text(t(StrKey.signOut)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true && mounted) await context.appState.signOut();
+  }
 
   void _notBuilt() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Tab "Bàn của tôi"
+  // Tab "Bàn của tôi": khách thấy lời mời đăng nhập (như ảnh), thành viên thấy danh sách bàn.
   Widget _myTables(Strings t, User? user) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,16 +111,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 14),
-        Text(
-          // Danh sách bàn thật (Sắp tới / Đã qua) làm ở giai đoạn G
-          user != null
-              ? t(StrKey.myTablesMemberPlaceholder)
-              : t(StrKey.myTablesGuest),
-          style: TextStyle(
-            fontSize: 16,
-            color: AppColors.text.withValues(alpha: 0.7),
+        if (user != null)
+          MyTables(userId: user.id, onFindTables: widget.onFindTables)
+        else
+          Text(
+            t(StrKey.myTablesGuest),
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.text.withValues(alpha: 0.7),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -218,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
             height: 50,
             child: OutlinedButton(
-              onPressed: context.appState.signOut,
+              onPressed: _confirmSignOut,
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary),

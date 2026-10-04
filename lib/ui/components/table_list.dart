@@ -42,6 +42,7 @@ class _TableListState extends State<TableList> {
 
   // Chỉ lấy những thứ cần so sánh để biết bộ lọc có đổi không.
   Object _keyOf(TableQuery q) => (
+    q.viewerId,
     q.areaId,
     q.dishId,
     q.radiusM,

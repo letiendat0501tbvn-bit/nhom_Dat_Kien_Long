@@ -35,13 +35,16 @@ class FakeChatRepository implements ChatRepository {
   var _id = 5000;
 
   @override
-  Future<List<ChatMessage>> getMessages(String tableId) async {
+  Future<List<ChatMessage>> getMessages(
+    String tableId, {
+    String? viewerId,
+  }) async {
     if (failLoad) throw Exception('Không có mạng');
     return messages.where((m) => m.tableId == tableId).toList();
   }
 
   @override
-  Stream<ChatMessage> incoming(String tableId) =>
+  Stream<ChatMessage> incoming(String tableId, {String? viewerId}) =>
       incomingController.stream.where((m) => m.tableId == tableId);
 
   @override

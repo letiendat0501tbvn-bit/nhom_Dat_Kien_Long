@@ -40,26 +40,51 @@ class MockChatRepository implements ChatRepository {
     this.now = systemClock,
     this.latency = randomLatency,
     this.autoReply,
+    this.blockedIdsOf,
   }) : _messages = List.of(messages);
 
   final Clock now;
   final Latency latency;
   final AutoReply? autoReply; // null: không có phản hồi giả lập
+  // Id những người mà một người dùng đã chặn (để lọc tin nhắn). null: không ai bị chặn.
+  final Future<Set<String>> Function(String userId)? blockedIdsOf;
   final List<ChatMessage> _messages;
   final _controller = StreamController<ChatMessage>.broadcast();
   var _nextId = 1000;
   var _replyCount = 0;
 
   @override
-  Future<List<ChatMessage>> getMessages(String tableId) async {
+  Future<List<ChatMessage>> getMessages(
+    String tableId, {
+    String? viewerId,
+  }) async {
     await Future<void>.delayed(latency());
-    return _messages.where((m) => m.tableId == tableId).toList()
+    final blocked = await _blockedBy(viewerId);
+    return _messages
+        .where((m) => m.tableId == tableId && !blocked.contains(m.senderId))
+        .toList()
       ..sort((a, b) => a.sentAt.compareTo(b.sentAt));
   }
 
+  Future<Set<String>> _blockedBy(String? viewerId) async {
+    final lookup = blockedIdsOf;
+    if (viewerId == null || lookup == null) return const {};
+    return lookup(viewerId);
+  }
+
   @override
-  Stream<ChatMessage> incoming(String tableId) =>
-      _controller.stream.where((m) => m.tableId == tableId);
+  Stream<ChatMessage> incoming(String tableId, {String? viewerId}) {
+    // Kiểm tra lúc tin đến: chặn xong thì tin mới của người đó cũng không hiện.
+    // Dùng asyncMap (không dùng async*) để đăng ký nghe luồng ngay khi listen.
+    return _controller.stream
+        .where((m) => m.tableId == tableId)
+        .asyncMap(
+          (m) async =>
+              (await _blockedBy(viewerId)).contains(m.senderId) ? null : m,
+        )
+        .where((m) => m != null)
+        .cast<ChatMessage>();
+  }
 
   ChatMessage _add(String tableId, String senderId, String text) {
     final message = ChatMessage(

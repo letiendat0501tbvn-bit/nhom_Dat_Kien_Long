@@ -15,12 +15,15 @@ class MockTableRepository implements TableRepository {
     required List<Area> areas,
     this.now = systemClock,
     this.latency = randomLatency,
+    this.blockedIdsOf,
   }) : _tables = List.of(tables),
        _restaurants = {for (final r in restaurants) r.id: r},
        _areas = {for (final a in areas) a.id: a};
 
   final Clock now;
   final Latency latency;
+  // Id những người mà một người dùng đã chặn (để ẩn bàn và chặn tham gia). null: không ai bị chặn.
+  final Future<Set<String>> Function(String userId)? blockedIdsOf;
   final List<DiningTable> _tables;
   final Map<String, Restaurant> _restaurants;
   final Map<String, Area> _areas;
@@ -57,12 +60,18 @@ class MockTableRepository implements TableRepository {
   @override
   Future<List<DiningTable>> getTables(TableQuery query) async {
     await _wait();
+    final viewer = query.viewerId;
+    final lookup = blockedIdsOf;
     return filterTables(
       tables: _tables,
       query: query,
       restaurants: _restaurants,
       areas: _areas,
       now: now(),
+      viewerId: viewer,
+      blockedHostIds: viewer == null || lookup == null
+          ? const {}
+          : await lookup(viewer),
     );
   }
 
@@ -127,6 +136,11 @@ class MockTableRepository implements TableRepository {
     _ensureOpenForChange(t);
     if (t.memberIds.contains(userId)) {
       throw const TableException(TableError.alreadyMember);
+    }
+    // Không tham gia được bàn của người mình đã chặn
+    final lookup = blockedIdsOf;
+    if (lookup != null && (await lookup(userId)).contains(t.hostId)) {
+      throw const TableException(TableError.blockedHost);
     }
     if (t.isFull) throw const TableException(TableError.full);
     if (hasOverlap(_tables, userId, t)) {

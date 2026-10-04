@@ -43,12 +43,16 @@ class AppState extends ChangeNotifier {
     bool simulateReplies = false,
   }) {
     final data = MockData.build(now());
+    final safety = MockSafetyRepository(now: now, latency: latency);
+    // Chặn người dùng được áp dụng ở repository (ẩn bàn, ẩn tin, không cho tham gia)
+    Future<Set<String>> blockedIdsOf(String id) async => safety.blockedIdsOf(id);
     final tables = MockTableRepository(
       tables: data.tables,
       restaurants: data.restaurants,
       areas: data.areas,
       now: now,
       latency: latency,
+      blockedIdsOf: blockedIdsOf,
     );
     return AppState(
       now: now,
@@ -59,6 +63,7 @@ class AppState extends ChangeNotifier {
         messages: data.messages,
         now: now,
         latency: latency,
+        blockedIdsOf: blockedIdsOf,
         autoReply: simulateReplies
             ? AutoReply(
                 membersOf: (id) async =>
@@ -66,7 +71,7 @@ class AppState extends ChangeNotifier {
               )
             : null,
       ),
-      safetyRepository: MockSafetyRepository(now: now, latency: latency),
+      safetyRepository: safety,
       locationRepository: MockLocationRepository(
         areas: data.areas,
         restaurants: data.restaurants,
@@ -338,5 +343,30 @@ class AppState extends ChangeNotifier {
     fromMinute: _fromMinute,
     toMinute: _toMinute,
     radiusM: _settings.radiusM,
+    viewerId: _currentUser?.id,
   );
+
+  // ---------- Chặn người dùng ----------
+
+  // Tăng mỗi khi danh sách chặn đổi, để chat và danh sách tải lại nội dung.
+  var _blocksVersion = 0;
+  int get blocksVersion => _blocksVersion;
+
+  // Chặn/bỏ chặn rồi báo mọi màn tải lại (bàn và tin nhắn hiện/ẩn ngay).
+  // Lỗi (SafetyException...) được ném lại cho giao diện. Cần đã đăng nhập.
+  Future<void> blockUser(String blockedUserId) async {
+    final me = _currentUser;
+    if (me == null) return;
+    await safetyRepository.blockUser(me.id, blockedUserId);
+    _blocksVersion++;
+    notifyTablesChanged();
+  }
+
+  Future<void> unblockUser(String blockedUserId) async {
+    final me = _currentUser;
+    if (me == null) return;
+    await safetyRepository.unblockUser(me.id, blockedUserId);
+    _blocksVersion++;
+    notifyTablesChanged();
+  }
 }

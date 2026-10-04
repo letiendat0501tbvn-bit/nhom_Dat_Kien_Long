@@ -227,12 +227,19 @@ List<DiningTable> filterTables({
   required Map<String, Restaurant> restaurants,
   required Map<String, Area> areas,
   required DateTime now,
+  String? viewerId,
+  Set<String> blockedHostIds = const {},
 }) {
   final area = query.areaId == null ? null : areas[query.areaId];
 
   bool keep(DiningTable t) {
     if (!isActive(t) || hasStarted(t, now)) return false;
     if (query.dishId != null && t.dishId != query.dishId) return false;
+    // Ẩn bàn do người đã chặn làm chủ; bàn mình đã là thành viên thì vẫn giữ để còn rời được
+    if (blockedHostIds.contains(t.hostId) &&
+        !(viewerId != null && t.memberIds.contains(viewerId))) {
+      return false;
+    }
 
     final restaurant = restaurants[t.restaurantId];
     if (query.areaId != null) {

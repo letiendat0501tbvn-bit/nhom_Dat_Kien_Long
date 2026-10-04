@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../data/logic/table_rules.dart';
 import '../../data/models/chat_message.dart';
+import '../../data/models/enums.dart';
 import '../../l10n/formatters.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../theme/app_theme.dart';
+import 'safety_actions.dart';
 import 'status_view.dart';
 
 // Chat của một bàn (mục 4.5 SPEC). Widget này chỉ được dựng cho THÀNH VIÊN của bàn;
@@ -53,7 +55,9 @@ class _TableChatState extends State<TableChat> {
     if (_started) return;
     _started = true;
     final repo = AppScope.of(context, listen: false).chatRepository;
-    _sub = repo.incoming(widget.tableId).listen(_onIncoming);
+    _sub = repo
+        .incoming(widget.tableId, viewerId: widget.userId)
+        .listen(_onIncoming);
     _load();
   }
 
@@ -71,7 +75,7 @@ class _TableChatState extends State<TableChat> {
       final list = await AppScope.of(
         context,
         listen: false,
-      ).chatRepository.getMessages(widget.tableId);
+      ).chatRepository.getMessages(widget.tableId, viewerId: widget.userId);
       if (!mounted) return;
       setState(() {
         _messages = list;
@@ -201,9 +205,53 @@ class _TableChatState extends State<TableChat> {
           name: mine ? t(StrKey.chatYou) : widget.nameOf(m.senderId),
           time: formatClockTime(m.sentAt, t.language),
           text: m.text,
+          // Bấm giữ tin của người khác: báo cáo tin nhắn / chặn người gửi
+          onLongPress: mine ? null : () => _messageMenu(m),
         );
       },
     );
+  }
+
+  // Menu của một tin nhắn người khác. Không có cho tin của chính mình.
+  Future<void> _messageMenu(ChatMessage m) async {
+    final t = context.strings;
+    final name = widget.nameOf(m.senderId);
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.flag_outlined),
+              title: Text(t(StrKey.tdReportMessage)),
+              onTap: () => Navigator.of(ctx).pop('report'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.block),
+              title: Text(t(StrKey.tdBlockUser)),
+              onTap: () => Navigator.of(ctx).pop('block'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || action == null) return;
+    if (action == 'report') {
+      await reportTarget(
+        context,
+        type: ReportTargetType.message,
+        targetId: m.id,
+        title: t(StrKey.tdReportMessage),
+      );
+    } else {
+      await blockUserFlow(context, userId: m.senderId, name: name);
+    }
   }
 
   Widget _composer(Strings t) {
@@ -320,8 +368,10 @@ class _Bubble extends StatelessWidget {
     required this.name,
     required this.time,
     required this.text,
+    this.onLongPress,
   });
 
+  final VoidCallback? onLongPress;
   final bool mine;
   final String name;
   final String time;
@@ -339,42 +389,49 @@ class _Bubble extends StatelessWidget {
       child: Semantics(
         label: '$name, $time: $text',
         excludeSemantics: true,
-        child: Align(
-          alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-          child: LayoutBuilder(
-            builder: (context, c) => ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: c.maxWidth * 0.8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: mine ? AppColors.primary : AppColors.selectedBg,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  crossAxisAlignment: mine
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  children: [
-                    if (!mine)
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+        onLongPress: onLongPress,
+        child: GestureDetector(
+          onLongPress: onLongPress,
+          child: Align(
+            alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+            child: LayoutBuilder(
+              builder: (context, c) => ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: c.maxWidth * 0.8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: mine ? AppColors.primary : AppColors.selectedBg,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: mine
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      if (!mine)
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
                         ),
+                      // Tin dài tự xuống dòng
+                      Text(
+                        text,
+                        style: TextStyle(fontSize: 15, color: textColor),
                       ),
-                    // Tin dài tự xuống dòng
-                    Text(
-                      text,
-                      style: TextStyle(fontSize: 15, color: textColor),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(time, style: TextStyle(fontSize: 11, color: subColor)),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        time,
+                        style: TextStyle(fontSize: 11, color: subColor),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

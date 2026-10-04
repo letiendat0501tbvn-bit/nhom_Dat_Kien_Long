@@ -31,5 +31,8 @@ enum TableStatus { open, full, ended, cancelled }
 // Đối tượng bị báo cáo.
 enum ReportTargetType { table, user, message }
 
+// Lý do báo cáo (danh sách cố định). Lưu trong Report.reason dưới dạng tên enum.
+enum ReportReason { spam, harassment, inappropriate, misinformation, other }
+
 // Ngôn ngữ giao diện.
 enum AppLanguage { vi, en }

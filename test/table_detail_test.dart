@@ -247,7 +247,8 @@ void main() {
       ]);
       await pumpDetail(tester, 'en', app: app, login: true);
       expect(find.text('Đã kết thúc'), findsOneWidget);
-      expect(find.bySubtype<ButtonStyleButton>(), findsNothing);
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(OutlinedButton), findsNothing);
     }, size: tall);
 
     phoneTest('bàn không còn tồn tại: báo rõ, Back về màn trước', (
@@ -311,7 +312,10 @@ void main() {
     ) async {
       await pumpDetail(tester, 'ta');
       expect(find.text('Đăng nhập để xem thành viên.'), findsOneWidget);
-      expect(find.text('Đăng nhập'), findsNWidgets(2)); // ở thành viên và ở trò chuyện
+      expect(
+        find.text('Đăng nhập'),
+        findsNWidgets(2),
+      ); // ở thành viên và ở trò chuyện
       expect(find.text('Quốc Bảo'), findsNothing);
       expect(find.text('Thu Hà'), findsNothing);
       expect(find.text('Chủ bàn'), findsNothing);
@@ -413,7 +417,10 @@ void main() {
         find.text('Trò chuyện'),
         findsOneWidget,
       ); // thành viên có khối chat dành sẵn
-      expect(find.byType(TextField), findsOneWidget); // thành viên có ô nhập chat
+      expect(
+        find.byType(TextField),
+        findsOneWidget,
+      ); // thành viên có ô nhập chat
     }, size: tall);
 
     phoneTest(
@@ -428,7 +435,8 @@ void main() {
         ]);
         await pumpDetail(tester, 'st', app: app, login: true);
         expect(find.text('Đã bắt đầu'), findsOneWidget);
-        expect(find.bySubtype<ButtonStyleButton>(), findsNothing);
+        expect(find.byType(FilledButton), findsNothing);
+        expect(find.byType(OutlinedButton), findsNothing);
         expect(find.text('Rời bàn'), findsNothing);
         expect(find.text('Huỷ bàn'), findsNothing);
       },
@@ -437,7 +445,8 @@ void main() {
 
     phoneTest('bàn đã huỷ: không có nút thao tác', (tester) async {
       await pumpDetail(tester, 'th', login: true);
-      expect(find.bySubtype<ButtonStyleButton>(), findsNothing);
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(OutlinedButton), findsNothing);
     }, size: tall);
   });
 
@@ -654,7 +663,8 @@ void main() {
         TableStatus.cancelled,
       );
       expect(find.text('Đã huỷ'), findsOneWidget);
-      expect(find.bySubtype<ButtonStyleButton>(), findsNothing); // hết thao tác
+      expect(find.byType(FilledButton), findsNothing);
+      expect(find.byType(OutlinedButton), findsNothing);
     }, size: tall);
 
     phoneTest(
@@ -721,7 +731,8 @@ void main() {
           TableStatus.cancelled,
         );
         expect(find.text('Đã huỷ'), findsOneWidget);
-        expect(find.bySubtype<ButtonStyleButton>(), findsNothing);
+        expect(find.byType(FilledButton), findsNothing);
+        expect(find.byType(OutlinedButton), findsNothing);
       },
       size: tall,
     );

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:giua_ki_app/data/mock/mock_data.dart';
 import 'package:giua_ki_app/data/mock/mock_support.dart';
 import 'package:giua_ki_app/data/mock_dishes.dart';
+import 'package:giua_ki_app/data/models/chat_message.dart';
 import 'package:giua_ki_app/data/models/dining_table.dart';
 import 'package:giua_ki_app/data/models/dish.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
@@ -14,6 +15,7 @@ import 'package:giua_ki_app/data/repositories/mock_chat_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_location_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_safety_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_table_repository.dart';
+import 'package:giua_ki_app/data/repositories/safety_repository.dart';
 import 'package:giua_ki_app/data/repositories/table_repository.dart';
 import 'package:giua_ki_app/state/app_scope.dart';
 import 'package:giua_ki_app/state/app_state.dart';
@@ -167,9 +169,14 @@ AppState makeAppStateWithTables(
   TableRepository? tableRepository,
   DishRepository? dishRepository,
   ChatRepository? chatRepository,
+  List<ChatMessage> messages = const [],
+  // Bọc MockSafetyRepository (ví dụ để thêm lỗi/cổng chờ); chặn vẫn dùng bản mock bên trong.
+  SafetyRepository Function(MockSafetyRepository inner)? wrapSafety,
 }) {
   final data = MockData.build(testNow);
   final clock = now ?? () => testNow;
+  final safety = MockSafetyRepository(now: clock, latency: latency);
+  Future<Set<String>> blockedIdsOf(String id) async => safety.blockedIdsOf(id);
   return AppState(
     now: clock,
     dishRepository: dishRepository ?? MockDishRepository(latency: latency),
@@ -180,11 +187,17 @@ AppState makeAppStateWithTables(
           areas: data.areas,
           now: clock,
           latency: latency,
+          blockedIdsOf: blockedIdsOf,
         ),
     authRepository: MockAuthRepository(users: data.users, latency: latency),
     chatRepository: chatRepository ??
-        MockChatRepository(messages: const [], now: clock, latency: latency),
-    safetyRepository: MockSafetyRepository(now: clock, latency: latency),
+        MockChatRepository(
+          messages: messages,
+          now: clock,
+          latency: latency,
+          blockedIdsOf: blockedIdsOf,
+        ),
+    safetyRepository: wrapSafety == null ? safety : wrapSafety(safety),
     locationRepository: MockLocationRepository(
       areas: data.areas,
       restaurants: data.restaurants,

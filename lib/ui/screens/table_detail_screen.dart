@@ -10,6 +10,7 @@ import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../components/dish_image.dart';
 import '../components/login_sheet.dart';
+import '../components/safety_actions.dart';
 import '../components/status_view.dart';
 import '../components/table_chat.dart';
 import '../theme/app_theme.dart';
@@ -37,6 +38,7 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
   Dish? _dish;
   var _names =
       <String, String>{}; // id thành viên -> tên (chỉ khi đã đăng nhập)
+  var _blockedIds = <String>{}; // người mà mình đã chặn (chỉ khi đã đăng nhập)
   var _busy = _Busy.none;
   var _requestId = 0;
   Object? _key; // (tablesVersion, userId) của lần tải gần nhất
@@ -63,6 +65,7 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
       Restaurant? restaurant;
       Dish? dish;
       var names = <String, String>{};
+      var blocked = <String>{};
       if (table != null) {
         final restaurants = await app.locationRepository.getRestaurants();
         for (final r in restaurants) {
@@ -80,6 +83,12 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
             for (var i = 0; i < users.length; i++)
               if (users[i] != null) table.memberIds[i]: users[i]!.displayName,
           };
+          blocked = {
+            for (final b in await app.safetyRepository.getBlocks(
+              app.currentUser!.id,
+            ))
+              b.blockedUserId,
+          };
         }
       }
       if (!mounted || id != _requestId) return;
@@ -88,6 +97,7 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
         _restaurant = restaurant;
         _dish = dish;
         _names = names;
+        _blockedIds = blocked;
         _status = LoadStatus.ready;
       });
     } catch (_) {
@@ -248,7 +258,29 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
             context.appState.now(),
           );
     return Scaffold(
-      appBar: AppBar(title: Text(t(StrKey.tdTitle))),
+      appBar: AppBar(
+        title: Text(t(StrKey.tdTitle)),
+        actions: [
+          // Menu "⋯": báo cáo bàn (chủ bàn không báo cáo bàn của chính mình)
+          if (table != null && table.hostId != context.appState.currentUser?.id)
+            PopupMenuButton<String>(
+              tooltip: t(StrKey.tdMore),
+              icon: const Icon(Icons.more_horiz),
+              onSelected: (_) => reportTarget(
+                context,
+                type: ReportTargetType.table,
+                targetId: table.id,
+                title: t(StrKey.tdReportTable),
+              ),
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'report',
+                  child: Text(t(StrKey.tdReportTable)),
+                ),
+              ],
+            ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -416,7 +448,8 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
       else
         TableChat(
           // Rời bàn thì widget này bị gỡ: mất quyền xem ngay
-          key: ValueKey('chat-${table.id}'),
+          // Chặn/bỏ chặn ai đó thì dựng lại để tải lại tin nhắn đã lọc
+          key: ValueKey('chat-${table.id}-${context.appState.blocksVersion}'),
           tableId: table.id,
           userId: userId!,
           readOnly: access == ChatAccess.readOnly,
@@ -492,10 +525,45 @@ class _TableDetailScreenState extends State<TableDetailScreen> {
                   name: _nameOf(id),
                   isHost: id == table.hostId,
                   hostLabel: t(StrKey.tdHostBadge),
+                  blocked: _blockedIds.contains(id),
+                  blockedLabel: t(StrKey.tdBlockedBadge),
+                  // Không có menu cho chính mình (không tự chặn/báo cáo)
+                  menu: id == userId ? null : _memberMenu(t, id),
                 ),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  // Menu "⋯" của một thành viên khác: chặn/bỏ chặn và báo cáo người dùng.
+  Widget _memberMenu(Strings t, String id) {
+    final blocked = _blockedIds.contains(id);
+    final name = _nameOf(id);
+    return PopupMenuButton<String>(
+      tooltip: '${t(StrKey.tdMore)}: $name',
+      icon: const Icon(Icons.more_horiz),
+      onSelected: (v) {
+        if (v == 'block') {
+          blockUserFlow(context, userId: id, name: name);
+        } else if (v == 'unblock') {
+          unblockUserFlow(context, userId: id, name: name);
+        } else {
+          reportTarget(
+            context,
+            type: ReportTargetType.user,
+            targetId: id,
+            title: t(StrKey.tdReportUser),
+          );
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: blocked ? 'unblock' : 'block',
+          child: Text(t(blocked ? StrKey.tdUnblockUser : StrKey.tdBlockUser)),
+        ),
+        PopupMenuItem(value: 'report', child: Text(t(StrKey.tdReportUser))),
       ],
     );
   }
@@ -663,11 +731,17 @@ class _MemberRow extends StatelessWidget {
     required this.name,
     required this.isHost,
     required this.hostLabel,
+    this.blocked = false,
+    this.blockedLabel = '',
+    this.menu,
   });
 
   final String name;
   final bool isHost;
   final String hostLabel;
+  final bool blocked; // mình đã chặn người này
+  final String blockedLabel;
+  final Widget? menu; // menu "⋯" (null: chính mình)
 
   @override
   Widget build(BuildContext context) {
@@ -716,6 +790,25 @@ class _MemberRow extends StatelessWidget {
               ),
             ),
           ],
+          if (blocked) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.text.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                blockedLabel,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.text.withValues(alpha: 0.75),
+                ),
+              ),
+            ),
+          ],
+          ?menu,
         ],
       ),
     );

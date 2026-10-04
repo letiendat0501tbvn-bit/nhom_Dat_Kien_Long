@@ -9,6 +9,7 @@ class Report {
     required this.targetId,
     required this.reason,
     required this.createdAt,
+    this.note = '',
   });
 
   final String id;
@@ -17,4 +18,5 @@ class Report {
   final String targetId;
   final String reason;
   final DateTime createdAt;
+  final String note; // ghi chú tuỳ chọn của người báo cáo (tối đa 280 ký tự)
 }

@@ -7,6 +7,8 @@ import '../components/login_sheet.dart';
 import '../components/pill_tabs.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
+import 'block_list_screen.dart';
+import 'reports_sent_screen.dart';
 
 // Màn "Hồ sơ của bạn" với 2 tab: Bàn của tôi (0) và Tài khoản (1).
 // Tab Lịch hẹn ở thanh dưới mở tab 0, tab Tôi mở tab 1.
@@ -138,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Thẻ thành viên: khung đơn giản. Phản hồi riêng tư, báo cáo, danh sách chặn
+  // Thẻ thành viên. Báo cáo đã gửi và Danh sách chặn mở màn riêng; Phản hồi riêng tư
   // chưa có nội dung (làm ở giai đoạn G).
   Widget _memberCard(Strings t, User user) {
     return Container(
@@ -204,7 +206,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 contentPadding: EdgeInsets.zero,
                 title: Text(t(key)),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: _notBuilt,
+                onTap: switch (key) {
+                  StrKey.reportsSent => () => openReportsSent(context),
+                  StrKey.blockList => () => openBlockList(context),
+                  _ => _notBuilt, // phản hồi riêng tư: giai đoạn G
+                },
               ),
             ),
           const SizedBox(height: 8),

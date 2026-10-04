@@ -3,7 +3,8 @@ import '../models/chat_message.dart';
 // Trò chuyện trong bàn. Quyền (chỉ thành viên bàn còn hiệu lực) kiểm tra ở tầng trên.
 // Chưa có tin hệ thống ("X đã tham gia"...): ChatMessage chỉ có tin của người dùng.
 abstract class ChatRepository {
-  Future<List<ChatMessage>> getMessages(String tableId);
+  // viewerId: người xem. Tin của người họ đã chặn bị lọc ngay ở đây (không chỉ ẩn ở giao diện).
+  Future<List<ChatMessage>> getMessages(String tableId, {String? viewerId});
 
   Future<ChatMessage> sendMessage({
     required String tableId,
@@ -13,5 +14,6 @@ abstract class ChatRepository {
 
   // Tin mới do NGƯỜI KHÁC gửi vào bàn (tin của chính mình đã có trong kết quả của
   // sendMessage). Giao diện nghe luồng này để hiện tin mới ngay.
-  Stream<ChatMessage> incoming(String tableId);
+  // Cũng lọc tin của người viewerId đã chặn.
+  Stream<ChatMessage> incoming(String tableId, {String? viewerId});
 }

@@ -11,6 +11,7 @@ class TableQuery {
     this.fromMinute,
     this.toMinute,
     this.radiusM = 1000,
+    this.viewerId,
   });
 
   final String? areaId;
@@ -20,6 +21,8 @@ class TableQuery {
   final int? fromMinute; // phút trong ngày, 0–1439
   final int? toMinute;
   final int radiusM;
+  // Người đang xem: bàn do người họ đã chặn làm chủ bị ẩn (trừ bàn họ đã là thành viên).
+  final String? viewerId;
 }
 
 // Lý do một thao tác với bàn bị từ chối (quy tắc mục 7 SPEC).
@@ -35,6 +38,7 @@ enum TableError {
   alreadyMember,
   notMember,
   notHost,
+  blockedHost, // chủ bàn là người bạn đã chặn
 }
 
 class TableException implements Exception {

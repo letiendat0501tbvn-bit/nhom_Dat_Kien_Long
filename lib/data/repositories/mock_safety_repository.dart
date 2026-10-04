@@ -6,7 +6,8 @@ import '../models/user_feedback.dart';
 import 'safety_repository.dart';
 
 // Bản mock của SafetyRepository: báo cáo, chặn, phản hồi lưu trong bộ nhớ.
-// Việc ẩn nội dung của người bị chặn làm ở tầng trên (giai đoạn F).
+// Việc ẩn nội dung của người bị chặn do MockTableRepository/MockChatRepository làm,
+// dùng blockedIdsOf bên dưới (không có độ trễ để các repository kia gọi nhanh).
 class MockSafetyRepository implements SafetyRepository {
   MockSafetyRepository({
     this.now = systemClock,
@@ -22,20 +23,39 @@ class MockSafetyRepository implements SafetyRepository {
 
   Future<void> _wait() => Future<void>.delayed(latency());
 
+  // Id những người mà userId đã chặn (không trễ; dùng nội bộ giữa các repository mock).
+  Set<String> blockedIdsOf(String userId) => {
+    for (final b in _blocks)
+      if (b.userId == userId) b.blockedUserId,
+  };
+
   @override
   Future<Report> submitReport({
     required String reporterId,
     required ReportTargetType targetType,
     required String targetId,
     required String reason,
+    String note = '',
   }) async {
     await _wait();
+    if (targetType == ReportTargetType.user && targetId == reporterId) {
+      throw const SafetyException(SafetyError.cannotTargetSelf);
+    }
+    final duplicate = _reports.any(
+      (r) =>
+          r.reporterId == reporterId &&
+          r.targetType == targetType &&
+          r.targetId == targetId &&
+          r.reason == reason,
+    );
+    if (duplicate) throw const SafetyException(SafetyError.alreadyReported);
     final report = Report(
       id: 'r${_nextId++}',
       reporterId: reporterId,
       targetType: targetType,
       targetId: targetId,
       reason: reason,
+      note: note.trim(),
       createdAt: now(),
     );
     _reports.add(report);
@@ -51,6 +71,9 @@ class MockSafetyRepository implements SafetyRepository {
   @override
   Future<void> blockUser(String userId, String blockedUserId) async {
     await _wait();
+    if (userId == blockedUserId) {
+      throw const SafetyException(SafetyError.cannotTargetSelf);
+    }
     final exists = _blocks.any(
         (b) => b.userId == userId && b.blockedUserId == blockedUserId);
     if (exists) return; // chặn lại người đã chặn thì bỏ qua

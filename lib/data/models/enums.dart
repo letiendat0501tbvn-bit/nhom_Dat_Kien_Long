@@ -34,5 +34,8 @@ enum ReportTargetType { table, user, message }
 // Lý do báo cáo (danh sách cố định). Lưu trong Report.reason dưới dạng tên enum.
 enum ReportReason { spam, harassment, inappropriate, misinformation, other }
 
+// Các trang tĩnh (nội dung mẫu).
+enum StaticPage { about, contact, privacy, terms }
+
 // Ngôn ngữ giao diện.
 enum AppLanguage { vi, en }

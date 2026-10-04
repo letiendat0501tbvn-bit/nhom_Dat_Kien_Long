@@ -24,7 +24,12 @@ void main() {
 
     test('bản EN thật sự đã được dịch (trừ vài khoá giữ nguyên tên riêng)', () {
       // Tên app và tiêu đề có biểu tượng giữ nguyên ở cả hai ngôn ngữ.
-      const same = {StrKey.appName, StrKey.appNameWithEyes, StrKey.chatCounter};
+      const same = {
+        StrKey.appName,
+        StrKey.appNameWithEyes,
+        StrKey.chatCounter,
+        StrKey.pageContactP5, // tên nhóm Threads giữ nguyên
+      };
       for (final key in StrKey.values.where((k) => !same.contains(k))) {
         expect(enStrings[key], isNot(viStrings[key]),
             reason: 'EN giống hệt VI: ${key.name}');

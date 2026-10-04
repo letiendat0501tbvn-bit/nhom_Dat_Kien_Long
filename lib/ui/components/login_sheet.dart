@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
+import '../../data/models/enums.dart';
+import '../screens/static_page_screen.dart';
 import '../theme/app_theme.dart';
 
 // Bảng đăng nhập dạng bottom sheet (mục 4.7 SPEC).
@@ -41,12 +43,8 @@ class _LoginSheetState extends State<_LoginSheet> {
     }
   }
 
-  // Trang chính sách / điều khoản làm ở giai đoạn G.
-  void _openStatic() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.strings(StrKey.notBuiltYet))),
-    );
-  }
+  // Mở trang chính sách / điều khoản; Back quay về bảng đăng nhập (bảng vẫn mở bên dưới).
+  void _openStatic(StaticPage page) => openStaticPage(context, page);
 
   @override
   Widget build(BuildContext context) {
@@ -118,11 +116,11 @@ class _LoginSheetState extends State<_LoginSheet> {
               spacing: 8,
               children: [
                 TextButton(
-                  onPressed: _openStatic,
+                  onPressed: () => _openStatic(StaticPage.privacy),
                   child: Text(t(StrKey.privacyPolicy)),
                 ),
                 TextButton(
-                  onPressed: _openStatic,
+                  onPressed: () => _openStatic(StaticPage.terms),
                   child: Text(t(StrKey.termsOfUse)),
                 ),
               ],

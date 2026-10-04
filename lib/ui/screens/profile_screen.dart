@@ -8,6 +8,8 @@ import '../components/my_tables.dart';
 import '../components/pill_tabs.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
+import 'feedback_screen.dart';
+import 'static_page_screen.dart';
 import 'block_list_screen.dart';
 import 'reports_sent_screen.dart';
 
@@ -60,12 +62,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     if (ok == true && mounted) await context.appState.signOut();
-  }
-
-  void _notBuilt() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.strings(StrKey.notBuiltYet))),
-    );
   }
 
   @override
@@ -128,6 +124,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Tab "Tài khoản"
   Widget _account(Strings t, User? user) {
     if (user != null) return _memberCard(t, user);
+    // Khách: thẻ "Khách ghé chơi" như ảnh, mục "Thông tin" xếp ngay dưới
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _guestCard(t),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0x1F000000)),
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(t(StrKey.infoTitle)),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => openInfo(context),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _guestCard(Strings t) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -227,6 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             StrKey.privateFeedback,
             StrKey.reportsSent,
             StrKey.blockList,
+            StrKey.infoTitle,
           ])
             // Material trong suốt để ListTile vẽ hiệu ứng bấm đúng trên nền thẻ trắng
             Material(
@@ -238,7 +263,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: switch (key) {
                   StrKey.reportsSent => () => openReportsSent(context),
                   StrKey.blockList => () => openBlockList(context),
-                  _ => _notBuilt, // phản hồi riêng tư: giai đoạn G
+                  StrKey.infoTitle => () => openInfo(context),
+                  _ => () => openFeedback(context),
                 },
               ),
             ),

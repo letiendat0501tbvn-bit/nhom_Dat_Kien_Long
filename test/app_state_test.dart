@@ -107,22 +107,25 @@ void main() {
       expect(app.isLoggedIn, isTrue);
     });
 
-    test('đăng nhập lỗi: vẫn là khách, cờ đang đăng nhập được tắt, lỗi ném lại', () async {
-      final failing = AppState(
-        dishRepository: app.dishRepository,
-        tableRepository: app.tableRepository,
-        authRepository: _FailingAuthRepository(),
-        chatRepository: app.chatRepository,
-        safetyRepository: app.safetyRepository,
-        locationRepository: app.locationRepository,
-        now: () => testNow,
-      );
-      addTearDown(failing.dispose);
+    test(
+      'đăng nhập lỗi: vẫn là khách, cờ đang đăng nhập được tắt, lỗi ném lại',
+      () async {
+        final failing = AppState(
+          dishRepository: app.dishRepository,
+          tableRepository: app.tableRepository,
+          authRepository: _FailingAuthRepository(),
+          chatRepository: app.chatRepository,
+          safetyRepository: app.safetyRepository,
+          locationRepository: app.locationRepository,
+          now: () => testNow,
+        );
+        addTearDown(failing.dispose);
 
-      await expectLater(failing.signIn(), throwsException);
-      expect(failing.isLoggedIn, isFalse);
-      expect(failing.isSigningIn, isFalse);
-    });
+        await expectLater(failing.signIn(), throwsException);
+        expect(failing.isLoggedIn, isFalse);
+        expect(failing.isSigningIn, isFalse);
+      },
+    );
   });
 
   group('khu vực', () {
@@ -190,7 +193,10 @@ void main() {
     test('khung giờ phải hợp lệ', () {
       expect(() => app.setTimeWindow(fromMinute: -1), throwsArgumentError);
       expect(() => app.setTimeWindow(toMinute: 1440), throwsArgumentError);
-      expect(() => app.setTimeWindow(fromMinute: 600, toMinute: 500), throwsArgumentError);
+      expect(
+        () => app.setTimeWindow(fromMinute: 600, toMinute: 500),
+        throwsArgumentError,
+      );
       app.setTimeWindow(fromMinute: 600); // chỉ có đầu "từ" thì được
       expect(app.fromMinute, 600);
       expect(app.toMinute, isNull);
@@ -318,7 +324,10 @@ void main() {
         () => app.applyFilters(radiusM: 100, fromMinute: 700, toMinute: 600),
         throwsArgumentError,
       );
-      expect(() => app.applyFilters(radiusM: 100, toMinute: 2000), throwsArgumentError);
+      expect(
+        () => app.applyFilters(radiusM: 100, toMinute: 2000),
+        throwsArgumentError,
+      );
 
       expect(n, 0);
       expect(app.mealTime, MealTime.noon);

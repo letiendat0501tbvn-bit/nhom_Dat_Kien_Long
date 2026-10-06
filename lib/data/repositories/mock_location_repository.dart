@@ -24,6 +24,8 @@ class MockLocationRepository implements LocationRepository {
   @override
   Future<List<Restaurant>> getRestaurants({String? areaId}) async {
     await Future<void>.delayed(latency());
-    return restaurants.where((r) => areaId == null || r.areaId == areaId).toList();
+    return restaurants
+        .where((r) => areaId == null || r.areaId == areaId)
+        .toList();
   }
 }

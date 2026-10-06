@@ -9,10 +9,7 @@ import 'safety_repository.dart';
 // Việc ẩn nội dung của người bị chặn do MockTableRepository/MockChatRepository làm,
 // dùng blockedIdsOf bên dưới (không có độ trễ để các repository kia gọi nhanh).
 class MockSafetyRepository implements SafetyRepository {
-  MockSafetyRepository({
-    this.now = systemClock,
-    this.latency = randomLatency,
-  });
+  MockSafetyRepository({this.now = systemClock, this.latency = randomLatency});
 
   final Clock now;
   final Latency latency;
@@ -75,20 +72,24 @@ class MockSafetyRepository implements SafetyRepository {
       throw const SafetyException(SafetyError.cannotTargetSelf);
     }
     final exists = _blocks.any(
-        (b) => b.userId == userId && b.blockedUserId == blockedUserId);
+      (b) => b.userId == userId && b.blockedUserId == blockedUserId,
+    );
     if (exists) return; // chặn lại người đã chặn thì bỏ qua
-    _blocks.add(BlockEntry(
-      userId: userId,
-      blockedUserId: blockedUserId,
-      createdAt: now(),
-    ));
+    _blocks.add(
+      BlockEntry(
+        userId: userId,
+        blockedUserId: blockedUserId,
+        createdAt: now(),
+      ),
+    );
   }
 
   @override
   Future<void> unblockUser(String userId, String blockedUserId) async {
     await _wait();
     _blocks.removeWhere(
-        (b) => b.userId == userId && b.blockedUserId == blockedUserId);
+      (b) => b.userId == userId && b.blockedUserId == blockedUserId,
+    );
   }
 
   @override

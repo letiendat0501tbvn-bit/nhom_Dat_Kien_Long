@@ -5,11 +5,7 @@ import 'package:giua_ki_app/data/mock_dishes.dart';
 import 'package:giua_ki_app/data/models/dish.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
 
-Dish dish(
-  String id, {
-  String? region,
-  String? hashtag,
-}) => Dish(
+Dish dish(String id, {String? region, String? hashtag}) => Dish(
   id: id,
   name: id,
   category: 'Ăn vặt',

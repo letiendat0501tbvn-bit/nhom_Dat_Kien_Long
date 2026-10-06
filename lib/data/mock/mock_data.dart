@@ -39,14 +39,62 @@ class MockData {
 // ---------- Khu vực (mục 4.9 SPEC) ----------
 
 const mockAreas = <Area>[
-  Area(id: 'hcm-q1', city: 'Hồ Chí Minh', district: 'Quận 1', lat: 10.7769, lng: 106.7009),
-  Area(id: 'hcm-binh-thanh', city: 'Hồ Chí Minh', district: 'Bình Thạnh', lat: 10.8106, lng: 106.7091),
-  Area(id: 'hcm-thu-duc', city: 'Hồ Chí Minh', district: 'Thủ Đức', lat: 10.8494, lng: 106.7537),
-  Area(id: 'hn-hoan-kiem', city: 'Hà Nội', district: 'Hoàn Kiếm', lat: 21.0285, lng: 105.8542),
-  Area(id: 'dn-hai-chau', city: 'Đà Nẵng', district: 'Hải Châu', lat: 16.0678, lng: 108.2208),
-  Area(id: 'hue-phu-hoi', city: 'Huế', district: 'Phú Hội', lat: 16.4600, lng: 107.5900),
-  Area(id: 'ha-minh-an', city: 'Hội An', district: 'Minh An', lat: 15.8801, lng: 108.3380),
-  Area(id: 'ct-ninh-kieu', city: 'Cần Thơ', district: 'Ninh Kiều', lat: 10.0341, lng: 105.7880),
+  Area(
+    id: 'hcm-q1',
+    city: 'Hồ Chí Minh',
+    district: 'Quận 1',
+    lat: 10.7769,
+    lng: 106.7009,
+  ),
+  Area(
+    id: 'hcm-binh-thanh',
+    city: 'Hồ Chí Minh',
+    district: 'Bình Thạnh',
+    lat: 10.8106,
+    lng: 106.7091,
+  ),
+  Area(
+    id: 'hcm-thu-duc',
+    city: 'Hồ Chí Minh',
+    district: 'Thủ Đức',
+    lat: 10.8494,
+    lng: 106.7537,
+  ),
+  Area(
+    id: 'hn-hoan-kiem',
+    city: 'Hà Nội',
+    district: 'Hoàn Kiếm',
+    lat: 21.0285,
+    lng: 105.8542,
+  ),
+  Area(
+    id: 'dn-hai-chau',
+    city: 'Đà Nẵng',
+    district: 'Hải Châu',
+    lat: 16.0678,
+    lng: 108.2208,
+  ),
+  Area(
+    id: 'hue-phu-hoi',
+    city: 'Huế',
+    district: 'Phú Hội',
+    lat: 16.4600,
+    lng: 107.5900,
+  ),
+  Area(
+    id: 'ha-minh-an',
+    city: 'Hội An',
+    district: 'Minh An',
+    lat: 15.8801,
+    lng: 108.3380,
+  ),
+  Area(
+    id: 'ct-ninh-kieu',
+    city: 'Cần Thơ',
+    district: 'Ninh Kiều',
+    lat: 10.0341,
+    lng: 105.7880,
+  ),
 ];
 
 // ---------- Quán (tên giả) ----------
@@ -71,27 +119,59 @@ Area _area(String id) => mockAreas.firstWhere((a) => a.id == id);
 
 final mockRestaurants = <Restaurant>[
   ..._spread('q1', _area('hcm-q1'), const [
-    'Quán Nhà Lá', 'Tiệm Hẻm Nhỏ', 'Bếp Bà Tư', 'Quán Gió Sài Gòn',
-    'Tiệm Mười Hai', 'Quán Góc Phố', 'Bếp Hoa Sữa', 'Quán Trăng Non',
-    'Tiệm Lửa Hồng', 'Quán Bốn Mùa',
+    'Quán Nhà Lá',
+    'Tiệm Hẻm Nhỏ',
+    'Bếp Bà Tư',
+    'Quán Gió Sài Gòn',
+    'Tiệm Mười Hai',
+    'Quán Góc Phố',
+    'Bếp Hoa Sữa',
+    'Quán Trăng Non',
+    'Tiệm Lửa Hồng',
+    'Quán Bốn Mùa',
   ]),
   ..._spread('hk', _area('hn-hoan-kiem'), const [
-    'Quán Phố Cổ Mẫu', 'Tiệm Hàng Mẫu', 'Bếp Ngõ Nhỏ', 'Quán Sen Hồ',
-    'Tiệm Chiều Thu', 'Quán Mái Ngói', 'Bếp Cửa Đông', 'Quán Gốc Đa',
-    'Tiệm Hương Cốm', 'Quán Mùa Đông',
+    'Quán Phố Cổ Mẫu',
+    'Tiệm Hàng Mẫu',
+    'Bếp Ngõ Nhỏ',
+    'Quán Sen Hồ',
+    'Tiệm Chiều Thu',
+    'Quán Mái Ngói',
+    'Bếp Cửa Đông',
+    'Quán Gốc Đa',
+    'Tiệm Hương Cốm',
+    'Quán Mùa Đông',
   ]),
-  ..._spread('bt', _area('hcm-binh-thanh'),
-      const ['Quán Cầu Nhỏ', 'Tiệm Bến Sông', 'Bếp Chợ Mẫu']),
-  ..._spread('td', _area('hcm-thu-duc'),
-      const ['Quán Sân Trường', 'Tiệm Đồi Thông', 'Bếp Ngã Tư']),
-  ..._spread('hc', _area('dn-hai-chau'),
-      const ['Quán Gió Biển', 'Tiệm Cầu Rồng Mẫu', 'Bếp Sông Hàn']),
-  ..._spread('ph', _area('hue-phu-hoi'),
-      const ['Quán Vườn Cau', 'Tiệm Mưa Huế', 'Bếp Cố Đô Mẫu']),
-  ..._spread('ma', _area('ha-minh-an'),
-      const ['Quán Đèn Lồng Mẫu', 'Tiệm Phố Cổ Nhỏ', 'Bếp Sông Hoài Mẫu']),
-  ..._spread('nk', _area('ct-ninh-kieu'),
-      const ['Quán Chợ Nổi Mẫu', 'Tiệm Bến Ninh Kiều', 'Bếp Miệt Vườn']),
+  ..._spread('bt', _area('hcm-binh-thanh'), const [
+    'Quán Cầu Nhỏ',
+    'Tiệm Bến Sông',
+    'Bếp Chợ Mẫu',
+  ]),
+  ..._spread('td', _area('hcm-thu-duc'), const [
+    'Quán Sân Trường',
+    'Tiệm Đồi Thông',
+    'Bếp Ngã Tư',
+  ]),
+  ..._spread('hc', _area('dn-hai-chau'), const [
+    'Quán Gió Biển',
+    'Tiệm Cầu Rồng Mẫu',
+    'Bếp Sông Hàn',
+  ]),
+  ..._spread('ph', _area('hue-phu-hoi'), const [
+    'Quán Vườn Cau',
+    'Tiệm Mưa Huế',
+    'Bếp Cố Đô Mẫu',
+  ]),
+  ..._spread('ma', _area('ha-minh-an'), const [
+    'Quán Đèn Lồng Mẫu',
+    'Tiệm Phố Cổ Nhỏ',
+    'Bếp Sông Hoài Mẫu',
+  ]),
+  ..._spread('nk', _area('ct-ninh-kieu'), const [
+    'Quán Chợ Nổi Mẫu',
+    'Tiệm Bến Ninh Kiều',
+    'Bếp Miệt Vườn',
+  ]),
 ];
 
 // ---------- Người dùng mẫu ----------
@@ -143,7 +223,10 @@ List<DiningTable> _buildTables(DateTime now) {
     (('oc', 'q1-6', 90, 6, 6, 'Đã đầy'), today(225)),
     (('nem-lui', 'ma-1', 90, 6, 3, ''), today(225)),
     (('hu-tieu', 'nk-1', 60, 4, 2, ''), today(45)),
-    (('ca-phe', 'hk-3', 60, 4, 1, 'Cà phê chiều, nói chuyện nhẹ nhàng'), today(315)),
+    (
+      ('ca-phe', 'hk-3', 60, 4, 1, 'Cà phê chiều, nói chuyện nhẹ nhàng'),
+      today(315),
+    ),
     // Ngày mai
     (('pho', 'q1-1', 60, 6, 2, 'Phở sáng trước giờ làm'), tomorrow(7, 30)),
     (('bun-cha', 'hk-2', 60, 4, 2, ''), tomorrow(12, 15)),
@@ -154,8 +237,7 @@ List<DiningTable> _buildTables(DateTime now) {
   ];
 
   return [
-    for (var i = 0; i < specs.length; i++)
-      _table(i, specs[i].$1, specs[i].$2),
+    for (var i = 0; i < specs.length; i++) _table(i, specs[i].$1, specs[i].$2),
   ];
 }
 
@@ -163,7 +245,8 @@ DiningTable _table(int index, _Spec s, DateTime startAt) {
   final (dishId, restaurantId, duration, capacity, count, note) = s;
   // Chủ bàn luân phiên; các thành viên là những người kế tiếp trong danh sách
   final members = [
-    for (var k = 0; k < count; k++) mockUsers[(index + k) % mockUsers.length].id,
+    for (var k = 0; k < count; k++)
+      mockUsers[(index + k) % mockUsers.length].id,
   ];
   return DiningTable(
     id: 't${index + 1}',
@@ -182,7 +265,13 @@ DiningTable _table(int index, _Spec s, DateTime startAt) {
 // ---------- Tin nhắn mẫu ----------
 
 List<ChatMessage> _buildMessages(DateTime now) {
-  ChatMessage m(String id, String table, String sender, String text, int minAgo) {
+  ChatMessage m(
+    String id,
+    String table,
+    String sender,
+    String text,
+    int minAgo,
+  ) {
     return ChatMessage(
       id: id,
       tableId: table,

@@ -32,8 +32,9 @@ String normalizeVietnamese(String input) {
 // `text` khớp `query` khi MỌI từ của query đều xuất hiện trong text (sau chuẩn hoá),
 // không cần đúng thứ tự. Query rỗng thì khớp tất cả.
 bool matchesQuery(String text, String query) {
-  final tokens =
-      normalizeVietnamese(query).split(' ').where((t) => t.isNotEmpty);
+  final tokens = normalizeVietnamese(query)
+      .split(' ')
+      .where((t) => t.isNotEmpty);
   if (tokens.isEmpty) return true;
   final haystack = normalizeVietnamese(text);
   return tokens.every(haystack.contains);

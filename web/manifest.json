@@ -1,11 +1,11 @@
 {
-    "name": "giua_ki_app",
-    "short_name": "giua_ki_app",
+    "name": "Ăn Gì Đây Ta?",
+    "short_name": "Ăn Gì Đây Ta?",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Ăn Gì Đây Ta? - Gặp nhau qua món ăn.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

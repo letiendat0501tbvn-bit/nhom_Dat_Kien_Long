@@ -21,9 +21,9 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.background,
       textTheme: ThemeData.light().textTheme.apply(
-            bodyColor: AppColors.text,
-            displayColor: AppColors.text,
-          ),
+        bodyColor: AppColors.text,
+        displayColor: AppColors.text,
+      ),
     );
   }
 }

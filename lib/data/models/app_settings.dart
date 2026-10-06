@@ -31,7 +31,9 @@ class AppSettings {
   }) {
     return AppSettings(
       language: language ?? this.language,
-      selectedAreaId: clearArea ? null : (selectedAreaId ?? this.selectedAreaId),
+      selectedAreaId: clearArea
+          ? null
+          : (selectedAreaId ?? this.selectedAreaId),
       radiusM: radiusM ?? this.radiusM,
       mealTime: clearMealTime ? null : (mealTime ?? this.mealTime),
       useDeviceLocation: useDeviceLocation ?? this.useDeviceLocation,

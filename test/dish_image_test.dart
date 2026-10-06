@@ -16,29 +16,31 @@ const pho = Dish(
 Widget host(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 void main() {
-  testWidgets('ảnh đứng một mình có nhãn ngữ nghĩa là tên món, không đọc emoji', (
-    tester,
-  ) async {
-    final handle = tester.ensureSemantics();
-    await tester.pumpWidget(host(const DishImage(dish: pho)));
+  testWidgets(
+    'ảnh đứng một mình có nhãn ngữ nghĩa là tên món, không đọc emoji',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(host(const DishImage(dish: pho)));
 
-    expect(find.bySemanticsLabel('Phở'), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('🍜')), findsNothing);
-    handle.dispose();
-  });
+      expect(find.bySemanticsLabel('Phở'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('🍜')), findsNothing);
+      handle.dispose();
+    },
+  );
 
-  testWidgets('excludeFromSemantics: ảnh không có nhãn nào (tránh đọc lặp tên)', (
-    tester,
-  ) async {
-    final handle = tester.ensureSemantics();
-    await tester.pumpWidget(
-      host(const DishImage(dish: pho, excludeFromSemantics: true)),
-    );
+  testWidgets(
+    'excludeFromSemantics: ảnh không có nhãn nào (tránh đọc lặp tên)',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        host(const DishImage(dish: pho, excludeFromSemantics: true)),
+      );
 
-    expect(find.bySemanticsLabel('Phở'), findsNothing);
-    expect(find.bySemanticsLabel(RegExp('🍜')), findsNothing);
-    handle.dispose();
-  });
+      expect(find.bySemanticsLabel('Phở'), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('🍜')), findsNothing);
+      handle.dispose();
+    },
+  );
 
   testWidgets('vẫn hiện emoji và nền màu của món', (tester) async {
     await tester.pumpWidget(host(const DishImage(dish: pho)));

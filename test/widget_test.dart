@@ -27,8 +27,9 @@ void main() {
     expect(find.text('Mở bàn mới'), findsWidgets);
   });
 
-  testWidgets('Lịch hẹn and Tôi open the right profile tab',
-      (WidgetTester tester) async {
+  testWidgets('Lịch hẹn and Tôi open the right profile tab', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
 
     await tester.tap(find.text('Lịch hẹn'));
@@ -48,8 +49,9 @@ void main() {
     expect(find.text('Khách ghé chơi'), findsNothing);
   });
 
-  testWidgets('Lịch hẹn and Tôi share one profile screen',
-      (WidgetTester tester) async {
+  testWidgets('Lịch hẹn and Tôi share one profile screen', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
 
     await tester.tap(find.text('Lịch hẹn'));
@@ -62,8 +64,9 @@ void main() {
     expect(tester.state(find.byType(ProfileScreen)), same(first));
   });
 
-  testWidgets('Explore shows loading, then dishes, then filters by search',
-      (WidgetTester tester) async {
+  testWidgets('Explore shows loading, then dishes, then filters by search', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MyApp());
     expect(find.text('Chọn món để lên kèo'), findsOneWidget);
 
@@ -81,7 +84,9 @@ void main() {
     expect(find.text('Không tìm thấy món phù hợp.'), findsOneWidget);
   });
 
-  testWidgets('DishPicker shows error and retries', (WidgetTester tester) async {
+  testWidgets('DishPicker shows error and retries', (
+    WidgetTester tester,
+  ) async {
     final repo = FakeDishRepository(fail: true);
     await tester.pumpWidget(wrapWithApp(DishPicker(repository: repo)));
     await tester.pumpAndSettle();
@@ -127,8 +132,9 @@ void main() {
   });
 
   group('đổi ngôn ngữ', () {
-    testWidgets('nút EN/VI đổi toàn bộ chữ ngay lập tức',
-        (WidgetTester tester) async {
+    testWidgets('nút EN/VI đổi toàn bộ chữ ngay lập tức', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
@@ -153,8 +159,9 @@ void main() {
       expect(find.text('EN'), findsOneWidget);
     });
 
-    testWidgets('màn Hồ sơ và thanh dưới cũng đổi ngôn ngữ',
-        (WidgetTester tester) async {
+    testWidgets('màn Hồ sơ và thanh dưới cũng đổi ngôn ngữ', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const MyApp());
       await tester.tap(find.text('Tôi'));
       await tester.pumpAndSettle();
@@ -164,7 +171,10 @@ void main() {
       expect(find.text('Your profile'), findsOneWidget);
       expect(find.text('Guest visitor'), findsOneWidget);
       expect(find.text('Sign in'), findsOneWidget);
-      expect(find.text('Good food • New friends • Real connections'), findsOneWidget);
+      expect(
+        find.text('Good food • New friends • Real connections'),
+        findsOneWidget,
+      );
     });
   });
 
@@ -176,31 +186,39 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Tôi'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Đăng nhập')); // tiêu đề lớn đẩy nút xuống
+      await tester.ensureVisible(
+        find.text('Đăng nhập'),
+      ); // tiêu đề lớn đẩy nút xuống
       await tester.pumpAndSettle();
       await tester.tap(find.text('Đăng nhập'));
       await tester.pumpAndSettle();
       return app;
     }
 
-    testWidgets('bảng đăng nhập có đủ nội dung mục 4.7 SPEC',
-        (WidgetTester tester) async {
+    testWidgets('bảng đăng nhập có đủ nội dung mục 4.7 SPEC', (
+      WidgetTester tester,
+    ) async {
       await openLoginSheet(tester);
 
       expect(find.text('Vào hội thôi!'), findsOneWidget);
       expect(
         find.text(
-            'Đăng nhập để xem thành viên, tham gia bàn và trò chuyện. Đăng nhập không tự tham gia hay mở bàn.'),
+          'Đăng nhập để xem thành viên, tham gia bàn và trò chuyện. Đăng nhập không tự tham gia hay mở bàn.',
+        ),
         findsOneWidget,
       );
       expect(find.text('Tiếp tục với Google'), findsOneWidget);
-      expect(find.text('Không cần mật khẩu. Chỉ cần một chiếc bụng đói.'), findsOneWidget);
+      expect(
+        find.text('Không cần mật khẩu. Chỉ cần một chiếc bụng đói.'),
+        findsOneWidget,
+      );
       expect(find.text('Chính sách quyền riêng tư'), findsOneWidget);
       expect(find.text('Điều khoản sử dụng'), findsOneWidget);
     });
 
-    testWidgets('đăng nhập xong ở lại đúng màn cũ và không tự tham gia/mở bàn',
-        (WidgetTester tester) async {
+    testWidgets('đăng nhập xong ở lại đúng màn cũ và không tự tham gia/mở bàn', (
+      WidgetTester tester,
+    ) async {
       final app = await openLoginSheet(tester);
       // runAsync: repository dùng Future.delayed nên phải chạy ngoài đồng hồ giả của test
       Future<int> countTablesOfU1() async =>
@@ -225,12 +243,16 @@ void main() {
       expect(await countTablesOfU1(), before);
     });
 
-    testWidgets('đăng xuất quay lại trạng thái khách', (WidgetTester tester) async {
+    testWidgets('đăng xuất quay lại trạng thái khách', (
+      WidgetTester tester,
+    ) async {
       await openLoginSheet(tester);
       await tester.tap(find.text('Tiếp tục với Google'));
       await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Đăng xuất')); // nút nằm dưới, cần cuộn tới
+      await tester.ensureVisible(
+        find.text('Đăng xuất'),
+      ); // nút nằm dưới, cần cuộn tới
       await tester.pumpAndSettle();
       await tester.tap(find.text('Đăng xuất'));
       await tester.pumpAndSettle();
@@ -247,8 +269,9 @@ void main() {
       expect(find.text('Đăng nhập'), findsOneWidget);
     });
 
-    testWidgets('tab Bàn của tôi đổi nội dung theo khách/thành viên',
-        (WidgetTester tester) async {
+    testWidgets('tab Bàn của tôi đổi nội dung theo khách/thành viên', (
+      WidgetTester tester,
+    ) async {
       await openLoginSheet(tester);
       await tester.tap(find.text('Tiếp tục với Google'));
       await tester.pumpAndSettle();
@@ -260,8 +283,9 @@ void main() {
       expect(find.text('Sắp tới'), findsOneWidget);
     });
 
-    testWidgets('bảng đăng nhập hiện bằng tiếng Anh khi đang chọn EN',
-        (WidgetTester tester) async {
+    testWidgets('bảng đăng nhập hiện bằng tiếng Anh khi đang chọn EN', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const MyApp());
       await tester.tap(find.text('EN'));
       await tester.pumpAndSettle();
@@ -274,7 +298,10 @@ void main() {
 
       expect(find.text("Let's get in!"), findsOneWidget);
       expect(find.text('Continue with Google'), findsOneWidget);
-      expect(find.text('No password needed. Just an empty stomach.'), findsOneWidget);
+      expect(
+        find.text('No password needed. Just an empty stomach.'),
+        findsOneWidget,
+      );
       expect(find.text('Privacy Policy'), findsOneWidget);
       expect(find.text('Terms of Use'), findsOneWidget);
     });
@@ -296,8 +323,9 @@ void main() {
       expect(find.text('Phở chay'), findsOneWidget);
     });
 
-    phoneTest('bấm thẻ món mở màn chi tiết món , bấm Back quay lại',
-        (WidgetTester tester) async {
+    phoneTest('bấm thẻ món mở màn chi tiết món , bấm Back quay lại', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
@@ -305,8 +333,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Bàn ăn cho món này'), findsOneWidget);
       expect(find.text('Phở'), findsNWidgets(2)); // tiêu đề AppBar + tên món
-      expect(find.text('Nước dùng thơm, bánh phở mềm, một tô thật ấm bụng.'),
-          findsOneWidget);
+      expect(
+        find.text('Nước dùng thơm, bánh phở mềm, một tô thật ấm bụng.'),
+        findsOneWidget,
+      );
 
       await tester.pageBack();
       await tester.pumpAndSettle();
@@ -314,8 +344,9 @@ void main() {
       expect(find.text('Chọn món để lên kèo'), findsOneWidget);
     });
 
-    phoneTest('liên kết "Tìm bàn ăn" cũng mở màn chi tiết món',
-        (WidgetTester tester) async {
+    phoneTest('liên kết "Tìm bàn ăn" cũng mở màn chi tiết món', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
@@ -324,14 +355,20 @@ void main() {
       expect(find.text('Bàn ăn cho món này'), findsOneWidget);
     });
 
-    phoneTest('thẻ món không đọc lặp tên món và không đọc emoji',
-        (WidgetTester tester) async {
+    phoneTest('thẻ món không đọc lặp tên món và không đọc emoji', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
-      final semantics = tester.ensureSemantics(); // bật cây ngữ nghĩa trong test
+      final semantics = tester
+          .ensureSemantics(); // bật cây ngữ nghĩa trong test
 
       final label = tester.getSemantics(find.byType(DishCard).first).label;
-      expect('Phở'.allMatches(label).length, 1, reason: label); // tên món đúng một lần
+      expect(
+        'Phở'.allMatches(label).length,
+        1,
+        reason: label,
+      ); // tên món đúng một lần
       expect(label, isNot(contains('🍜')), reason: label); // emoji không bị đọc
       expect(label, contains('Bún & mì')); // nhãn danh mục vẫn được đọc
 
@@ -374,7 +411,10 @@ void main() {
       expect(find.text('Từ'), findsOneWidget);
       expect(find.text('Đến'), findsOneWidget);
       expect(find.text('Bất kỳ'), findsWidgets);
-      expect(find.text('Giờ Việt Nam · 30–120 phút · khung 15 phút'), findsOneWidget);
+      expect(
+        find.text('Giờ Việt Nam · 30–120 phút · khung 15 phút'),
+        findsOneWidget,
+      );
       expect(find.text('Ngày'), findsOneWidget);
       expect(find.text('Hôm nay · 05/10'), findsOneWidget); // kèm ngày thực tế
       expect(find.text('Ngày mai · 06/10'), findsOneWidget);
@@ -382,8 +422,9 @@ void main() {
       expect(find.text('Đặt lại'), findsOneWidget);
     });
 
-    phoneTest('mặc định: 1 km và Hôm nay được chọn, chưa chọn buổi ăn',
-        (WidgetTester tester) async {
+    phoneTest('mặc định: 1 km và Hôm nay được chọn, chưa chọn buổi ăn', (
+      WidgetTester tester,
+    ) async {
       await openSheet(tester);
 
       ChoiceChip chip(String label) =>
@@ -396,8 +437,9 @@ void main() {
       }
     });
 
-    phoneTest('Áp dụng ghi buổi ăn, bán kính, ngày vào AppState và đóng bảng',
-        (WidgetTester tester) async {
+    phoneTest('Áp dụng ghi buổi ăn, bán kính, ngày vào AppState và đóng bảng', (
+      WidgetTester tester,
+    ) async {
       final app = await openSheet(tester);
 
       await tapText(tester, 'Sáng');
@@ -416,8 +458,9 @@ void main() {
       expect(app.hasActiveFilters, isTrue);
     });
 
-    phoneTest('buổi ăn lọc món trên màn Khám phá theo mealTimes',
-        (WidgetTester tester) async {
+    phoneTest('buổi ăn lọc món trên màn Khám phá theo mealTimes', (
+      WidgetTester tester,
+    ) async {
       await openSheet(tester);
       await tapText(tester, 'Sáng');
       await tapText(tester, 'Áp dụng');
@@ -436,7 +479,9 @@ void main() {
       expect(find.text('Lẩu'), findsOneWidget);
     });
 
-    phoneTest('bấm lại buổi ăn đang chọn thì bỏ chọn', (WidgetTester tester) async {
+    phoneTest('bấm lại buổi ăn đang chọn thì bỏ chọn', (
+      WidgetTester tester,
+    ) async {
       final app = await openSheet(tester);
       await tapText(tester, 'Tối');
       await tapText(tester, 'Tối');
@@ -444,59 +489,67 @@ void main() {
       expect(app.mealTime, isNull);
     });
 
-    phoneTest('Đặt lại đưa bản nháp về mặc định nhưng chỉ có hiệu lực khi Áp dụng',
-        (WidgetTester tester) async {
-      final app = makeAppState()
-        ..applyFilters(
-          mealTime: MealTime.evening,
-          radiusM: 500,
-          date: DateTime(2026, 10, 7),
-          fromMinute: 17 * 60,
-          toMinute: 20 * 60,
-        );
-      await openSheet(tester, app: app);
+    phoneTest(
+      'Đặt lại đưa bản nháp về mặc định nhưng chỉ có hiệu lực khi Áp dụng',
+      (WidgetTester tester) async {
+        final app = makeAppState()
+          ..applyFilters(
+            mealTime: MealTime.evening,
+            radiusM: 500,
+            date: DateTime(2026, 10, 7),
+            fromMinute: 17 * 60,
+            toMinute: 20 * 60,
+          );
+        await openSheet(tester, app: app);
 
-      // Mở lên phải phản ánh bộ lọc đang áp dụng
-      ChoiceChip chip(String label) =>
-          tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, label));
-      expect(chip('Tối').selected, isTrue);
-      expect(chip('500 m').selected, isTrue);
-      expect(chip('T4 · 07/10').selected, isTrue);
-      expect(find.text('17:00'), findsOneWidget); // giá trị "Từ"
-      expect(find.text('20:00'), findsOneWidget); // giá trị "Đến"
+        // Mở lên phải phản ánh bộ lọc đang áp dụng
+        ChoiceChip chip(String label) =>
+            tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, label));
+        expect(chip('Tối').selected, isTrue);
+        expect(chip('500 m').selected, isTrue);
+        expect(chip('T4 · 07/10').selected, isTrue);
+        expect(find.text('17:00'), findsOneWidget); // giá trị "Từ"
+        expect(find.text('20:00'), findsOneWidget); // giá trị "Đến"
 
-      await tapText(tester, 'Đặt lại');
-      expect(chip('Tối').selected, isFalse);
-      expect(chip('1 km').selected, isTrue);
-      expect(chip('Hôm nay · 05/10').selected, isTrue);
-      expect(find.text('17:00'), findsNothing);
-      // Chưa áp dụng: AppState còn nguyên
-      expect(app.mealTime, MealTime.evening);
-      expect(app.radiusM, 500);
+        await tapText(tester, 'Đặt lại');
+        expect(chip('Tối').selected, isFalse);
+        expect(chip('1 km').selected, isTrue);
+        expect(chip('Hôm nay · 05/10').selected, isTrue);
+        expect(find.text('17:00'), findsNothing);
+        // Chưa áp dụng: AppState còn nguyên
+        expect(app.mealTime, MealTime.evening);
+        expect(app.radiusM, 500);
 
-      await tapText(tester, 'Áp dụng');
-      expect(app.mealTime, isNull);
-      expect(app.radiusM, 1000);
-      expect(app.isDateDefault, isTrue);
-      expect(app.fromMinute, isNull);
-      expect(app.toMinute, isNull);
-      expect(app.hasActiveFilters, isFalse);
-    });
+        await tapText(tester, 'Áp dụng');
+        expect(app.mealTime, isNull);
+        expect(app.radiusM, 1000);
+        expect(app.isDateDefault, isTrue);
+        expect(app.fromMinute, isNull);
+        expect(app.toMinute, isNull);
+        expect(app.hasActiveFilters, isFalse);
+      },
+    );
 
-    phoneTest('đóng bảng mà không bấm Áp dụng thì không đổi gì',
-        (WidgetTester tester) async {
+    phoneTest('đóng bảng mà không bấm Áp dụng thì không đổi gì', (
+      WidgetTester tester,
+    ) async {
       final app = await openSheet(tester);
       await tapText(tester, 'Sáng');
       // Vuốt bảng xuống để đóng mà không bấm Áp dụng
-      await tester.fling(find.text('Bộ lọc & giờ ăn'), const Offset(0, 800), 2000);
+      await tester.fling(
+        find.text('Bộ lọc & giờ ăn'),
+        const Offset(0, 800),
+        2000,
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Bộ lọc & giờ ăn'), findsNothing);
       expect(app.mealTime, isNull);
     });
 
-    phoneTest('khung giờ đã lưu có thể áp dụng lại không bị mất',
-        (WidgetTester tester) async {
+    phoneTest('khung giờ đã lưu có thể áp dụng lại không bị mất', (
+      WidgetTester tester,
+    ) async {
       final app = makeAppState()
         ..applyFilters(radiusM: 1000, fromMinute: 600, toMinute: 780);
       await openSheet(tester, app: app);
@@ -505,7 +558,9 @@ void main() {
       expect(app.toMinute, 780);
     });
 
-    phoneTest('bảng lọc hiện bằng tiếng Anh khi chọn EN', (WidgetTester tester) async {
+    phoneTest('bảng lọc hiện bằng tiếng Anh khi chọn EN', (
+      WidgetTester tester,
+    ) async {
       final app = makeAppState()..setLanguage(AppLanguage.en);
       await openSheet(tester, app: app);
 
@@ -522,16 +577,22 @@ void main() {
       expect(find.text('Reset'), findsOneWidget);
     });
 
-    phoneTest('nút lọc được tô sáng khi có bộ lọc khác mặc định',
-        (WidgetTester tester) async {
+    phoneTest('nút lọc được tô sáng khi có bộ lọc khác mặc định', (
+      WidgetTester tester,
+    ) async {
       final app = makeAppState();
       await tester.pumpWidget(MyApp(appState: app));
       await tester.pumpAndSettle();
 
       Color? filterButtonColor() => tester
-          .widget<Material>(find
-              .ancestor(of: find.byIcon(Icons.tune), matching: find.byType(Material))
-              .first)
+          .widget<Material>(
+            find
+                .ancestor(
+                  of: find.byIcon(Icons.tune),
+                  matching: find.byType(Material),
+                )
+                .first,
+          )
           .color;
       expect(filterButtonColor(), Colors.white);
 
@@ -540,8 +601,9 @@ void main() {
       expect(filterButtonColor(), isNot(Colors.white));
     });
 
-    phoneTest('màn Bàn ăn cũng dùng chung bảng lọc',
-        (WidgetTester tester) async {
+    phoneTest('màn Bàn ăn cũng dùng chung bảng lọc', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Bàn ăn'));

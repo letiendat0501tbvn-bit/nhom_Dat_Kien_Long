@@ -7,7 +7,7 @@ import 'app_state.dart';
 // dựng lại khi AppState đổi (ví dụ đổi ngôn ngữ, đăng nhập).
 class AppScope extends InheritedNotifier<AppState> {
   const AppScope({super.key, required AppState state, required super.child})
-      : super(notifier: state);
+    : super(notifier: state);
 
   // listen: false khi chỉ cần gọi hàm/lấy repository, không cần dựng lại theo thay đổi.
   static AppState of(BuildContext context, {bool listen = true}) {

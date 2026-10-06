@@ -133,7 +133,9 @@ DiningTable makeTable(
     startAt: start,
     durationMin: duration,
     capacity: capacity,
-    status: status ?? (members.length >= capacity ? TableStatus.full : TableStatus.open),
+    status:
+        status ??
+        (members.length >= capacity ? TableStatus.full : TableStatus.open),
     memberIds: members,
   );
 }
@@ -152,13 +154,49 @@ List<DiningTable> standardTables() {
       DateTime(d.year, d.month, d.day + dayOffset, h, m);
   return [
     makeTable('ta', dishId: 'pho', start: at(11, 0), members: ['u2', 'u3']),
-    makeTable('tb', dishId: 'lau', start: at(12, 0), capacity: 2, members: ['u2', 'u3']),
-    makeTable('tc', restaurantId: 'q1-2', start: at(14, 0), members: ['u1', 'u2']),
-    makeTable('td', dishId: 'banh-xeo', restaurantId: 'q1-2', start: at(14, 30), members: ['u4']),
-    makeTable('tg', dishId: 'oc', restaurantId: 'q1-4', start: at(18, 0), capacity: 6, members: ['u5', 'u6']),
-    makeTable('tf', dishId: 'com-tam', restaurantId: 'q1-4', start: at(8, 0, dayOffset: 1), members: ['u5']),
+    makeTable(
+      'tb',
+      dishId: 'lau',
+      start: at(12, 0),
+      capacity: 2,
+      members: ['u2', 'u3'],
+    ),
+    makeTable(
+      'tc',
+      restaurantId: 'q1-2',
+      start: at(14, 0),
+      members: ['u1', 'u2'],
+    ),
+    makeTable(
+      'td',
+      dishId: 'banh-xeo',
+      restaurantId: 'q1-2',
+      start: at(14, 30),
+      members: ['u4'],
+    ),
+    makeTable(
+      'tg',
+      dishId: 'oc',
+      restaurantId: 'q1-4',
+      start: at(18, 0),
+      capacity: 6,
+      members: ['u5', 'u6'],
+    ),
+    makeTable(
+      'tf',
+      dishId: 'com-tam',
+      restaurantId: 'q1-4',
+      start: at(8, 0, dayOffset: 1),
+      members: ['u5'],
+    ),
     makeTable('te', dishId: 'pho', start: at(9, 30), members: ['u7', 'u8']),
-    makeTable('th', dishId: 'pho', start: at(13, 0), members: ['u7'], status: TableStatus.cancelled),
+    makeTable(
+      'th',
+      dishId: 'pho',
+      start: at(13, 0),
+      members: ['u7'],
+      status: TableStatus.cancelled,
+    ),
   ];
 }
 
@@ -184,7 +222,8 @@ AppState makeAppStateWithTables(
     now: clock,
     random: random,
     dishRepository: dishRepository ?? MockDishRepository(latency: latency),
-    tableRepository: tableRepository ??
+    tableRepository:
+        tableRepository ??
         MockTableRepository(
           tables: tables,
           restaurants: data.restaurants,
@@ -194,7 +233,8 @@ AppState makeAppStateWithTables(
           blockedIdsOf: blockedIdsOf,
         ),
     authRepository: MockAuthRepository(users: data.users, latency: latency),
-    chatRepository: chatRepository ??
+    chatRepository:
+        chatRepository ??
         MockChatRepository(
           messages: messages,
           now: clock,
@@ -227,7 +267,8 @@ class ThrowingTableRepository implements TableRepository {
   int joinCalls = 0;
   int createCalls = 0;
   int getCalls = 0; // số lần getTable
-  final TableError? createError; // lỗi createTable ném ra (null: lỗi chung bất ngờ)
+  final TableError?
+  createError; // lỗi createTable ném ra (null: lỗi chung bất ngờ)
   TableQuery? lastQuery; // truy vấn của lần getTables gần nhất
 
   @override

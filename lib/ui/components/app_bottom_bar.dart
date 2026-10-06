@@ -70,8 +70,11 @@ class AppBottomBar extends StatelessWidget {
                             BoxShadow(color: Colors.black26, blurRadius: 6),
                           ],
                         ),
-                        child:
-                            const Icon(Icons.add, color: Colors.white, size: 30),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 30,
+                        ),
                       ),
                     ),
                   ),
@@ -111,7 +114,8 @@ class AppBottomBar extends StatelessWidget {
             ),
             Text(
               t(labelKey),
-              maxLines: 1, // nhãn dài (ví dụ bản EN) không được xuống dòng làm tràn
+              maxLines:
+                  1, // nhãn dài (ví dụ bản EN) không được xuống dòng làm tràn
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,

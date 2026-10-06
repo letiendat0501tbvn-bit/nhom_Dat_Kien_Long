@@ -26,7 +26,10 @@ void main() {
     });
 
     test('isSameDay bỏ qua giờ', () {
-      expect(isSameDay(DateTime(2026, 10, 5, 1), DateTime(2026, 10, 5, 23)), isTrue);
+      expect(
+        isSameDay(DateTime(2026, 10, 5, 1), DateTime(2026, 10, 5, 23)),
+        isTrue,
+      );
       expect(isSameDay(DateTime(2026, 10, 5), DateTime(2026, 10, 6)), isFalse);
       expect(isSameDay(DateTime(2026, 10, 5), DateTime(2025, 10, 5)), isFalse);
     });
@@ -61,10 +64,20 @@ void main() {
     final today = DateTime(2026, 10, 5); // thứ Hai
 
     test('mealTimeLabel đủ 5 buổi ở cả hai ngôn ngữ', () {
-      expect(MealTime.values.map(vi.mealTimeLabel),
-          ['Sáng', 'Trưa', 'Xế', 'Tối', 'Khuya']);
-      expect(MealTime.values.map(en.mealTimeLabel),
-          ['Morning', 'Noon', 'Afternoon', 'Evening', 'Late night']);
+      expect(MealTime.values.map(vi.mealTimeLabel), [
+        'Sáng',
+        'Trưa',
+        'Xế',
+        'Tối',
+        'Khuya',
+      ]);
+      expect(MealTime.values.map(en.mealTimeLabel), [
+        'Morning',
+        'Noon',
+        'Afternoon',
+        'Evening',
+        'Late night',
+      ]);
     });
 
     test('dayLabel: hôm nay, ngày mai và thứ trong tuần kèm ngày thực tế', () {
@@ -78,7 +91,10 @@ void main() {
 
     test('dayLabel đúng khi sang tháng', () {
       final endOfMonth = DateTime(2026, 10, 31);
-      expect(vi.dayLabel(DateTime(2026, 11, 1), endOfMonth), 'Ngày mai · 01/11');
+      expect(
+        vi.dayLabel(DateTime(2026, 11, 1), endOfMonth),
+        'Ngày mai · 01/11',
+      );
     });
   });
 }

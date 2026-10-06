@@ -363,8 +363,10 @@ const Map<StrKey, String> viStrings = {
   StrKey.diceAgain: 'Quay lại',
   StrKey.diceResult: 'Món vừa ra: {name}',
   StrKey.diceMealNote: 'Đang quay theo buổi {meal}.',
-  StrKey.diceFallbackNote: 'Chưa có món hợp buổi {meal}, nên quay trong tất cả món.',
-  StrKey.fbNote: 'Phản hồi này là riêng tư: chỉ đội ngũ đọc, không hiện cho người khác.',
+  StrKey.diceFallbackNote:
+      'Chưa có món hợp buổi {meal}, nên quay trong tất cả món.',
+  StrKey.fbNote:
+      'Phản hồi này là riêng tư: chỉ đội ngũ đọc, không hiện cho người khác.',
   StrKey.fbHint: 'Bạn muốn góp ý điều gì?',
   StrKey.fbSend: 'Gửi phản hồi',
   StrKey.fbSent: 'Cảm ơn bạn! Đã gửi phản hồi riêng tư.',
@@ -373,7 +375,8 @@ const Map<StrKey, String> viStrings = {
   StrKey.fbEmpty: 'Bạn chưa gửi phản hồi nào.',
   StrKey.fbError: 'Không tải được phản hồi. Kiểm tra mạng rồi thử lại nhé.',
   StrKey.infoTitle: 'Thông tin',
-  StrKey.pageSampleNote: 'Nội dung mẫu: chỉ phục vụ đồ án, chưa phải nội dung chính thức.',
+  StrKey.pageSampleNote:
+      'Nội dung mẫu: chỉ phục vụ đồ án, chưa phải nội dung chính thức.',
   StrKey.pageAbout: 'Góc "Ăn Gì Đây Ta?"',
   StrKey.pageContact: 'Liên hệ',
   StrKey.pageAboutP1: '## Gặp nhau qua món ăn',
@@ -441,7 +444,8 @@ const Map<StrKey, String> viStrings = {
   StrKey.reportsEmpty: 'Bạn chưa gửi báo cáo nào.',
   StrKey.reportsError: 'Không tải được báo cáo. Kiểm tra mạng rồi thử lại nhé.',
   StrKey.blocksEmpty: 'Bạn chưa chặn ai.',
-  StrKey.blocksError: 'Không tải được danh sách chặn. Kiểm tra mạng rồi thử lại nhé.',
+  StrKey.blocksError:
+      'Không tải được danh sách chặn. Kiểm tra mạng rồi thử lại nhé.',
   StrKey.tdTitle: 'Chi tiết bàn',
   StrKey.tdStatusUpcoming: 'Sắp diễn ra',
   StrKey.tdStatusFull: 'Đã đầy',
@@ -470,7 +474,8 @@ const Map<StrKey, String> viStrings = {
   StrKey.tdLeaveTitle: 'Rời bàn này?',
   StrKey.tdLeaveBody: 'Bạn sẽ trả lại chỗ của mình. Nếu bàn còn chỗ, bạn có thể tham gia lại sau.',
   StrKey.tdLeaveHostBody: 'Bạn là chủ bàn. Khi bạn rời, quyền chủ bàn sẽ chuyển cho {name}, người vào bàn sớm nhất.',
-  StrKey.tdLeaveAloneBody: 'Bạn là người duy nhất trong bàn. Rời bàn sẽ huỷ bàn này.',
+  StrKey.tdLeaveAloneBody:
+      'Bạn là người duy nhất trong bàn. Rời bàn sẽ huỷ bàn này.',
   StrKey.tdLeaveStay: 'Ở lại',
   StrKey.tdCancelTitle: 'Huỷ bàn này?',
   StrKey.tdCancelBody: 'Bàn sẽ đóng lại và không ai tham gia được nữa. Thao tác này không hoàn tác được.',
@@ -490,7 +495,8 @@ const Map<StrKey, String> viStrings = {
   StrKey.ntDishClear: 'Bỏ chọn món',
   StrKey.ntRestaurantTitle: 'Quán',
   StrKey.ntRestaurantEmpty: 'Khu vực này chưa có quán nào.',
-  StrKey.ntRestaurantError: 'Không tải được danh sách quán. Kiểm tra mạng rồi thử lại nhé.',
+  StrKey.ntRestaurantError:
+      'Không tải được danh sách quán. Kiểm tra mạng rồi thử lại nhé.',
   StrKey.ntDateTitle: 'Ngày',
   StrKey.ntTimeTitle: 'Giờ bắt đầu',
   StrKey.ntTimeNote: 'Giờ Việt Nam, theo khung 15 phút.',
@@ -606,8 +612,7 @@ const Map<StrKey, String> viStrings = {
   StrKey.filterApply: 'Áp dụng',
   StrKey.filterReset: 'Đặt lại',
   StrKey.areaSheetTitle: 'Vị trí của bạn',
-  StrKey.areaSheetBody:
-      'Cho phép vị trí để tìm điểm hẹn tại quán gần đây. Vị trí không được dùng để ghép người và không hiển thị cho người khác.',
+  StrKey.areaSheetBody: 'Cho phép vị trí để tìm điểm hẹn tại quán gần đây. Vị trí không được dùng để ghép người và không hiển thị cho người khác.',
   StrKey.allowLocation: 'Cho phép vị trí',
   StrKey.maybeLater: 'Để sau',
   StrKey.areaOrChoose: 'Hoặc chọn khu vực',
@@ -643,7 +648,8 @@ const Map<StrKey, String> viStrings = {
   StrKey.myTablesUpcoming: 'Sắp tới',
   StrKey.myTablesPast: 'Đã qua',
   StrKey.myTablesNoUpcoming: 'Chưa có bàn sắp tới.',
-  StrKey.myTablesEmpty: 'Bạn chưa có bàn nào. Mở bàn mới hoặc tìm một bàn để tham gia nhé!',
+  StrKey.myTablesEmpty:
+      'Bạn chưa có bàn nào. Mở bàn mới hoặc tìm một bàn để tham gia nhé!',
   StrKey.signOutTitle: 'Đăng xuất?',
   StrKey.signOutBody: 'Bạn sẽ trở lại là khách ghé chơi. Bạn có thể đăng nhập lại bất cứ lúc nào.',
   StrKey.guestTitle: 'Khách ghé chơi',
@@ -691,7 +697,8 @@ const Map<StrKey, String> enStrings = {
   StrKey.diceAgain: 'Spin again',
   StrKey.diceResult: 'You got: {name}',
   StrKey.diceMealNote: 'Spinning among {meal} dishes.',
-  StrKey.diceFallbackNote: 'No dishes fit {meal}, so we are spinning among all dishes.',
+  StrKey.diceFallbackNote:
+      'No dishes fit {meal}, so we are spinning among all dishes.',
   StrKey.fbNote: 'This feedback is private: only the team reads it, and nobody else can see it.',
   StrKey.fbHint: 'What would you like to tell us?',
   StrKey.fbSend: 'Send feedback',
@@ -699,9 +706,11 @@ const Map<StrKey, String> enStrings = {
   StrKey.fbSendFailed: "Couldn't send your feedback.",
   StrKey.fbSentTitle: 'Sent feedback',
   StrKey.fbEmpty: "You haven't sent any feedback yet.",
-  StrKey.fbError: "Couldn't load your feedback. Check your connection and try again.",
+  StrKey.fbError:
+      "Couldn't load your feedback. Check your connection and try again.",
   StrKey.infoTitle: 'Info',
-  StrKey.pageSampleNote: 'Sample content: for the course project only, not official text.',
+  StrKey.pageSampleNote:
+      'Sample content: for the course project only, not official text.',
   StrKey.pageAbout: 'The "Ăn Gì Đây Ta?" corner',
   StrKey.pageContact: 'Contact',
   StrKey.pageAboutP1: '## Meeting over food',
@@ -732,7 +741,8 @@ const Map<StrKey, String> enStrings = {
   StrKey.pageTermsP6: 'Please arrive on time and leave the table early if you cannot come, so the seat is freed. Hosts can cancel a table.',
   StrKey.pageTermsP7: '## Responsibility',
   StrKey.pageTermsP8: 'Everyone pays for their own meal. Meet in public places and keep yourself safe.',
-  StrKey.errTableBlocked: "You've blocked this table's host, so you can't join.",
+  StrKey.errTableBlocked:
+      "You've blocked this table's host, so you can't join.",
   StrKey.tdMore: 'More options',
   StrKey.tdReportTable: 'Report table',
   StrKey.tdReportUser: 'Report user',
@@ -767,9 +777,11 @@ const Map<StrKey, String> enStrings = {
   StrKey.unblockConfirm: 'Unblock',
   StrKey.unblockDone: 'Unblocked {name}.',
   StrKey.reportsEmpty: "You haven't sent any reports.",
-  StrKey.reportsError: "Couldn't load reports. Check your connection and try again.",
+  StrKey.reportsError:
+      "Couldn't load reports. Check your connection and try again.",
   StrKey.blocksEmpty: "You haven't blocked anyone.",
-  StrKey.blocksError: "Couldn't load the block list. Check your connection and try again.",
+  StrKey.blocksError:
+      "Couldn't load the block list. Check your connection and try again.",
   StrKey.tdTitle: 'Table details',
   StrKey.tdStatusUpcoming: 'Upcoming',
   StrKey.tdStatusFull: 'Full',
@@ -785,12 +797,14 @@ const Map<StrKey, String> enStrings = {
   StrKey.tdChatTitle: 'Chat',
   StrKey.chatJoinToChat: 'Join the table to chat.',
   StrKey.chatEmpty: 'No messages yet. Say hello first!',
-  StrKey.chatError: "Couldn't load messages. Check your connection and try again.",
+  StrKey.chatError:
+      "Couldn't load messages. Check your connection and try again.",
   StrKey.chatHint: 'Type a message…',
   StrKey.chatSend: 'Send',
   StrKey.chatSendFailed: "Couldn't send the message.",
   StrKey.chatResend: 'Resend',
-  StrKey.chatReadOnly: 'Chat is read-only because the table has started or ended.',
+  StrKey.chatReadOnly:
+      'Chat is read-only because the table has started or ended.',
   StrKey.chatCounter: '{n}/{max}',
   StrKey.chatYou: 'You',
   StrKey.tdLeave: 'Leave table',
@@ -798,10 +812,12 @@ const Map<StrKey, String> enStrings = {
   StrKey.tdLeaveTitle: 'Leave this table?',
   StrKey.tdLeaveBody: 'You will give up your seat. If the table still has room, you can join again later.',
   StrKey.tdLeaveHostBody: 'You are the host. If you leave, hosting passes to {name}, who joined first.',
-  StrKey.tdLeaveAloneBody: 'You are the only one at this table. Leaving will cancel it.',
+  StrKey.tdLeaveAloneBody:
+      'You are the only one at this table. Leaving will cancel it.',
   StrKey.tdLeaveStay: 'Stay',
   StrKey.tdCancelTitle: 'Cancel this table?',
-  StrKey.tdCancelBody: 'The table will close and nobody can join. This cannot be undone.',
+  StrKey.tdCancelBody:
+      'The table will close and nobody can join. This cannot be undone.',
   StrKey.tdCancelBodyOthers: 'The table will close, {n} other members will lose their seats and nobody can join. This cannot be undone.',
   StrKey.tdCancelKeep: 'Keep table',
   StrKey.tdLeft: 'You left the table.',
@@ -818,7 +834,8 @@ const Map<StrKey, String> enStrings = {
   StrKey.ntDishClear: 'Remove dish',
   StrKey.ntRestaurantTitle: 'Venue',
   StrKey.ntRestaurantEmpty: 'No venues in this area yet.',
-  StrKey.ntRestaurantError: "Couldn't load venues. Check your connection and try again.",
+  StrKey.ntRestaurantError:
+      "Couldn't load venues. Check your connection and try again.",
   StrKey.ntDateTitle: 'Date',
   StrKey.ntTimeTitle: 'Start time',
   StrKey.ntTimeNote: 'Vietnam time, in 15-minute steps.',
@@ -935,13 +952,13 @@ const Map<StrKey, String> enStrings = {
   StrKey.filterApply: 'Apply',
   StrKey.filterReset: 'Reset',
   StrKey.areaSheetTitle: 'Your location',
-  StrKey.areaSheetBody:
-      'Allow location to find nearby meeting spots. Your location is never used to match people and is never shown to others.',
+  StrKey.areaSheetBody: 'Allow location to find nearby meeting spots. Your location is never used to match people and is never shown to others.',
   StrKey.allowLocation: 'Allow location',
   StrKey.maybeLater: 'Not now',
   StrKey.areaOrChoose: 'Or choose an area',
   StrKey.areaCenterNote: "We'll search around the center of the area you pick.",
-  StrKey.locationComingSoon: 'This feature will be available in a later version.',
+  StrKey.locationComingSoon:
+      'This feature will be available in a later version.',
   StrKey.areaClear: 'Clear area',
   StrKey.changeArea: 'Change',
   StrKey.tablesError:
@@ -972,9 +989,11 @@ const Map<StrKey, String> enStrings = {
   StrKey.myTablesUpcoming: 'Upcoming',
   StrKey.myTablesPast: 'Past',
   StrKey.myTablesNoUpcoming: 'No upcoming tables.',
-  StrKey.myTablesEmpty: "You don't have any tables yet. Open a new one or find one to join!",
+  StrKey.myTablesEmpty:
+      "You don't have any tables yet. Open a new one or find one to join!",
   StrKey.signOutTitle: 'Sign out?',
-  StrKey.signOutBody: 'You will go back to being a guest. You can sign in again any time.',
+  StrKey.signOutBody:
+      'You will go back to being a guest. You can sign in again any time.',
   StrKey.guestTitle: 'Guest visitor',
   StrKey.guestBody:
       'Sign in to revisit your tables, chat and manage private feedback.',
@@ -1017,7 +1036,9 @@ class Strings {
   // Điền chỗ trống dạng {tên} trong một chuỗi: fill(StrKey.seatsLeft, {'left': '2', 'total': '4'}).
   String fill(StrKey key, Map<String, Object> params) {
     var text = call(key);
-    params.forEach((name, value) => text = text.replaceAll('{$name}', '$value'));
+    params.forEach(
+      (name, value) => text = text.replaceAll('{$name}', '$value'),
+    );
     return text;
   }
 

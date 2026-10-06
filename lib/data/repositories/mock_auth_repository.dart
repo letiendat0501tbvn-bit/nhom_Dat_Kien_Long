@@ -9,8 +9,8 @@ class MockAuthRepository implements AuthRepository {
     required List<User> users,
     User? signInAs,
     this.latency = randomLatency,
-  })  : _users = users,
-        _signInAs = signInAs ?? users.first;
+  }) : _users = users,
+       _signInAs = signInAs ?? users.first;
 
   final Latency latency;
   final List<User> _users;

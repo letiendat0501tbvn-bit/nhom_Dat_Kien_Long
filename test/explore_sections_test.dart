@@ -265,7 +265,9 @@ void main() {
       await tester.tap(find.text('Hải sản'));
       await tester.pumpAndSettle();
       expect(
-        find.text('Không tải được danh sách món. Kiểm tra mạng rồi thử lại nhé.'),
+        find.text(
+          'Không tải được danh sách món. Kiểm tra mạng rồi thử lại nhé.',
+        ),
         findsOneWidget,
       );
       expect(repo.calls, 1);
@@ -312,29 +314,35 @@ void main() {
       ]) {
         expect(find.text(chip), findsOneWidget, reason: chip);
       }
-      expect(find.text('Pick a taste to see suggested dishes.'), findsOneWidget);
+      expect(
+        find.text('Pick a taste to see suggested dishes.'),
+        findsOneWidget,
+      );
     });
   });
 
   group('Gói trọn hương vị ba miền', () {
-    phoneTest('có tiêu đề, thẻ Bún chả với vùng và hashtag, nút Khám phá thêm', (
+    phoneTest(
+      'có tiêu đề, thẻ Bún chả với vùng và hashtag, nút Khám phá thêm',
+      (tester) async {
+        await tester.pumpWidget(wrapWithApp(RegionSection(onMore: () {})));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Gói trọn hương vị ba miền'), findsOneWidget);
+        expect(
+          find.text('Không chỉ là ăn ngon, mà còn là câu chuyện văn hoá.'),
+          findsOneWidget,
+        );
+        expect(find.text('Bún chả'), findsOneWidget);
+        expect(find.text('Hà Nội'), findsOneWidget);
+        expect(find.text('#HanoiClassic'), findsOneWidget);
+        expect(find.text('Khám phá thêm món Việt'), findsOneWidget);
+      },
+    );
+
+    phoneTest('đủ 4 thẻ theo thứ tự, mỗi thẻ có vùng và hashtag', (
       tester,
     ) async {
-      await tester.pumpWidget(wrapWithApp(RegionSection(onMore: () {})));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Gói trọn hương vị ba miền'), findsOneWidget);
-      expect(
-        find.text('Không chỉ là ăn ngon, mà còn là câu chuyện văn hoá.'),
-        findsOneWidget,
-      );
-      expect(find.text('Bún chả'), findsOneWidget);
-      expect(find.text('Hà Nội'), findsOneWidget);
-      expect(find.text('#HanoiClassic'), findsOneWidget);
-      expect(find.text('Khám phá thêm món Việt'), findsOneWidget);
-    });
-
-    phoneTest('đủ 4 thẻ theo thứ tự, mỗi thẻ có vùng và hashtag', (tester) async {
       await tester.pumpWidget(wrapWithApp(RegionSection(onMore: () {})));
       await tester.pumpAndSettle();
 
@@ -454,7 +462,9 @@ void main() {
 
     int dishCards() => find.byType(DishCard).evaluate().length;
 
-    phoneTest('hiện đúng 8 món và nút "Xem tất cả 56 món ngon"', (tester) async {
+    phoneTest('hiện đúng 8 món và nút "Xem tất cả 56 món ngon"', (
+      tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
@@ -509,8 +519,13 @@ void main() {
     phoneTest('gõ tìm kiếm thì hiện mọi kết quả, không giới hạn 8, không nút', (
       tester,
     ) async {
-      final expected = kMockDishes.where((d) => matchesQuery(d.name, 'ch')).length;
-      expect(expected, greaterThan(dishPreviewCount)); // đảm bảo bài kiểm tra có ý nghĩa
+      final expected = kMockDishes
+          .where((d) => matchesQuery(d.name, 'ch'))
+          .length;
+      expect(
+        expected,
+        greaterThan(dishPreviewCount),
+      ); // đảm bảo bài kiểm tra có ý nghĩa
 
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
@@ -527,7 +542,9 @@ void main() {
       expect(find.text('Xem tất cả 56 món ngon'), findsOneWidget);
     }, size: tall);
 
-    phoneTest('"Xem tất cả" mở màn Tất cả món ngon có đủ 56 món', (tester) async {
+    phoneTest('"Xem tất cả" mở màn Tất cả món ngon có đủ 56 món', (
+      tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
@@ -604,7 +621,9 @@ void main() {
       expect(find.text('All dishes'), findsOneWidget);
     }, size: tall);
 
-    phoneTest('bấm thẻ vùng trên trang Khám phá mở chi tiết món', (tester) async {
+    phoneTest('bấm thẻ vùng trên trang Khám phá mở chi tiết món', (
+      tester,
+    ) async {
       await tester.pumpWidget(MyApp(appState: makeAppState()));
       await tester.pumpAndSettle();
 
@@ -632,7 +651,11 @@ void main() {
 
               // Mở từng tab và chip để bố cục các trạng thái đều được dựng
               final t = app.strings;
-              for (final key in [StrKey.tabMood, StrKey.tabHot, StrKey.tabTaste]) {
+              for (final key in [
+                StrKey.tabMood,
+                StrKey.tabHot,
+                StrKey.tabTaste,
+              ]) {
                 await tester.tap(find.text(t(key)));
                 await tester.pumpAndSettle();
               }

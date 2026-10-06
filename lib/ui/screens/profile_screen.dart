@@ -79,6 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SectionHeading(
                   title: t(StrKey.profileTitle),
                   subtitle: t(StrKey.profileSubtitle),
+                  titleSize: 35, // to hơn các tiêu đề khác, theo lich-hen.jpg và toi.jpg
                 ),
                 const SizedBox(height: 20),
                 PillTabs(

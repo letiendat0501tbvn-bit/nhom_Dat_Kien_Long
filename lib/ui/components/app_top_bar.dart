@@ -5,6 +5,7 @@ import '../../state/app_scope.dart';
 import '../../data/models/area.dart';
 import '../theme/app_theme.dart';
 import 'area_sheet.dart';
+import 'dice_sheet.dart';
 
 // Thanh trên cùng dùng chung: logo | vị trí hoặc tên app | EN | xúc xắc | hồ sơ.
 class AppTopBar extends StatelessWidget {
@@ -58,8 +59,8 @@ class AppTopBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           _circleButton(
-            label: t(StrKey.semDice), // chức năng lắc món: giai đoạn H
-            onTap: onDiceTap,
+            label: t(StrKey.semDice),
+            onTap: onDiceTap ?? () => showDiceSheet(context),
             color: AppColors.accent,
             child: const Icon(Icons.casino_outlined, color: AppColors.text),
           ),
@@ -101,8 +102,11 @@ class AppTopBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.location_on_outlined,
-                  color: AppColors.primary, size: 20),
+              const Icon(
+                Icons.location_on_outlined,
+                color: AppColors.primary,
+                size: 20,
+              ),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(

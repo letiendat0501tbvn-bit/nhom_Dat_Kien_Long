@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,8 +26,8 @@ import 'package:giua_ki_app/state/app_state.dart';
 final testNow = DateTime(2026, 10, 5, 10, 0);
 
 // AppState dùng dữ liệu mẫu, giờ cố định, không có độ trễ.
-AppState makeAppState({Latency latency = noLatency}) =>
-    AppState.mock(now: () => testNow, latency: latency);
+AppState makeAppState({Latency latency = noLatency, Random? random}) =>
+    AppState.mock(now: () => testNow, latency: latency, random: random);
 
 // Bọc một widget trong AppScope + MaterialApp để test riêng từng widget.
 Widget wrapWithApp(Widget child, {AppState? app}) {
@@ -170,6 +172,7 @@ AppState makeAppStateWithTables(
   DishRepository? dishRepository,
   ChatRepository? chatRepository,
   List<ChatMessage> messages = const [],
+  Random? random,
   // Bọc MockSafetyRepository (ví dụ để thêm lỗi/cổng chờ); chặn vẫn dùng bản mock bên trong.
   SafetyRepository Function(MockSafetyRepository inner)? wrapSafety,
 }) {
@@ -179,6 +182,7 @@ AppState makeAppStateWithTables(
   Future<Set<String>> blockedIdsOf(String id) async => safety.blockedIdsOf(id);
   return AppState(
     now: clock,
+    random: random,
     dishRepository: dishRepository ?? MockDishRepository(latency: latency),
     tableRepository: tableRepository ??
         MockTableRepository(

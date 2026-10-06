@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 
 import '../data/mock/mock_data.dart';
@@ -32,8 +34,9 @@ class AppState extends ChangeNotifier {
     required this.safetyRepository,
     required this.locationRepository,
     this.now = systemClock,
+    Random? random,
     this._settings = const AppSettings(),
-  });
+  }) : random = random ?? Random();
 
   // Bản dùng dữ liệu mẫu cho cả app. `now`/`latency` truyền vào được để test.
   // simulateReplies: bật phản hồi giả lập trong chat (CHỈ ĐỂ DEMO); test để tắt.
@@ -41,11 +44,13 @@ class AppState extends ChangeNotifier {
     Clock now = systemClock,
     Latency latency = randomLatency,
     bool simulateReplies = false,
+    Random? random,
   }) {
     final data = MockData.build(now());
     final safety = MockSafetyRepository(now: now, latency: latency);
     // Chặn người dùng được áp dụng ở repository (ẩn bàn, ẩn tin, không cho tham gia)
-    Future<Set<String>> blockedIdsOf(String id) async => safety.blockedIdsOf(id);
+    Future<Set<String>> blockedIdsOf(String id) async =>
+        safety.blockedIdsOf(id);
     final tables = MockTableRepository(
       tables: data.tables,
       restaurants: data.restaurants,
@@ -56,6 +61,7 @@ class AppState extends ChangeNotifier {
     );
     return AppState(
       now: now,
+      random: random,
       dishRepository: MockDishRepository(latency: latency),
       tableRepository: tables,
       authRepository: MockAuthRepository(users: data.users, latency: latency),
@@ -87,6 +93,8 @@ class AppState extends ChangeNotifier {
   final SafetyRepository safetyRepository;
   final LocationRepository locationRepository;
   final Clock now;
+  // Nguồn ngẫu nhiên (cho Lắc món); truyền vào được để test cho kết quả xác định.
+  final Random random;
 
   AppSettings _settings;
   User? _currentUser; // null = khách ghé chơi

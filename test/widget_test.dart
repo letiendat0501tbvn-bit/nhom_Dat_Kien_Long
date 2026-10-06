@@ -176,6 +176,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Tôi'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Đăng nhập')); // tiêu đề lớn đẩy nút xuống
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Đăng nhập'));
       await tester.pumpAndSettle();
       return app;
@@ -264,6 +266,8 @@ void main() {
       await tester.tap(find.text('EN'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Me'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Sign in'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();

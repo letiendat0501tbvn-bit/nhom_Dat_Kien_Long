@@ -339,6 +339,25 @@ void main() {
     );
   });
 
+  group('Dữ liệu mẫu mặc định', () {
+    phoneTest(
+      'đăng nhập giả lập vào Lịch hẹn: đúng 1 bàn Sắp tới và 1 bàn Đã kết thúc',
+      (tester) async {
+        await pumpMyTables(tester, app: makeAppState());
+        expect(find.text('Sắp tới'), findsOneWidget);
+        expect(find.text('Đã qua'), findsOneWidget);
+        final cards = tester
+            .widgetList<TableCard>(find.byType(TableCard))
+            .toList();
+        expect(cards.length, 2);
+        expect(cards.first.table.hostId, 'u1'); // Sắp tới: Minh Anh là chủ bàn
+        expect(cards.last.table.status, TableStatus.ended);
+        expect(inCard(cards.last.table.id, 'Đã kết thúc'), findsOneWidget);
+      },
+      size: tall,
+    );
+  });
+
   group('Đăng xuất', () {
     phoneTest('có hộp xác nhận; Huỷ giữ nguyên; xác nhận về trạng thái khách', (
       tester,

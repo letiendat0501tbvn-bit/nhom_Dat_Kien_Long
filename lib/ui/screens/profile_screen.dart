@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/user.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
+import '../components/app_logo.dart';
 import '../components/login_sheet.dart';
 import '../components/my_tables.dart';
 import '../components/pill_tabs.dart';
@@ -311,15 +312,7 @@ class _BrandFooter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.ramen_dining,
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-              ),
+              const AppLogo(radius: 16),
               const SizedBox(width: 10),
               Text(
                 t(StrKey.appName),

@@ -4,6 +4,7 @@ import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
 import '../../data/models/area.dart';
 import '../theme/app_theme.dart';
+import 'app_logo.dart';
 import 'area_sheet.dart';
 import 'dice_sheet.dart';
 
@@ -35,12 +36,8 @@ class AppTopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Logo tròn (chưa có ảnh logo nên dùng biểu tượng tạm)
-          const CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.ramen_dining, color: AppColors.primary),
-          ),
+          // Logo tròn (assets/images/logo.png; chưa có file thì hiện biểu tượng tạm)
+          const AppLogo(radius: 20),
           const SizedBox(width: 8),
           Expanded(
             child: showLocation

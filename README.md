@@ -70,7 +70,7 @@ design/                   ảnh thiết kế tham chiếu
 
 Những phần sau là **giả lập để demo**, không phải dịch vụ thật:
 
-- **Dữ liệu mẫu:** 56 món, các khu vực (Hà Nội, TP.HCM), quán, người dùng và bàn ăn được sinh trong bộ nhớ lúc mở app (giờ của bàn tính từ thời điểm hiện tại). Tên người dùng là tên giả. Mọi thay đổi mất khi tắt app.
+- **Dữ liệu mẫu:** 56 món, các khu vực (Hà Nội, TP.HCM), quán, người dùng và bàn ăn được sinh trong bộ nhớ lúc mở app (giờ của bàn tính từ thời điểm hiện tại). Tên người dùng là tên giả. Người dùng đăng nhập giả lập (Minh Anh) chỉ có sẵn 2 bàn mẫu: một bàn sắp tới và một bàn đã kết thúc; có một bàn mở ở Quận 1 cố ý trùng giờ để thử lỗi trùng giờ. Mọi thay đổi mất khi tắt app.
 - **Đăng nhập giả lập:** nút "Tiếp tục với Google" luôn đăng nhập thành người dùng mẫu "Minh Anh" (không dùng tài khoản Google thật, không có mật khẩu).
 - **Phản hồi chat tự động:** sau khi bạn gửi tin trong bàn, một thành viên khác của bàn tự trả lời bằng một câu có sẵn sau 1–2 giây (chỉ để demo, nằm trong `MockChatRepository`).
 - **Độ trễ:** mỗi thao tác có độ trễ ngẫu nhiên 300–600 ms để thấy trạng thái đang tải.

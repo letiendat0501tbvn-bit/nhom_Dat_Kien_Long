@@ -18,6 +18,7 @@ class Dish {
     this.hashtag,
     this.isTrending = false,
     this.mealTimes = const [],
+    this.imageAsset,
   });
 
   final String id; // slug, ví dụ 'pho'
@@ -34,4 +35,6 @@ class Dish {
   final String? hashtag; // ví dụ #HanoiClassic
   final bool isTrending; // tab "Đang hot"
   final List<MealTime> mealTimes; // buổi ăn phù hợp
+  // Đường dẫn ảnh trong assets; null (hoặc file không đọc được) thì dùng ô màu + emoji.
+  final String? imageAsset;
 }

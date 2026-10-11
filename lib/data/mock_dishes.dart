@@ -1,3 +1,4 @@
+import 'dish_images.dart';
 import 'logic/text_search.dart';
 import 'mock/mock_support.dart';
 import 'models/dish.dart';
@@ -88,6 +89,7 @@ Dish _dish(
     hashtag: hashtag,
     isTrending: hot,
     mealTimes: _meals(meals),
+    imageAsset: dishImageAsset(id),
   );
 }
 

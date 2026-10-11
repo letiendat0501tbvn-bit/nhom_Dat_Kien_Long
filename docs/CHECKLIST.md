@@ -32,7 +32,9 @@ Chạy app bằng `flutter run -d chrome` (hoặc trên thiết bị Android). M
 - [ ] Bấm "Tham gia" một bàn còn chỗ. *Mong đợi:* thông báo thành công, thẻ đổi thành "Đã tham gia", số chỗ giảm 1.
 - [ ] Bấm vào thẻ (không phải nút) để mở Chi tiết bàn. *Mong đợi:* thấy món, quán, giờ, thời lượng, chỗ còn, danh sách thành viên với huy hiệu "Chủ bàn", khối trò chuyện.
 - [ ] Bấm "Rời bàn". *Mong đợi:* hộp xác nhận nói rõ hậu quả; xác nhận xong có thông báo, nút về "Tham gia", chat biến mất. Back về danh sách: thẻ đã cập nhật.
-- [ ] Tham gia hai bàn trùng giờ. *Mong đợi:* thông báo lỗi trùng giờ, không vào bàn thứ hai.
+- [ ] Vừa đăng nhập, vào tab Lịch hẹn. *Mong đợi:* Minh Anh chỉ có đúng 2 bàn mẫu: 1 bàn "Sắp tới" (cô ấy là chủ bàn, bắt đầu sau khoảng 1–3 giờ, còn 1 chỗ) và 1 bàn "Đã qua" (nhãn "Đã kết thúc", bắt đầu cách đây khoảng 3 giờ).
+- [ ] **Thử Tham gia bàn trùng giờ để thấy lỗi:** ở Bàn ăn, khu vực Quận 1, tìm bàn "Bánh xèo" còn 2 chỗ có giờ trùng bàn "Sắp tới" của Minh Anh (cách bây giờ khoảng 2 giờ) và bấm "Tham gia". *Mong đợi:* thông báo lỗi trùng giờ, số chỗ không đổi, không vào bàn.
+- [ ] **Thử Tham gia một bàn khác để thấy thành công:** bấm "Tham gia" một bàn Quận 1 còn chỗ khác (ví dụ "Bánh mì chảo" sắp đến giờ, hoặc "Lẩu"). *Mong đợi:* thông báo thành công, thẻ đổi thành "Đã tham gia", bàn xuất hiện ở tab Lịch hẹn.
 - [ ] Bàn đã đầy. *Mong đợi:* nút "Đã đầy" không bấm được.
 
 ## 6. Mở bàn mới
@@ -58,7 +60,7 @@ Chạy app bằng `flutter run -d chrome` (hoặc trên thiết bị Android). M
 - [ ] "Báo cáo đã gửi". *Mong đợi:* liệt kê loại, lý do, ghi chú, giờ, mới nhất trước.
 
 ## 9. Hồ sơ, phản hồi, đăng xuất
-- [ ] Tab **Lịch hẹn** (đã đăng nhập). *Mong đợi:* "Sắp tới" và "Đã qua"; bàn đã huỷ/kết thúc có nhãn trạng thái; bấm thẻ mở Chi tiết bàn. Chưa có bàn thì hiện câu gợi ý với nút "Mở bàn mới" và "Tìm bàn ăn".
+- [ ] Tab **Lịch hẹn** (đã đăng nhập, chưa tham gia gì). *Mong đợi:* đúng 1 bàn "Sắp tới" và 1 bàn "Đã qua" (xem mục 4); bàn đã huỷ/kết thúc có nhãn trạng thái; bấm thẻ mở Chi tiết bàn. Chưa có bàn thì hiện câu gợi ý với nút "Mở bàn mới" và "Tìm bàn ăn".
 - [ ] Khách vào tab Lịch hẹn. *Mong đợi:* "Đăng nhập để xem những bàn ăn của bạn." như ảnh.
 - [ ] Tab **Tôi** → "Phản hồi riêng tư". *Mong đợi:* ghi chú "riêng tư"; gửi phản hồi có thông báo, ô được xoá, phản hồi hiện đầu danh sách; trên 500 ký tự bị chặn.
 - [ ] Tab Tôi → "Thông tin" (cả khách) → mở 4 trang. *Mong đợi:* có dòng "Nội dung mẫu", Back về danh sách.

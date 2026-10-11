@@ -17,3 +17,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Ảnh món (assets/images/dishes/) và logo (assets/images/logo.png)
+  assets:
+    - assets/images/
+    - assets/images/dishes/

@@ -41,7 +41,7 @@ Future<void> settle(WidgetTester tester) async {
 void main() {
   group('Đường dẫn ảnh của món mẫu', () {
     test(
-      'món có file thì có đường dẫn; ca-phe dùng cafe.jpg; cao-lau chưa có ảnh',
+      'món có file thì có đường dẫn; ca-phe dùng cafe.jpg; cao-lau có ảnh',
       () {
         final byId = {for (final d in kMockDishes) d.id: d};
         expect(byId['pho']!.imageAsset, 'assets/images/dishes/Pho.jpg');
@@ -50,7 +50,7 @@ void main() {
           'assets/images/dishes/Banh-beo.png',
         );
         expect(byId['ca-phe']!.imageAsset, 'assets/images/dishes/cafe.jpg');
-        expect(byId['cao-lau']!.imageAsset, isNull);
+        expect(byId['cao-lau']!.imageAsset, 'assets/images/dishes/Cao-lau.jpg');
         expect(dishImageAsset('khong-co'), isNull);
       },
     );

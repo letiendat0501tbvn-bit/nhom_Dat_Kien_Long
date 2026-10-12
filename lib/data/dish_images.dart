@@ -1,7 +1,7 @@
 // Ảnh món thật nằm ở assets/images/dishes/. Tên file không khớp hoàn toàn với id món
 // (viết hoa chữ đầu, có file .png, "cafe.jpg" cho món "ca-phe"), mà Flutter phân biệt hoa
 // thường khi đọc asset trên web và Android, nên ghi rõ tên file thật cho từng món ở đây.
-// Món không có trong bảng (hiện là "cao-lau") thì dùng ô màu + emoji như trước.
+// Món không có trong bảng thì dùng ô màu + emoji như trước.
 // Thêm ảnh mới: bỏ file vào thư mục rồi thêm một dòng "id món": "tên file".
 const kDishImageDir = 'assets/images/dishes/';
 
@@ -13,6 +13,7 @@ const kDishImageFiles = <String, String>{
   'hu-tieu': 'Hu-tieu.jpg',
   'bun-rieu': 'Bun-rieu.jpg',
   'bun-dau-mam-tom': 'Bun-dau-mam-tom.jpg',
+  'cao-lau': 'Cao-lau.jpg',
   'banh-canh': 'Banh-canh.jpg',
   'hu-tieu-go': 'Hu-tieu-go.jpg',
   'pho-chay': 'Pho-chay.jpg',

@@ -52,7 +52,7 @@ class DishCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    dish.description,
+                    dish.descriptionFor(t.language),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

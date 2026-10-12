@@ -79,7 +79,7 @@ Chạy app bằng `flutter run -d chrome` (hoặc trên thiết bị Android). M
 - [ ] "Đăng xuất". *Mong đợi:* hộp xác nhận; xác nhận xong về "Khách ghé chơi" + nút Đăng nhập như ảnh, tab Lịch hẹn cũng về trạng thái khách.
 
 ## 10. Đổi ngôn ngữ
-- [ ] Bấm nút "EN" ở thanh trên. *Mong đợi:* toàn bộ chữ đổi sang tiếng Anh ngay (thanh dưới, các màn, bảng lọc, bảng đăng nhập, chat, hộp thoại); giờ hiển thị kiểu AM/PM; nút đổi thành "VI". Mô tả món vẫn tiếng Việt (chưa dịch).
+- [ ] Bấm nút "EN" ở thanh trên. *Mong đợi:* toàn bộ chữ đổi sang tiếng Anh ngay (thanh dưới, các màn, bảng lọc, bảng đăng nhập, chat, hộp thoại); giờ hiển thị kiểu AM/PM; nút đổi thành "VI". Tên món giữ tiếng Việt, còn mô tả món (thẻ món, Chi tiết món, kết quả Lắc món) đổi sang tiếng Anh; đổi lại VI thì mô tả về tiếng Việt.
 - [ ] Lặp lại vài luồng ở mục 3–9 bằng tiếng Anh. *Mong đợi:* không còn chữ Việt lẫn trong giao diện, không tràn dòng.
 
 ## 11. Khổ màn hình và chữ phóng to

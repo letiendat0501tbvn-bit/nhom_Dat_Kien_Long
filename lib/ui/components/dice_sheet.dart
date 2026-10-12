@@ -221,7 +221,7 @@ class _DiceSheetState extends State<DiceSheet>
           ),
           const SizedBox(height: 4),
           Text(
-            dish.description,
+            dish.descriptionFor(t.language),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 16, height: 1.4),

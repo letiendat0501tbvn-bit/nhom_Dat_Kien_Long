@@ -79,7 +79,7 @@ Những phần sau là **giả lập để demo**, không phải dịch vụ th�
 - **Vị trí:** chưa dùng vị trí thật; "Cho phép vị trí" chỉ báo sẽ có ở bản sau. Khu vực chọn thủ công.
 - **Ảnh món và logo:** là ô màu kèm biểu tượng tạm, chưa có ảnh thật.
 - **Các trang thông tin** (Giới thiệu, Liên hệ, Chính sách quyền riêng tư, Điều khoản sử dụng): nội dung mẫu ngắn, có ghi chú trên màn. Nhóm Facebook/Threads chỉ hiện chữ, không có liên kết.
-- Mô tả món chỉ có tiếng Việt (chưa dịch sang tiếng Anh).
+- Tên món giữ tiếng Việt ở cả hai ngôn ngữ; mô tả món có bản tiếng Anh (bản dịch tự soạn, chưa được người bản ngữ kiểm tra).
 
 ## Thay bằng API thật
 

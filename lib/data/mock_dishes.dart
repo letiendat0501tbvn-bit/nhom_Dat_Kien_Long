@@ -1,3 +1,4 @@
+import 'dish_descriptions_en.dart';
 import 'dish_images.dart';
 import 'logic/text_search.dart';
 import 'mock/mock_support.dart';
@@ -90,6 +91,7 @@ Dish _dish(
     isTrending: hot,
     mealTimes: _meals(meals),
     imageAsset: dishImageAsset(id),
+    descriptionEn: kDishDescriptionsEn[id],
   );
 }
 

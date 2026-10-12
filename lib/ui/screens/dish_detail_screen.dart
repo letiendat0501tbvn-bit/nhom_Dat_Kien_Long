@@ -105,7 +105,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
             ],
             const SizedBox(height: 12),
             Text(
-              dish.description,
+              dish.descriptionFor(t.language),
               style: const TextStyle(fontSize: 16, height: 1.4),
             ),
             if (dish.tastes.isNotEmpty) ...[

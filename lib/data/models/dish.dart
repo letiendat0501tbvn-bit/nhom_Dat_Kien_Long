@@ -19,6 +19,7 @@ class Dish {
     this.isTrending = false,
     this.mealTimes = const [],
     this.imageAsset,
+    this.descriptionEn,
   });
 
   final String id; // slug, ví dụ 'pho'
@@ -37,4 +38,13 @@ class Dish {
   final List<MealTime> mealTimes; // buổi ăn phù hợp
   // Đường dẫn ảnh trong assets; null (hoặc file không đọc được) thì dùng ô màu + emoji.
   final String? imageAsset;
+  // Mô tả tiếng Anh; null thì dùng mô tả tiếng Việt. Tên món luôn giữ tiếng Việt.
+  final String? descriptionEn;
+
+  // Mô tả theo ngôn ngữ đang chọn, có dự phòng về tiếng Việt nếu thiếu bản dịch.
+  String descriptionFor(AppLanguage language) {
+    final en = descriptionEn;
+    if (language == AppLanguage.en && en != null && en.isNotEmpty) return en;
+    return description;
+  }
 }

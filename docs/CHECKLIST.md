@@ -28,6 +28,18 @@ Chạy app bằng `flutter run -d chrome` (hoặc trên thiết bị Android). M
 - [ ] Trong bảng đăng nhập bấm "Chính sách quyền riêng tư" và "Điều khoản sử dụng". *Mong đợi:* mở đúng trang (có ghi chú nội dung mẫu); Back về bảng đăng nhập còn mở.
 - [ ] Bấm "Tiếp tục với Google". *Mong đợi:* bảng đóng, ở lại đúng màn, **không tự tham gia** bàn nào.
 
+### Đăng ký tài khoản (giả lập)
+- [ ] Tab Tôi (chưa đăng nhập) → bấm "Chưa có tài khoản? Đăng ký" (hoặc trong bảng đăng nhập). *Mong đợi:* màn "Tạo tài khoản" có Họ tên, Email, Mật khẩu, Nhập lại mật khẩu, nút Đăng ký và liên kết "Đã có tài khoản? Đăng nhập".
+- [ ] Bấm "Đăng ký" khi để trống. *Mong đợi:* lỗi đỏ ngay dưới từng ô; sửa ô nào thì lỗi ô đó mất ngay.
+- [ ] Thử họ tên 1 ký tự, email "abc", mật khẩu 3 ký tự, nhập lại khác nhau. *Mong đợi:* mỗi ô báo đúng lỗi; họ tên chỉ có khoảng trắng hai đầu vẫn tính là thiếu.
+- [ ] Nhập email "MinhAnh@Example.com" (trùng tài khoản mẫu, khác hoa thường). *Mong đợi:* "Email đã được sử dụng."
+- [ ] Bấm biểu tượng con mắt ở ô mật khẩu. *Mong đợi:* hiện/ẩn mật khẩu của cả hai ô.
+- [ ] Điền đúng rồi bấm "Đăng ký". *Mong đợi:* nút có vòng quay và không bấm đúp được; xong có thông báo "Đăng ký thành công!", quay về bảng đăng nhập với email (chữ thường) điền sẵn; **chưa đăng nhập**.
+- [ ] Nhập sai mật khẩu rồi "Đăng nhập bằng email". *Mong đợi:* "Sai mật khẩu." dưới ô mật khẩu. Nhập email lạ: "Không có tài khoản với email này."
+- [ ] Nhập đúng mật khẩu. *Mong đợi:* vào được; tab Tôi hiện đúng tên và email vừa đăng ký; tab Lịch hẹn hiện trạng thái rỗng thân thiện ("Bạn chưa có bàn nào…" với nút "Mở bàn mới" và "Tìm bàn ăn").
+- [ ] Đăng xuất rồi đăng nhập lại bằng email. *Mong đợi:* vẫn thấy tài khoản mới. Tải lại trang web (F5) thì tài khoản mất (giới hạn của bản mô phỏng).
+- [ ] Bấm "Tiếp tục với Google". *Mong đợi:* vẫn vào tài khoản mẫu "Minh Anh" như cũ.
+
 ## 5. Tham gia và rời bàn
 - [ ] Bấm "Tham gia" một bàn còn chỗ. *Mong đợi:* thông báo thành công, thẻ đổi thành "Đã tham gia", số chỗ giảm 1.
 - [ ] Bấm vào thẻ (không phải nút) để mở Chi tiết bàn. *Mong đợi:* thấy món, quán, giờ, thời lượng, chỗ còn, danh sách thành viên với huy hiệu "Chủ bàn", khối trò chuyện.

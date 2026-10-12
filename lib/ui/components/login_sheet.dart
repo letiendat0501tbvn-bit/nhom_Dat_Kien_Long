@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../../data/logic/account_rules.dart';
+import '../../data/models/enums.dart';
+import '../../data/repositories/auth_repository.dart';
 import '../../l10n/strings.dart';
 import '../../state/app_scope.dart';
-import '../../data/models/enums.dart';
+import '../screens/register_screen.dart';
 import '../screens/static_page_screen.dart';
 import '../theme/app_theme.dart';
 
 // Bảng đăng nhập dạng bottom sheet (mục 4.7 SPEC).
 // Đăng nhập xong chỉ đóng bảng: người dùng ở lại đúng màn cũ và tự bấm lại hành động
 // đang định làm. Đăng nhập KHÔNG tự tham gia hay mở bàn.
-Future<void> showLoginSheet(BuildContext context) {
+// Có hai cách: nút "Tiếp tục với Google" (giả lập, vào tài khoản mẫu) và email + mật khẩu
+// (tài khoản đã đăng ký trong app). initialEmail: email điền sẵn (sau khi vừa đăng ký).
+Future<void> showLoginSheet(BuildContext context, {String? initialEmail}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -18,19 +23,37 @@ Future<void> showLoginSheet(BuildContext context) {
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
     ),
-    builder: (_) => const _LoginSheet(),
+    builder: (_) => _LoginSheet(initialEmail: initialEmail),
   );
 }
 
 class _LoginSheet extends StatefulWidget {
-  const _LoginSheet();
+  const _LoginSheet({this.initialEmail});
+
+  final String? initialEmail;
 
   @override
   State<_LoginSheet> createState() => _LoginSheetState();
 }
 
 class _LoginSheetState extends State<_LoginSheet> {
-  var _failed = false;
+  late final _email = TextEditingController(text: widget.initialEmail ?? '');
+  final _password = TextEditingController();
+  var _failed = false; // đăng nhập Google lỗi
+  var _emailFailed = false; // đăng nhập email lỗi chung (không có mạng...)
+  var _emailSigning =
+      false; // đang đăng nhập bằng email (để hiện vòng quay đúng nút)
+  var _showPassword = false;
+  AccountIssue? _emailIssue;
+  AccountIssue? _passwordIssue;
+  AuthError? _authError; // lỗi từ repository: không có email / sai mật khẩu
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
 
   Future<void> _signIn() async {
     final app = AppScope.of(context, listen: false);
@@ -43,8 +66,86 @@ class _LoginSheetState extends State<_LoginSheet> {
     }
   }
 
+  // Đăng nhập bằng email + mật khẩu: kiểm tra ô trước, rồi hỏi repository.
+  Future<void> _signInWithEmail() async {
+    final app = AppScope.of(context, listen: false);
+    if (app.isSigningIn) return;
+    final emailIssue = validateEmail(_email.text);
+    final passwordIssue = _password.text.isEmpty
+        ? AccountIssue.passwordRequired
+        : null;
+    setState(() {
+      _emailIssue = emailIssue;
+      _passwordIssue = passwordIssue;
+      _authError = null;
+      _emailFailed = false;
+    });
+    if (emailIssue != null || passwordIssue != null) return;
+    setState(() => _emailSigning = true);
+    try {
+      await app.signInWithEmail(_email.text, _password.text);
+      if (mounted) Navigator.of(context).pop();
+    } on AuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          _emailSigning = false;
+          _authError = e.error;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _emailSigning = false;
+          _emailFailed = true;
+        });
+      }
+    }
+  }
+
+  // Sang màn Đăng ký; xong thì quay lại đây, điền sẵn email vừa đăng ký.
+  Future<void> _openRegister() async {
+    final result = await openRegister(context);
+    if (!mounted || result == null) return;
+    setState(() {
+      if (result.email.isNotEmpty) _email.text = result.email;
+      _password.clear();
+      _emailIssue = null;
+      _passwordIssue = null;
+      _authError = null;
+    });
+  }
+
   // Mở trang chính sách / điều khoản; Back quay về bảng đăng nhập (bảng vẫn mở bên dưới).
   void _openStatic(StaticPage page) => openStaticPage(context, page);
+
+  String? _emailError(Strings t) {
+    if (_emailIssue != null) return t.accountIssue(_emailIssue!);
+    if (_authError == AuthError.emailNotFound) {
+      return t(StrKey.accErrEmailNotFound);
+    }
+    return null;
+  }
+
+  String? _passwordError(Strings t) {
+    if (_passwordIssue != null) return t.accountIssue(_passwordIssue!);
+    if (_authError == AuthError.wrongPassword) {
+      return t(StrKey.accErrWrongPassword);
+    }
+    return null;
+  }
+
+  InputDecoration _decoration(String label, String? error, {Widget? suffix}) {
+    return InputDecoration(
+      labelText: label,
+      errorText: error,
+      errorMaxLines: 3,
+      suffixIcon: suffix,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(20),
+        borderSide: const BorderSide(color: Color(0x1F000000)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +153,13 @@ class _LoginSheetState extends State<_LoginSheet> {
     final busy = context.appState.isSigningIn;
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 4, 24, 20),
+        // Đẩy nội dung lên trên bàn phím
+        padding: EdgeInsets.fromLTRB(
+          24,
+          4,
+          24,
+          20 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +183,7 @@ class _LoginSheetState extends State<_LoginSheet> {
                   backgroundColor: AppColors.primary,
                   shape: const StadiumBorder(),
                 ),
-                icon: busy
+                icon: busy && !_emailSigning
                     ? const SizedBox(
                         width: 18,
                         height: 18,
@@ -99,7 +206,93 @@ class _LoginSheetState extends State<_LoginSheet> {
                 style: const TextStyle(color: AppColors.primary),
               ),
             ],
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                t(StrKey.loginOr),
+                style: TextStyle(color: AppColors.text.withValues(alpha: 0.6)),
+              ),
+            ),
             const SizedBox(height: 12),
+            TextField(
+              controller: _email,
+              enabled: !busy,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              onChanged: (_) => setState(() {
+                _emailIssue = null;
+                _authError = null;
+              }),
+              decoration: _decoration(t(StrKey.fieldEmail), _emailError(t)),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _password,
+              enabled: !busy,
+              obscureText: !_showPassword,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _signInWithEmail(),
+              onChanged: (_) => setState(() {
+                _passwordIssue = null;
+                _authError = null;
+              }),
+              decoration: _decoration(
+                t(StrKey.fieldPassword),
+                _passwordError(t),
+                suffix: IconButton(
+                  tooltip: t(
+                    _showPassword ? StrKey.hidePassword : StrKey.showPassword,
+                  ),
+                  onPressed: () =>
+                      setState(() => _showPassword = !_showPassword),
+                  icon: Icon(
+                    _showPassword ? Icons.visibility_off : Icons.visibility,
+                  ),
+                ),
+              ),
+            ),
+            if (_emailFailed) ...[
+              const SizedBox(height: 10),
+              Text(
+                t(StrKey.loginFailed),
+                style: const TextStyle(color: AppColors.primary),
+              ),
+            ],
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: OutlinedButton(
+                onPressed: busy ? null : _signInWithEmail,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: const StadiumBorder(),
+                ),
+                child: _emailSigning && busy
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        t(StrKey.loginEmailButton),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+              ),
+            ),
+            Center(
+              child: TextButton(
+                onPressed: busy ? null : _openRegister,
+                child: Text(
+                  t(StrKey.loginNoAccount),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
             Center(
               child: Text(
                 t(StrKey.loginNote),

@@ -276,6 +276,8 @@ void main() {
       await tester.tap(find.text('Tiếp tục với Google'));
       await tester.pumpAndSettle();
 
+      await tester.ensureVisible(find.text('Bàn của tôi')); // trang đã cuộn xuống ở bước trước
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Bàn của tôi'));
       await tester.pumpAndSettle();
       expect(find.text('Đăng nhập để xem những bàn ăn của bạn.'), findsNothing);

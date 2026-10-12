@@ -36,6 +36,7 @@ void main() {
         StrKey.appName,
         StrKey.appNameWithEyes,
         StrKey.chatCounter,
+        StrKey.fieldEmail, // "Email" giống nhau ở hai ngôn ngữ
         StrKey.pageContactP5, // tên nhóm Threads giữ nguyên
       };
       for (final key in StrKey.values.where((k) => !same.contains(k))) {

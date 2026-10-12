@@ -10,6 +10,7 @@ import 'package:giua_ki_app/data/models/chat_message.dart';
 import 'package:giua_ki_app/data/models/dining_table.dart';
 import 'package:giua_ki_app/data/models/dish.dart';
 import 'package:giua_ki_app/data/models/enums.dart';
+import 'package:giua_ki_app/data/repositories/auth_repository.dart';
 import 'package:giua_ki_app/data/repositories/chat_repository.dart';
 import 'package:giua_ki_app/data/repositories/dish_repository.dart';
 import 'package:giua_ki_app/data/repositories/mock_auth_repository.dart';
@@ -211,6 +212,7 @@ AppState makeAppStateWithTables(
   ChatRepository? chatRepository,
   List<ChatMessage> messages = const [],
   Random? random,
+  AuthRepository? authRepository,
   // Bọc MockSafetyRepository (ví dụ để thêm lỗi/cổng chờ); chặn vẫn dùng bản mock bên trong.
   SafetyRepository Function(MockSafetyRepository inner)? wrapSafety,
 }) {
@@ -232,7 +234,9 @@ AppState makeAppStateWithTables(
           latency: latency,
           blockedIdsOf: blockedIdsOf,
         ),
-    authRepository: MockAuthRepository(users: data.users, latency: latency),
+    authRepository:
+        authRepository ??
+        MockAuthRepository(users: data.users, latency: latency, now: clock),
     chatRepository:
         chatRepository ??
         MockChatRepository(

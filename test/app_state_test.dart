@@ -23,6 +23,19 @@ class _FailingAuthRepository implements AuthRepository {
 
   @override
   Future<User?> getUser(String id) async => null;
+
+  @override
+  Future<User> register({
+    required String displayName,
+    required String email,
+    required String password,
+  }) async => throw Exception('Không có mạng');
+
+  @override
+  Future<User> signInWithPassword({
+    required String email,
+    required String password,
+  }) async => throw Exception('Không có mạng');
 }
 
 // Đếm số lần AppState báo thay đổi.

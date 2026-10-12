@@ -492,7 +492,7 @@ void main() {
 
   group('Trang tĩnh', () {
     final pages = {
-      StaticPage.about: ('Góc "Ăn Gì Đây Ta?"', 'Gặp nhau qua món ăn'),
+      StaticPage.about: ('Góc "Món Ngon Chung Lối"', 'Gặp nhau qua món ăn'),
       StaticPage.contact: ('Liên hệ', 'Góp ý và hỗ trợ'),
       StaticPage.privacy: (
         'Chính sách quyền riêng tư',
@@ -551,7 +551,7 @@ void main() {
       await pumpAccount(tester, app: app, login: false);
       await tapText(tester, 'Info');
       final expected = {
-        StaticPage.about: ('The "Ăn Gì Đây Ta?" corner', 'Meeting over food'),
+        StaticPage.about: ('The "Món Ngon Chung Lối" corner', 'Meeting over food'),
         StaticPage.contact: ('Contact', 'Feedback and support'),
         StaticPage.privacy: ('Privacy Policy', 'Data we use'),
         StaticPage.terms: ('Terms of Use', 'Use it as intended'),
@@ -577,8 +577,8 @@ void main() {
         await tapText(tester, 'Thông tin');
         await tester.tap(find.byKey(const ValueKey('info-contact')));
         await tester.pumpAndSettle();
-        expect(find.text('Nhóm Facebook "Ăn Gì Đây Ta?"'), findsOneWidget);
-        expect(find.text('Threads "Ăn Gì Đây Ta?"'), findsOneWidget);
+        expect(find.text('Nhóm Facebook "Món Ngon Chung Lối"'), findsOneWidget);
+        expect(find.text('Threads "Món Ngon Chung Lối"'), findsOneWidget);
         final body = find.byType(SingleChildScrollView);
         expect(
           find.descendant(of: body, matching: find.byType(InkWell)),

@@ -1,4 +1,4 @@
-# Ăn Gì Đây Ta?
+# Món Ngon Chung Lối
 
 Ứng dụng di động (Flutter) giúp bạn **chọn món Việt và hẹn ăn cùng người khác ngay tại quán**: chọn món, xem các bàn theo giờ hẹn và số chỗ còn trống, rồi tham gia hoặc mở bàn mới. Đây **không** phải dịch vụ giao đồ ăn. Khẩu hiệu: "Món ngon • Bạn mới • Kết nối thật".
 
@@ -14,6 +14,7 @@ Dự án là đồ án môn Lập trình thiết bị di động. Ứng dụng c
 - **Chi tiết bàn:** thành viên (chỉ hiện khi đã đăng nhập), tham gia, rời bàn, huỷ bàn (chủ bàn), trò chuyện trong bàn (chỉ thành viên).
 - **An toàn:** báo cáo bàn, người dùng, tin nhắn; chặn và bỏ chặn người dùng (bàn và tin nhắn của người bị chặn bị ẩn).
 - **Hồ sơ:** "Bàn của tôi" (sắp tới / đã qua), phản hồi riêng tư, báo cáo đã gửi, danh sách chặn, đăng xuất, các trang thông tin.
+- **Đăng ký giả lập:** tạo tài khoản bằng họ tên, email, mật khẩu (kiểm tra hợp lệ ngay dưới từng ô, không cho trùng email); đăng ký xong quay về màn đăng nhập với email điền sẵn, không tự đăng nhập.
 - **Hai ngôn ngữ:** tiếng Việt và tiếng Anh, đổi bằng nút EN/VI ở thanh trên.
 - Khách chưa đăng nhập vẫn xem, lọc và điền form; các thao tác cần quyền sẽ mở bảng đăng nhập (đăng nhập xong không tự tham gia hay tự mở bàn).
 
@@ -71,7 +72,8 @@ design/                   ảnh thiết kế tham chiếu
 Những phần sau là **giả lập để demo**, không phải dịch vụ thật:
 
 - **Dữ liệu mẫu:** 56 món, các khu vực (Hà Nội, TP.HCM), quán, người dùng và bàn ăn được sinh trong bộ nhớ lúc mở app (giờ của bàn tính từ thời điểm hiện tại). Tên người dùng là tên giả. Người dùng đăng nhập giả lập (Minh Anh) chỉ có sẵn 2 bàn mẫu: một bàn sắp tới và một bàn đã kết thúc; có một bàn mở ở Quận 1 cố ý trùng giờ để thử lỗi trùng giờ. Mọi thay đổi mất khi tắt app.
-- **Đăng nhập giả lập:** nút "Tiếp tục với Google" luôn đăng nhập thành người dùng mẫu "Minh Anh" (không dùng tài khoản Google thật, không có mật khẩu).
+- **Đăng nhập giả lập:** nút "Tiếp tục với Google" luôn đăng nhập thành người dùng mẫu "Minh Anh" (không dùng tài khoản Google thật, không có mật khẩu). Tài khoản mẫu không có mật khẩu nên chỉ vào bằng nút này.
+- **Đăng ký giả lập:** tài khoản mới (và mật khẩu, lưu nguyên dạng chữ trong bộ nhớ vì chỉ là mô phỏng) chỉ tồn tại đến khi tắt app; **tải lại trang web là mất**. Bản thật phải dùng dịch vụ xác thực và không bao giờ lưu mật khẩu thô. Đăng nhập bằng email chỉ dùng được với tài khoản đã đăng ký trong lần chạy hiện tại.
 - **Phản hồi chat tự động:** sau khi bạn gửi tin trong bàn, một thành viên khác của bàn tự trả lời bằng một câu có sẵn sau 1–2 giây (chỉ để demo, nằm trong `MockChatRepository`).
 - **Độ trễ:** mỗi thao tác có độ trễ ngẫu nhiên 300–600 ms để thấy trạng thái đang tải.
 - **Vị trí:** chưa dùng vị trí thật; "Cho phép vị trí" chỉ báo sẽ có ở bản sau. Khu vực chọn thủ công.

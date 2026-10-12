@@ -1,11 +1,11 @@
 {
-    "name": "Ăn Gì Đây Ta?",
-    "short_name": "Ăn Gì Đây Ta?",
+    "name": "Món Ngon Chung Lối",
+    "short_name": "Món Ngon Chung Lối",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Ăn Gì Đây Ta? - Gặp nhau qua món ăn.",
+    "description": "Món Ngon Chung Lối - Gặp nhau qua món ăn.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

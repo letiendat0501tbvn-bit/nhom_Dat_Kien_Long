@@ -10,6 +10,7 @@ import '../components/pill_tabs.dart';
 import '../components/section_heading.dart';
 import '../theme/app_theme.dart';
 import 'feedback_screen.dart';
+import 'register_screen.dart';
 import 'static_page_screen.dart';
 import 'block_list_screen.dart';
 import 'reports_sent_screen.dart';
@@ -39,6 +40,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Mở bảng đăng nhập; xong thì ở lại đúng tab này.
   void _onLogin() => showLoginSheet(context);
+
+  // Mở màn Đăng ký; đăng ký xong (hoặc bấm "Đã có tài khoản") thì mở bảng đăng nhập với
+  // email điền sẵn. Bấm Back thì không làm gì thêm.
+  Future<void> _onRegister() async {
+    final result = await openRegister(context);
+    if (!mounted || result == null) return;
+    await showLoginSheet(
+      context,
+      initialEmail: result.email.isEmpty ? null : result.email,
+    );
+  }
 
   // Đăng xuất có hộp xác nhận; xong thì về trạng thái khách.
   Future<void> _confirmSignOut() async {
@@ -190,6 +202,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          // Chưa có tài khoản: mở màn Đăng ký (giả lập)
+          Align(
+            alignment: Alignment.center,
+            child: TextButton(
+              onPressed: _onRegister,
+              child: Text(
+                t(StrKey.loginNoAccount),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -314,11 +337,15 @@ class _BrandFooter extends StatelessWidget {
             children: [
               const AppLogo(radius: 16),
               const SizedBox(width: 10),
-              Text(
-                t(StrKey.appName),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              // Flexible: tên app dài hoặc chữ phóng to thì xuống dòng thay vì tràn
+              Flexible(
+                child: Text(
+                  t(StrKey.appName),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],

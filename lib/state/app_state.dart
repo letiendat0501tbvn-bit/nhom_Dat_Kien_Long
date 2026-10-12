@@ -64,7 +64,11 @@ class AppState extends ChangeNotifier {
       random: random,
       dishRepository: MockDishRepository(latency: latency),
       tableRepository: tables,
-      authRepository: MockAuthRepository(users: data.users, latency: latency),
+      authRepository: MockAuthRepository(
+        users: data.users,
+        latency: latency,
+        now: now,
+      ),
       chatRepository: MockChatRepository(
         messages: data.messages,
         now: now,
@@ -153,6 +157,34 @@ class AppState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Đăng nhập bằng email + mật khẩu (tài khoản đăng ký trong app). Dùng chung cờ đang đăng
+  // nhập với signIn để không bấm hai nơi cùng lúc. Lỗi (AuthException...) ném lại cho giao diện.
+  Future<void> signInWithEmail(String email, String password) async {
+    if (_signingIn) return;
+    _signingIn = true;
+    notifyListeners();
+    try {
+      _currentUser = await authRepository.signInWithPassword(
+        email: email,
+        password: password,
+      );
+    } finally {
+      _signingIn = false;
+      notifyListeners();
+    }
+  }
+
+  // Đăng ký tài khoản mới. KHÔNG tự đăng nhập: người dùng quay về màn đăng nhập.
+  Future<User> register({
+    required String displayName,
+    required String email,
+    required String password,
+  }) => authRepository.register(
+    displayName: displayName,
+    email: email,
+    password: password,
+  );
 
   Future<void> signOut() async {
     await authRepository.signOut();

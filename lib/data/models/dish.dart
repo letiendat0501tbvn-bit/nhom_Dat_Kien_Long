@@ -1,11 +1,12 @@
+import '../../core/entity.dart';
 import 'enums.dart';
 
 // Mô hình dữ liệu một món ăn.
 // Các trường từ `group` trở xuống là phần mở rộng theo SPEC, đều có giá trị
 // mặc định nên dữ liệu mẫu cũ vẫn dùng được.
-class Dish {
+class Dish extends Entity<String> {
   const Dish({
-    required this.id,
+    required String id,
     required this.name,
     required this.category,
     required this.description,
@@ -20,9 +21,8 @@ class Dish {
     this.mealTimes = const [],
     this.imageAsset,
     this.descriptionEn,
-  });
+  }) : super(id);
 
-  final String id; // slug, ví dụ 'pho'
   final String name;
   final String category; // nhãn danh mục: Bún & mì, Bánh mặn, ...
   final String description;
@@ -47,4 +47,7 @@ class Dish {
     if (language == AppLanguage.en && en != null && en.isNotEmpty) return en;
     return description;
   }
+
+  @override
+  String get label => name;
 }

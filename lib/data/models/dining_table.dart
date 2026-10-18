@@ -1,9 +1,10 @@
+import '../../core/entity.dart';
 import 'enums.dart';
 
 // Một bàn ăn tại quán. Bất biến: mọi thay đổi đi qua copyWith.
-class DiningTable {
+class DiningTable extends Entity<String> {
   const DiningTable({
-    required this.id,
+    required String id,
     this.dishId,
     required this.restaurantId,
     required this.hostId,
@@ -13,9 +14,8 @@ class DiningTable {
     this.note = '',
     this.status = TableStatus.open,
     required this.memberIds,
-  });
+  }) : super(id);
 
-  final String id;
   final String? dishId; // có thể chưa chọn món
   final String restaurantId;
   final String hostId;
@@ -50,4 +50,7 @@ class DiningTable {
       memberIds: memberIds ?? this.memberIds,
     );
   }
+
+  @override
+  String get label => '$restaurantId @ $startAt';
 }

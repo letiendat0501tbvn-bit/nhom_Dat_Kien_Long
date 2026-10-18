@@ -91,3 +91,102 @@ Giao diện chỉ làm việc với các **interface** trong `lib/data/repositor
 4. Việc ẩn bàn/tin nhắn của người bị chặn và quyền xem chat hiện do repository thực hiện (tham số `viewerId`), máy chủ thật cần làm tương tự.
 
 Các bản `Mock...` vẫn dùng được cho test.
+
+## Tổng quát hóa bằng Generics, extends, Object và Type
+
+Các đối tượng trong app (món, quán, khu vực, người dùng, bàn, tin nhắn, báo cáo, phản hồi) đều có một **id** và một **tên hiển thị**. Thay vì mỗi lớp tự viết lại, chúng cùng kế thừa một lớp cha tổng quát:
+
+- **Generics:** `Entity<ID>` ([lib/core/entity.dart](lib/core/entity.dart)) mô tả chung mọi đối tượng có danh tính; `ID` là kiểu của khoá nhận dạng (ở đây là `String`). `MemoryRepo<E extends Entity<ID>, ID>` ([lib/core/memory_repo.dart](lib/core/memory_repo.dart)) là kho lưu trong bộ nhớ dùng chung cho mọi `Entity`.
+- **extends:** 8 lớp model (`Dish`, `Restaurant`, `Area`, `User`, `DiningTable`, `ChatMessage`, `Report`, `UserFeedback`) đều `extends Entity<String>` và chỉ giữ phần riêng của mình. `AppSettings` và `BlockEntry` không có id riêng nên không kế thừa.
+- **Object:** hai hàm `describe(Object o)` và `groupByType(Iterable<Object>)` nhận **bất kỳ đối tượng nào** (kiểu `Object`), và toán tử `==` của `Entity` so sánh với một `Object`.
+- **Type:** `runtimeType` (lớp thật của đối tượng lúc chạy, tương đương "Class class" của Java) được dùng để so sánh hai `Entity` (khác lớp thì không bằng nhau dù cùng id), để tính `hashCode`, để `toString`/`describe` ghi tên lớp, và để `groupByType` gom theo lớp. `MemoryRepo.kind` trả về `Type` của phần tử trong kho (ví dụ `Dish`).
+
+### Sơ đồ lớp
+
+```mermaid
+classDiagram
+  class Entity~ID~ {
+    <<abstract>>
+    +ID id
+    +String label
+    +operator ==(Object other) bool
+    +hashCode int
+    +toString() String
+  }
+  Entity <|-- Dish
+  Entity <|-- Restaurant
+  Entity <|-- Area
+  Entity <|-- User
+  Entity <|-- DiningTable
+  Entity <|-- ChatMessage
+  Entity <|-- Report
+  Entity <|-- UserFeedback
+  class MemoryRepo~E extends Entity~ID~, ID~ {
+    +Type kind
+    +add(E item)
+    +find(ID id) E?
+    +all() List~E~
+    +where(test) List~E~
+  }
+  MemoryRepo o-- Entity : chứa
+  MockLocationRepository --> MemoryRepo : khu vực, quán
+  MockAuthRepository --> MemoryRepo : người dùng
+```
+
+### Lớp cha `Entity`
+
+```dart
+abstract class Entity<ID> {
+  const Entity(this.id);
+
+  final ID id;
+
+  // Tên ngắn để hiển thị/ghi log; mỗi lớp con tự định nghĩa.
+  String get label;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Entity<ID> && other.runtimeType == runtimeType && other.id == id);
+
+  @override
+  int get hashCode => Object.hash(runtimeType, id);
+
+  @override
+  String toString() => '$runtimeType(id: $id, label: $label)';
+}
+```
+
+Hai đối tượng bằng nhau khi **cùng lớp và cùng id**, bất kể các trường khác (ví dụ một bàn sau khi thêm thành viên vẫn "là cùng một bàn").
+
+### Ví dụ lớp con
+
+```dart
+class User extends Entity<String> {
+  const User({
+    required String id,
+    required this.displayName,
+    required this.email,
+    // ...
+  }) : super(id);
+
+  final String displayName;
+  final String email;
+
+  @override
+  String get label => displayName;
+}
+```
+
+Tên trường và tham số công khai (`id`, `displayName`...) không đổi nên phần còn lại của app dùng như trước.
+
+### Kho dùng chung
+
+`MockLocationRepository` (khu vực và quán) và `MockAuthRepository` (người dùng) dùng `MemoryRepo` thay cho các vòng lặp "tìm theo id" viết lặp lại:
+
+```dart
+final MemoryRepo<Restaurant, String> _restaurants = MemoryRepo(restaurants);
+_restaurants.find('q1-1');          // tìm theo id
+_restaurants.kind;                  // Restaurant (kiểu Type)
+describe(_restaurants.find('q1-1')!); // "Restaurant #q1-1: Quán Nhà Lá"
+```

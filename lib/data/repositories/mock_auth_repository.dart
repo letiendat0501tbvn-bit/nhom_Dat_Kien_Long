@@ -1,3 +1,4 @@
+import '../../core/memory_repo.dart';
 import '../logic/account_rules.dart';
 import '../mock/mock_support.dart';
 import '../models/user.dart';
@@ -16,12 +17,13 @@ class MockAuthRepository implements AuthRepository {
     User? signInAs,
     this.latency = randomLatency,
     this.now = systemClock,
-  }) : _users = List.of(users),
+  }) : _users = MemoryRepo(users),
        _signInAs = signInAs ?? users.first;
 
   final Latency latency;
   final Clock now;
-  final List<User> _users;
+  final MemoryRepo<User, String>
+  _users; // dùng chung kho Entity cho tra cứu theo id
   final User _signInAs;
   // Mật khẩu theo id người dùng. Tài khoản mẫu không có mật khẩu (chỉ vào bằng nút Google).
   final _passwords = <String, String>{};
@@ -48,7 +50,7 @@ class MockAuthRepository implements AuthRepository {
   }) async {
     await Future<void>.delayed(latency());
     // Kiểm tra trùng email với MỌI tài khoản đã có, kể cả tài khoản mẫu
-    if (isEmailTaken(email, _users.map((u) => u.email))) {
+    if (isEmailTaken(email, _users.all().map((u) => u.email))) {
       throw const AuthException(AuthError.emailTaken);
     }
     final user = User(
@@ -57,7 +59,7 @@ class MockAuthRepository implements AuthRepository {
       email: normalizeEmail(email),
       createdAt: now(),
     );
-    _users.add(user);
+    _users.add(user); // id 'r…' không bao giờ trùng nên không ném lỗi
     _passwords[user.id] = password;
     return user;
   }
@@ -87,9 +89,6 @@ class MockAuthRepository implements AuthRepository {
   @override
   Future<User?> getUser(String id) async {
     await Future<void>.delayed(latency());
-    for (final u in _users) {
-      if (u.id == id) return u;
-    }
-    return null;
+    return _users.find(id);
   }
 }

@@ -1,4 +1,5 @@
 import '../../core/entity.dart';
+import '../../core/map_utils.dart';
 import 'enums.dart';
 
 // Một bàn ăn tại quán. Bất biến: mọi thay đổi đi qua copyWith.
@@ -15,6 +16,20 @@ class DiningTable extends Entity<String> {
     this.status = TableStatus.open,
     required this.memberIds,
   }) : super(id);
+
+  factory DiningTable.fromMap(String id, Map<String, dynamic> map) =>
+      DiningTable(
+        id: id,
+        dishId: map['dishId'] as String?,
+        restaurantId: map['restaurantId'] as String,
+        hostId: map['hostId'] as String,
+        startAt: readDate(map['startAt']),
+        durationMin: readInt(map['durationMin']),
+        capacity: readInt(map['capacity']),
+        note: map['note'] as String? ?? '',
+        status: readEnum(TableStatus.values, map['status'], TableStatus.open),
+        memberIds: readStrings(map['memberIds']),
+      );
 
   final String? dishId; // có thể chưa chọn món
   final String restaurantId;
@@ -50,6 +65,19 @@ class DiningTable extends Entity<String> {
       memberIds: memberIds ?? this.memberIds,
     );
   }
+
+  @override
+  Map<String, dynamic> toMap() => {
+    'dishId': dishId,
+    'restaurantId': restaurantId,
+    'hostId': hostId,
+    'startAt': startAt,
+    'durationMin': durationMin,
+    'capacity': capacity,
+    'note': note,
+    'status': status.name,
+    'memberIds': memberIds,
+  };
 
   @override
   String get label => '$restaurantId @ $startAt';

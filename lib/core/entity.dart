@@ -9,6 +9,11 @@ abstract class Entity<ID> {
   // Tên ngắn dùng để hiển thị/ghi log; mỗi lớp con tự định nghĩa.
   String get label;
 
+  // Các trường của đối tượng dưới dạng Map (KHÔNG gồm id: id là id của document).
+  // Giá trị là kiểu Dart thường (DateTime, String, num, bool, List); enum lưu bằng tên.
+  // Chiều ngược lại là factory X.fromMap(String id, Map<String, dynamic> map) của từng lớp con.
+  Map<String, dynamic> toMap();
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

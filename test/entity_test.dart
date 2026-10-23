@@ -8,6 +8,9 @@ class _A extends Entity<String> {
   final String name;
 
   @override
+  Map<String, dynamic> toMap() => {'name': name};
+
+  @override
   String get label => name;
 }
 
@@ -15,11 +18,17 @@ class _B extends Entity<String> {
   const _B(super.id);
 
   @override
+  Map<String, dynamic> toMap() => {};
+
+  @override
   String get label => 'b';
 }
 
 class _N extends Entity<int> {
   const _N(super.id);
+
+  @override
+  Map<String, dynamic> toMap() => {};
 
   @override
   String get label => 'n$id';

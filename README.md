@@ -190,3 +190,76 @@ _restaurants.find('q1-1');          // tìm theo id
 _restaurants.kind;                  // Restaurant (kiểu Type)
 describe(_restaurants.find('q1-1')!); // "Restaurant #q1-1: Quán Nhà Lá"
 ```
+
+## Kết nối Firebase
+
+Mặc định app chạy bằng dữ liệu mẫu trong bộ nhớ (Mock), không cần mạng. Có thể chuyển sang **Firebase** (đăng ký/đăng nhập thật và dữ liệu bàn ăn trên Cloud Firestore) bằng một cờ lúc chạy; test luôn dùng Mock.
+
+```bash
+# Chạy với Firebase (cấu hình nằm ở lib/firebase_options.dart)
+flutter run -d chrome --dart-define=USE_FIREBASE=true
+flutter run -d <ma-thiet-bi> --dart-define=USE_FIREBASE=true   # Android
+```
+
+### Việc cần làm một lần trên Firebase Console
+1. **Authentication → Sign-in method:** bật nhà cung cấp **Email/Password**.
+2. **Firestore Database:** tạo cơ sở dữ liệu, rồi đặt luật bảo mật (gợi ý cho đồ án, chỉ người đã đăng nhập mới được ghi):
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{col}/{id} {
+      allow read: if col in ['areas', 'restaurants', 'tables'] || request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
+3. Chạy app với `USE_FIREBASE=true`, **đăng ký rồi đăng nhập** một tài khoản, sau đó **nhấn giữ logo ở thanh trên** để đưa dữ liệu mẫu (khu vực, quán, người dùng mẫu, bàn ăn) lên Firestore. Chạy lại sẽ ghi đè và làm mới giờ của các bàn.
+
+### Cấu trúc collection
+
+| Collection | Document id | Lớp (ORM) | Nội dung |
+|---|---|---|---|
+| `users` | uid của Firebase Auth (người mới) hoặc `u1`…`u8` (người mẫu) | `User` | tên, email, ngày tạo |
+| `tables` | id tự sinh (bàn mẫu: `t1`…) | `DiningTable` | món, quán, chủ bàn, giờ (Timestamp), thời lượng, số chỗ, ghi chú, trạng thái, danh sách thành viên |
+| `restaurants` | `q1-1`, `hk-2`… | `Restaurant` | tên, địa chỉ, khu vực, toạ độ |
+| `areas` | `hcm-q1`… | `Area` | thành phố, quận, toạ độ |
+
+Món ăn, trò chuyện, báo cáo và danh sách chặn vẫn nằm trong bộ nhớ (Mock) ở chế độ Firebase. Đăng nhập Google chưa hỗ trợ ở chế độ Firebase (chỉ email và mật khẩu).
+
+### ORM với Firestore Documents
+
+Mỗi model (`extends Entity<String>`) có `toMap()` (đối tượng → Map, không gồm id) và `factory X.fromMap(id, map)` (Map → đối tượng). `FirestoreRepo<E>` ([lib/core/firestore_repo.dart](lib/core/firestore_repo.dart)) là lớp chung ánh xạ một collection với một kiểu `Entity`: ghi bằng `toMap`, đọc bằng `fromMap`, tự đổi `DateTime` ↔ `Timestamp`, có `set`, `add`, `find`, `all`, `where`, `update` (transaction), `delete` và `watch` (luồng thời gian thực).
+
+```mermaid
+flowchart LR
+  subgraph App
+    M["Model extends Entity&lt;String&gt;<br/>toMap() / X.fromMap(id, map)"]
+    R["FirestoreRepo&lt;E&gt;<br/>set add find all where update delete watch"]
+    T["FirestoreTableRepository<br/>(quy tắc ở table_rules.dart)"]
+    A["FirebaseAuthRepository"]
+    L["FirestoreLocationRepository"]
+  end
+  subgraph Firestore
+    C1[("tables")]
+    C2[("users")]
+    C3[("restaurants / areas")]
+  end
+  Auth[["Firebase Authentication"]]
+  M <--> R
+  T --> R
+  A --> R
+  L --> R
+  R -- "DateTime <-> Timestamp" --> C1
+  R --> C2
+  R --> C3
+  A -- "email + mật khẩu (không lưu mật khẩu)" --> Auth
+```
+
+- **Đăng ký:** tạo tài khoản ở Firebase Auth, rồi tạo document `users/{uid}` qua `FirestoreRepo<User>`, sau đó đăng xuất để quay về màn đăng nhập. Mật khẩu chỉ gửi cho Firebase, app không lưu.
+- **Bàn ăn:** các quy tắc (2–8 chỗ, khung 15 phút, giờ ở tương lai, không trùng giờ, chuyển chủ bàn khi chủ rời, tự huỷ khi chỉ còn một mình) nằm ở `table_rules.dart` và được kiểm tra trước khi ghi; tham gia/rời/huỷ chạy trong transaction.
+- **Lỗi:** mọi lời gọi Firebase được bọc `try/catch`. Lỗi của Firebase Auth (email đã dùng, mật khẩu yếu, sai thông tin, mất mạng, quá nhiều lần thử...) được đổi thành thông báo tiếng Việt/Anh; lỗi đọc dữ liệu hiện trạng thái lỗi kèm nút "Thử lại", không làm app sập khi mất mạng.
+- **Giới hạn:** `FirestoreTableRepository.getTables` đọc cả collection rồi lọc trong bộ nhớ (đủ cho vài trăm bàn). Test dùng `fake_cloud_firestore` nên không kiểm chứng được tính nguyên tử của transaction khi nhiều người cùng ghi, chỉ kiểm chứng logic.
+- Trên Windows, build Android/Windows với plugin cần bật **Developer Mode** của hệ điều hành (để tạo liên kết tượng trưng).

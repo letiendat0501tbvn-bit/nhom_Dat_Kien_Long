@@ -89,3 +89,16 @@ Chạy app bằng `flutter run -d chrome` (hoặc trên thiết bị Android). M
 
 ## 12. Trạng thái tải, rỗng, lỗi
 - [ ] Mở các danh sách (món, bàn, quán, báo cáo, chặn, phản hồi). *Mong đợi:* có vòng xoay khi tải (độ trễ giả 300–600 ms) và câu rỗng thích hợp. Không có mạng thật để thử lỗi; các trạng thái lỗi và nút "Thử lại" được kiểm bằng test tự động.
+
+## 13. Chạy với Firebase (cần cấu hình Firebase Console)
+Chạy: `flutter run -d chrome --dart-define=USE_FIREBASE=true`. Cần bật Email/Password và tạo Firestore (xem README, mục "Kết nối Firebase").
+- [ ] Mở app. *Mong đợi:* không treo, không lỗi đỏ; danh sách món vẫn hiện (món là dữ liệu mẫu trong bộ nhớ).
+- [ ] Tab Tôi → "Chưa có tài khoản? Đăng ký", đăng ký bằng email mới. *Mong đợi:* thông báo thành công, quay về bảng đăng nhập với email điền sẵn, chưa đăng nhập. Trên Firebase Console: Authentication có người dùng mới và Firestore có document `users/{uid}` (tên, email, ngày tạo) và mật khẩu không xuất hiện trong bất kỳ document nào.
+- [ ] Đăng ký lại cùng email. *Mong đợi:* "Email đã được sử dụng." Mật khẩu 3 ký tự: báo ở ô mật khẩu (trước khi gửi). Mật khẩu 6 ký tự đơn giản mà Firebase từ chối: "Mật khẩu quá yếu…".
+- [ ] Đăng nhập bằng email, nhập sai mật khẩu. *Mong đợi:* "Email hoặc mật khẩu không đúng." (hoặc "Sai mật khẩu."). Đúng mật khẩu thì vào được; tab Tôi hiện đúng tên và email.
+- [ ] Đã đăng nhập, nhấn giữ logo ở thanh trên. *Mong đợi:* thông báo "Đang đưa dữ liệu mẫu lên Firestore…" rồi "Đã đưa dữ liệu mẫu…"; Firestore có các collection `areas`, `restaurants`, `users`, `tables`.
+- [ ] Tab Bàn ăn → Chọn khu vực → Quận 1. *Mong đợi:* thấy các bàn lấy từ Firestore. Tham gia một bàn: số chỗ giảm và document `tables/{id}` có thêm uid trong `memberIds`.
+- [ ] Mở bàn mới bằng nút +. *Mong đợi:* tạo document mới trong `tables` với bạn là chủ bàn; trùng giờ với bàn đang ở thì báo lỗi trùng giờ và không có document mới.
+- [ ] Rời bàn là chủ bàn khi còn người khác. *Mong đợi:* `hostId` chuyển cho người vào sớm nhất; chỉ còn một mình thì `status` thành `cancelled`.
+- [ ] Tắt mạng rồi mở danh sách bàn / bấm đăng nhập. *Mong đợi:* danh sách hiện lỗi kèm nút "Thử lại"; đăng nhập hiện "Không có kết nối mạng…"; app không sập. Bật lại mạng và bấm Thử lại thì tải được.
+- [ ] Đăng xuất rồi đăng nhập lại, tải lại trang. *Mong đợi:* tài khoản vẫn còn (khác với bản Mock, nơi tải lại là mất).

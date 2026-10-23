@@ -37,20 +37,6 @@ class MockTableRepository implements TableRepository {
     return i;
   }
 
-  // Bàn phải còn mở và chưa bắt đầu thì mới tham gia/rời được.
-  // Báo riêng từng lý do để giao diện nói đúng: đã huỷ / đã kết thúc / đã bắt đầu.
-  void _ensureOpenForChange(DiningTable t) {
-    if (t.status == TableStatus.cancelled) {
-      throw const TableException(TableError.cancelled);
-    }
-    if (t.status == TableStatus.ended) {
-      throw const TableException(TableError.ended);
-    }
-    if (hasStarted(t, now())) {
-      throw const TableException(TableError.alreadyStarted);
-    }
-  }
-
   // Cập nhật bàn trong danh sách và trả về bản mới.
   DiningTable _save(int index, DiningTable t) {
     _tables[index] = t;
@@ -133,7 +119,7 @@ class MockTableRepository implements TableRepository {
     await _wait();
     final i = _indexOf(tableId);
     final t = _tables[i];
-    _ensureOpenForChange(t);
+    ensureOpenForChange(t, now());
     if (t.memberIds.contains(userId)) {
       throw const TableException(TableError.alreadyMember);
     }
@@ -147,15 +133,7 @@ class MockTableRepository implements TableRepository {
       throw const TableException(TableError.overlap);
     }
 
-    final members = [...t.memberIds, userId];
-    final full = members.length >= t.capacity;
-    return _save(
-      i,
-      t.copyWith(
-        memberIds: members,
-        status: full ? TableStatus.full : TableStatus.open,
-      ),
-    );
+    return _save(i, tableAfterJoin(t, userId));
   }
 
   @override
@@ -166,26 +144,9 @@ class MockTableRepository implements TableRepository {
     if (!t.memberIds.contains(userId)) {
       throw const TableException(TableError.notMember);
     }
-    _ensureOpenForChange(t);
+    ensureOpenForChange(t, now());
 
-    final remaining = t.memberIds.where((m) => m != userId).toList();
-    // Chủ bàn rời mà không còn ai: bàn tự huỷ
-    if (remaining.isEmpty) {
-      return _save(
-        i,
-        t.copyWith(memberIds: remaining, status: TableStatus.cancelled),
-      );
-    }
-    // Chủ bàn rời: chuyển quyền cho người vào bàn sớm nhất (đứng đầu danh sách còn lại)
-    final newHost = userId == t.hostId ? remaining.first : t.hostId;
-    return _save(
-      i,
-      t.copyWith(
-        hostId: newHost,
-        memberIds: remaining,
-        status: TableStatus.open, // vừa trả lại một chỗ
-      ),
-    );
+    return _save(i, tableAfterLeave(t, userId));
   }
 
   @override
@@ -194,7 +155,7 @@ class MockTableRepository implements TableRepository {
     final i = _indexOf(tableId);
     final t = _tables[i];
     if (t.hostId != userId) throw const TableException(TableError.notHost);
-    _ensureOpenForChange(t);
+    ensureOpenForChange(t, now());
     return _save(i, t.copyWith(status: TableStatus.cancelled));
   }
 }

@@ -39,8 +39,8 @@ class _LoginSheet extends StatefulWidget {
 class _LoginSheetState extends State<_LoginSheet> {
   late final _email = TextEditingController(text: widget.initialEmail ?? '');
   final _password = TextEditingController();
-  var _failed = false; // đăng nhập Google lỗi
-  var _emailFailed = false; // đăng nhập email lỗi chung (không có mạng...)
+  AuthError? _googleError; // đăng nhập Google lỗi
+  AuthError? _emailGeneralError; // đăng nhập email lỗi chung (mất mạng, quá nhiều lần thử...)
   var _emailSigning =
       false; // đang đăng nhập bằng email (để hiện vòng quay đúng nút)
   var _showPassword = false;
@@ -57,12 +57,14 @@ class _LoginSheetState extends State<_LoginSheet> {
 
   Future<void> _signIn() async {
     final app = AppScope.of(context, listen: false);
-    setState(() => _failed = false);
+    setState(() => _googleError = null);
     try {
       await app.signIn();
       if (mounted) Navigator.of(context).pop(); // quay lại màn cũ
+    } on AuthException catch (e) {
+      if (mounted) setState(() => _googleError = e.error);
     } catch (_) {
-      if (mounted) setState(() => _failed = true);
+      if (mounted) setState(() => _googleError = AuthError.unknown);
     }
   }
 
@@ -78,7 +80,7 @@ class _LoginSheetState extends State<_LoginSheet> {
       _emailIssue = emailIssue;
       _passwordIssue = passwordIssue;
       _authError = null;
-      _emailFailed = false;
+      _emailGeneralError = null;
     });
     if (emailIssue != null || passwordIssue != null) return;
     setState(() => _emailSigning = true);
@@ -87,16 +89,23 @@ class _LoginSheetState extends State<_LoginSheet> {
       if (mounted) Navigator.of(context).pop();
     } on AuthException catch (e) {
       if (mounted) {
+        final field =
+            e.error == AuthError.emailNotFound ||
+            e.error == AuthError.wrongPassword;
         setState(() {
           _emailSigning = false;
-          _authError = e.error;
+          if (field) {
+            _authError = e.error; // báo ngay dưới ô email/mật khẩu
+          } else {
+            _emailGeneralError = e.error; // lỗi chung: hiện dưới nút
+          }
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
           _emailSigning = false;
-          _emailFailed = true;
+          _emailGeneralError = AuthError.unknown;
         });
       }
     }
@@ -199,10 +208,10 @@ class _LoginSheetState extends State<_LoginSheet> {
                 ),
               ),
             ),
-            if (_failed) ...[
+            if (_googleError != null) ...[
               const SizedBox(height: 10),
               Text(
-                t(StrKey.loginFailed),
+                t.authError(_googleError!),
                 style: const TextStyle(color: AppColors.primary),
               ),
             ],
@@ -251,10 +260,10 @@ class _LoginSheetState extends State<_LoginSheet> {
                 ),
               ),
             ),
-            if (_emailFailed) ...[
+            if (_emailGeneralError != null) ...[
               const SizedBox(height: 10),
               Text(
-                t(StrKey.loginFailed),
+                t.authError(_emailGeneralError!),
                 style: const TextStyle(color: AppColors.primary),
               ),
             ],

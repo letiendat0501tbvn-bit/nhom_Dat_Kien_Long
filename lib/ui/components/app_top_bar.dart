@@ -37,7 +37,11 @@ class AppTopBar extends StatelessWidget {
       child: Row(
         children: [
           // Logo tròn (assets/images/logo.png; chưa có file thì hiện biểu tượng tạm)
-          const AppLogo(radius: 20),
+          // Nhấn giữ logo (chỉ khi chạy với Firebase): đưa dữ liệu mẫu lên Firestore
+          GestureDetector(
+            onLongPress: app.seedData == null ? null : () => _seed(context),
+            child: const AppLogo(radius: 20),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: showLocation
@@ -70,6 +74,26 @@ class AppTopBar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Nút ẩn đưa dữ liệu mẫu lên Firestore (xem firebase_seed.dart).
+  Future<void> _seed(BuildContext context) async {
+    final app = context.appState;
+    final t = context.strings;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(t(StrKey.seedStarted))));
+    String message;
+    try {
+      await app.seedData!();
+      message = t(StrKey.seedDone);
+    } catch (_) {
+      message = t(StrKey.seedFailed);
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _title(Strings t) {

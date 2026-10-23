@@ -35,6 +35,7 @@ class AppState extends ChangeNotifier {
     required this.locationRepository,
     this.now = systemClock,
     Random? random,
+    this.seedData,
     this._settings = const AppSettings(),
   }) : random = random ?? Random();
 
@@ -99,6 +100,8 @@ class AppState extends ChangeNotifier {
   final Clock now;
   // Nguồn ngẫu nhiên (cho Lắc món); truyền vào được để test cho kết quả xác định.
   final Random random;
+  // Đưa dữ liệu mẫu lên Firestore; chỉ có khi chạy với Firebase (null ở bản Mock).
+  final Future<void> Function()? seedData;
 
   AppSettings _settings;
   User? _currentUser; // null = khách ghé chơi

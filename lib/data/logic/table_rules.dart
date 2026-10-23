@@ -146,6 +146,43 @@ ChatAccess chatAccessOf(DiningTable t, String? userId, DateTime now) {
   return open ? ChatAccess.joinToChat : ChatAccess.none;
 }
 
+// Bàn phải còn mở và chưa bắt đầu thì mới tham gia/rời/huỷ được. Báo riêng từng lý do để
+// giao diện nói đúng: đã huỷ / đã kết thúc / đã bắt đầu. Dùng chung cho mọi TableRepository.
+void ensureOpenForChange(DiningTable t, DateTime now) {
+  if (t.status == TableStatus.cancelled) {
+    throw const TableException(TableError.cancelled);
+  }
+  if (t.status == TableStatus.ended) {
+    throw const TableException(TableError.ended);
+  }
+  if (hasStarted(t, now)) {
+    throw const TableException(TableError.alreadyStarted);
+  }
+}
+
+// Bàn sau khi có thêm một thành viên: đủ chỗ thì chuyển sang "đã đầy".
+DiningTable tableAfterJoin(DiningTable t, String userId) {
+  final members = [...t.memberIds, userId];
+  return t.copyWith(
+    memberIds: members,
+    status: members.length >= t.capacity ? TableStatus.full : TableStatus.open,
+  );
+}
+
+// Bàn sau khi một thành viên rời: chủ bàn rời thì chuyển quyền cho người vào bàn sớm nhất
+// (đứng đầu danh sách còn lại); không còn ai thì bàn tự huỷ; còn lại thì mở lại một chỗ.
+DiningTable tableAfterLeave(DiningTable t, String userId) {
+  final remaining = t.memberIds.where((m) => m != userId).toList();
+  if (remaining.isEmpty) {
+    return t.copyWith(memberIds: remaining, status: TableStatus.cancelled);
+  }
+  return t.copyWith(
+    hostId: userId == t.hostId ? remaining.first : t.hostId,
+    memberIds: remaining,
+    status: TableStatus.open, // vừa trả lại một chỗ
+  );
+}
+
 // Kiểm tra thông tin khi mở bàn; trả về lỗi đầu tiên hoặc null nếu hợp lệ.
 TableError? validateNewTable({
   required DateTime now,

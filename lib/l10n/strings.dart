@@ -1,6 +1,7 @@
 import '../data/logic/account_rules.dart';
 import '../data/logic/table_rules.dart';
 import '../data/models/enums.dart';
+import '../data/repositories/auth_repository.dart';
 import '../data/repositories/table_repository.dart';
 import 'formatters.dart';
 
@@ -23,6 +24,18 @@ enum StrKey {
   tabSchedule,
   tabMe,
   createTable,
+  authErrInvalidCredential,
+  authErrWeakPassword,
+  authErrInvalidEmail,
+  authErrNetwork,
+  authErrTooManyRequests,
+  authErrUserDisabled,
+  authErrNotAllowed,
+  authErrPermissionDenied,
+  authErrUnknown,
+  seedStarted,
+  seedDone,
+  seedFailed,
   registerTitle,
   registerNote,
   fieldName,
@@ -35,7 +48,6 @@ enum StrKey {
   registerHaveAccount,
   loginNoAccount,
   registerSuccess,
-  registerFailed,
   loginOr,
   loginEmailButton,
   accErrNameRequired,
@@ -358,7 +370,6 @@ enum StrKey {
   loginNote,
   privacyPolicy,
   termsOfUse,
-  loginFailed,
   // Lỗi khi thao tác với bàn (ứng với TableError)
   errTableNotFound,
   errTableFull,
@@ -385,6 +396,18 @@ const Map<StrKey, String> viStrings = {
   StrKey.tabSchedule: 'Lịch hẹn',
   StrKey.tabMe: 'Tôi',
   StrKey.createTable: 'Tạo bàn mới',
+  StrKey.authErrInvalidCredential: 'Email hoặc mật khẩu không đúng.',
+  StrKey.authErrWeakPassword: 'Mật khẩu quá yếu, hãy dùng ít nhất 6 ký tự.',
+  StrKey.authErrInvalidEmail: 'Email không hợp lệ.',
+  StrKey.authErrNetwork: 'Không có kết nối mạng. Kiểm tra mạng rồi thử lại nhé.',
+  StrKey.authErrTooManyRequests: 'Bạn thử quá nhiều lần. Hãy đợi một lúc rồi thử lại.',
+  StrKey.authErrUserDisabled: 'Tài khoản này đã bị vô hiệu hoá.',
+  StrKey.authErrNotAllowed: 'Cách đăng nhập này chưa được bật.',
+  StrKey.authErrPermissionDenied: 'Bạn không có quyền thực hiện thao tác này.',
+  StrKey.authErrUnknown: 'Có lỗi xảy ra. Thử lại nhé.',
+  StrKey.seedStarted: 'Đang đưa dữ liệu mẫu lên Firestore…',
+  StrKey.seedDone: 'Đã đưa dữ liệu mẫu lên Firestore.',
+  StrKey.seedFailed: 'Chưa đưa được dữ liệu mẫu lên Firestore.',
   StrKey.registerTitle: 'Tạo tài khoản',
   StrKey.registerNote: 'Bản mô phỏng: tài khoản chỉ lưu trong bộ nhớ, tắt app là mất.',
   StrKey.fieldName: 'Họ tên',
@@ -397,7 +420,6 @@ const Map<StrKey, String> viStrings = {
   StrKey.registerHaveAccount: 'Đã có tài khoản? Đăng nhập',
   StrKey.loginNoAccount: 'Chưa có tài khoản? Đăng ký',
   StrKey.registerSuccess: 'Đăng ký thành công! Hãy đăng nhập bằng tài khoản mới.',
-  StrKey.registerFailed: 'Chưa đăng ký được. Thử lại nhé.',
   StrKey.loginOr: 'hoặc',
   StrKey.loginEmailButton: 'Đăng nhập bằng email',
   StrKey.accErrNameRequired: 'Nhập họ tên của bạn.',
@@ -723,7 +745,6 @@ const Map<StrKey, String> viStrings = {
   StrKey.loginNote: 'Không cần mật khẩu. Chỉ cần một chiếc bụng đói.',
   StrKey.privacyPolicy: 'Chính sách quyền riêng tư',
   StrKey.termsOfUse: 'Điều khoản sử dụng',
-  StrKey.loginFailed: 'Đăng nhập chưa thành công. Thử lại nhé.',
   StrKey.errTableNotFound: 'Không tìm thấy bàn này.',
   StrKey.errTableFull: 'Bàn này đã đầy.',
   StrKey.errTableStarted: 'Bàn này đã bắt đầu rồi.',
@@ -746,6 +767,18 @@ const Map<StrKey, String> enStrings = {
   StrKey.tabSchedule: 'Schedule',
   StrKey.tabMe: 'Me',
   StrKey.createTable: 'New table',
+  StrKey.authErrInvalidCredential: 'Incorrect email or password.',
+  StrKey.authErrWeakPassword: 'That password is too weak. Use at least 6 characters.',
+  StrKey.authErrInvalidEmail: 'That email is not valid.',
+  StrKey.authErrNetwork: 'No network connection. Check your connection and try again.',
+  StrKey.authErrTooManyRequests: 'Too many attempts. Please wait a moment and try again.',
+  StrKey.authErrUserDisabled: 'This account has been disabled.',
+  StrKey.authErrNotAllowed: 'This way of signing in is not enabled.',
+  StrKey.authErrPermissionDenied: "You don't have permission to do that.",
+  StrKey.authErrUnknown: 'Something went wrong. Please try again.',
+  StrKey.seedStarted: 'Uploading sample data to Firestore…',
+  StrKey.seedDone: 'Sample data uploaded to Firestore.',
+  StrKey.seedFailed: "Couldn't upload the sample data to Firestore.",
   StrKey.registerTitle: 'Create account',
   StrKey.registerNote: 'Demo only: accounts are kept in memory and disappear when the app closes.',
   StrKey.fieldName: 'Full name',
@@ -758,7 +791,6 @@ const Map<StrKey, String> enStrings = {
   StrKey.registerHaveAccount: 'Already have an account? Sign in',
   StrKey.loginNoAccount: "Don't have an account? Sign up",
   StrKey.registerSuccess: 'Account created! Sign in with your new account.',
-  StrKey.registerFailed: "Couldn't sign you up. Please try again.",
   StrKey.loginOr: 'or',
   StrKey.loginEmailButton: 'Sign in with email',
   StrKey.accErrNameRequired: 'Enter your name.',
@@ -1092,7 +1124,6 @@ const Map<StrKey, String> enStrings = {
   StrKey.loginNote: 'No password needed. Just an empty stomach.',
   StrKey.privacyPolicy: 'Privacy Policy',
   StrKey.termsOfUse: 'Terms of Use',
-  StrKey.loginFailed: "Couldn't sign in. Please try again.",
   StrKey.errTableNotFound: "We couldn't find this table.",
   StrKey.errTableFull: 'This table is full.',
   StrKey.errTableStarted: 'This table has already started.',
@@ -1269,6 +1300,24 @@ class Strings {
 
   List<String> staticPageParagraphs(StaticPage page) {
     return [for (final key in _pageParagraphKeys[page]!) call(key)];
+  }
+
+  // Thông báo cho từng lỗi tài khoản (đăng ký/đăng nhập), đã Việt hoá.
+  String authError(AuthError error) {
+    return call(switch (error) {
+      AuthError.emailTaken => StrKey.accErrEmailTaken,
+      AuthError.emailNotFound => StrKey.accErrEmailNotFound,
+      AuthError.wrongPassword => StrKey.accErrWrongPassword,
+      AuthError.invalidCredential => StrKey.authErrInvalidCredential,
+      AuthError.weakPassword => StrKey.authErrWeakPassword,
+      AuthError.invalidEmail => StrKey.authErrInvalidEmail,
+      AuthError.network => StrKey.authErrNetwork,
+      AuthError.tooManyRequests => StrKey.authErrTooManyRequests,
+      AuthError.userDisabled => StrKey.authErrUserDisabled,
+      AuthError.notAllowed => StrKey.authErrNotAllowed,
+      AuthError.permissionDenied => StrKey.authErrPermissionDenied,
+      AuthError.unknown => StrKey.authErrUnknown,
+    });
   }
 
   // Thông báo lỗi ở từng ô của form đăng ký.

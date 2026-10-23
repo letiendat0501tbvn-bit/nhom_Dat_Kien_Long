@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'core/config.dart';
+import 'data/firebase_wiring.dart';
 import 'firebase_options.dart';
 
 import 'l10n/strings.dart';
@@ -33,7 +34,10 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final AppState _appState =
-      widget.appState ?? AppState.mock(simulateReplies: true);
+      widget.appState ??
+      (kUseFirebase
+          ? createFirebaseAppState()
+          : AppState.mock(simulateReplies: true));
 
   @override
   void initState() {

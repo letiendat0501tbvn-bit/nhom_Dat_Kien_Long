@@ -53,6 +53,9 @@ class FirestoreRepo<E extends Entity<String>> {
   E _decode(DocumentSnapshot<Map<String, dynamic>> doc) =>
       fromMap(doc.id, fromFirestoreValue(doc.data()) as Map<String, dynamic>);
 
+  // Sinh sẵn một id mới cho document (Firestore tự sinh, không trùng).
+  String newId() => _col.doc().id;
+
   // Ghi (tạo mới hoặc ghi đè) document có id = e.id.
   Future<void> set(E e) => _col.doc(e.id).set(_encode(e));
 

@@ -1,4 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+import 'core/config.dart';
+import 'firebase_options.dart';
 
 import 'l10n/strings.dart';
 import 'navigation/main_shell.dart';
@@ -6,7 +10,14 @@ import 'state/app_scope.dart';
 import 'state/app_state.dart';
 import 'ui/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Chỉ khởi tạo Firebase khi bật cờ; bản Mock mặc định chạy được không cần mạng/Firebase.
+  if (kUseFirebase) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   runApp(const MyApp());
 }
 

@@ -123,7 +123,7 @@ classDiagram
   Entity <|-- ChatMessage
   Entity <|-- Report
   Entity <|-- UserFeedback
-  class MemoryRepo~E extends Entity~ID~, ID~ {
+  class MemoryRepo~E, ID~ {
     +Type kind
     +add(E item)
     +find(ID id) E?

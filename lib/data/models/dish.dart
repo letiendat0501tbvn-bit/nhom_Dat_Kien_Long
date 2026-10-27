@@ -1,11 +1,13 @@
+import '../../core/entity.dart';
+import '../../core/map_utils.dart';
 import 'enums.dart';
 
 // Mô hình dữ liệu một món ăn.
 // Các trường từ `group` trở xuống là phần mở rộng theo SPEC, đều có giá trị
 // mặc định nên dữ liệu mẫu cũ vẫn dùng được.
-class Dish {
+class Dish extends Entity<String> {
   const Dish({
-    required this.id,
+    required String id,
     required this.name,
     required this.category,
     required this.description,
@@ -20,9 +22,26 @@ class Dish {
     this.mealTimes = const [],
     this.imageAsset,
     this.descriptionEn,
-  });
+  }) : super(id);
 
-  final String id; // slug, ví dụ 'pho'
+  factory Dish.fromMap(String id, Map<String, dynamic> map) => Dish(
+    id: id,
+    name: map['name'] as String,
+    category: map['category'] as String,
+    description: map['description'] as String,
+    emoji: map['emoji'] as String,
+    tint: readInt(map['tint']),
+    group: map['group'] as String? ?? '',
+    tastes: readEnums(Taste.values, map['tastes']),
+    moods: readEnums(Mood.values, map['moods']),
+    region: map['region'] as String?,
+    hashtag: map['hashtag'] as String?,
+    isTrending: map['isTrending'] as bool? ?? false,
+    mealTimes: readEnums(MealTime.values, map['mealTimes']),
+    imageAsset: map['imageAsset'] as String?,
+    descriptionEn: map['descriptionEn'] as String?,
+  );
+
   final String name;
   final String category; // nhãn danh mục: Bún & mì, Bánh mặn, ...
   final String description;
@@ -47,4 +66,25 @@ class Dish {
     if (language == AppLanguage.en && en != null && en.isNotEmpty) return en;
     return description;
   }
+
+  @override
+  Map<String, dynamic> toMap() => {
+    'name': name,
+    'category': category,
+    'description': description,
+    'emoji': emoji,
+    'tint': tint,
+    'group': group,
+    'tastes': [for (final t in tastes) t.name],
+    'moods': [for (final m in moods) m.name],
+    'region': region,
+    'hashtag': hashtag,
+    'isTrending': isTrending,
+    'mealTimes': [for (final m in mealTimes) m.name],
+    'imageAsset': imageAsset,
+    'descriptionEn': descriptionEn,
+  };
+
+  @override
+  String get label => name;
 }

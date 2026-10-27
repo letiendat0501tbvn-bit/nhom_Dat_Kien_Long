@@ -34,7 +34,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   var _submitting = false; // đang xử lý: chặn bấm hai lần
   var _submitted = false; // đã thử đăng ký: từ đó báo lỗi trực tiếp khi sửa
   var _issues = <AccountField, AccountIssue>{};
-  var _failed = false; // lỗi chung (không có mạng...)
+  AuthError?
+  _authError; // lỗi chung (mất mạng, mật khẩu yếu...), hiện đã Việt hoá
 
   @override
   void dispose() {
@@ -55,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Mỗi lần sửa: xoá lỗi chung và (nếu đã thử đăng ký) kiểm tra lại ngay.
   void _edited() {
     setState(() {
-      _failed = false;
+      _authError = null;
       if (_submitted) {
         _issues = _validate();
       }
@@ -69,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final message = context.strings(StrKey.registerSuccess);
     setState(() {
       _submitted = true;
-      _failed = false;
+      _authError = null;
       _issues = _validate();
     });
     if (_issues.isNotEmpty) return;
@@ -92,14 +93,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (e.error == AuthError.emailTaken) {
           _issues = {..._issues, AccountField.email: AccountIssue.emailTaken};
         } else {
-          _failed = true;
+          _authError = e.error;
         }
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _failed = true;
+        _authError = AuthError.unknown;
       });
     }
   }
@@ -196,12 +197,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   AccountField.confirm,
                 ),
               ),
-              if (_failed) ...[
+              if (_authError != null) ...[
                 const SizedBox(height: 12),
                 Semantics(
                   liveRegion: true,
                   child: Text(
-                    t(StrKey.registerFailed),
+                    t.authError(_authError!),
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,

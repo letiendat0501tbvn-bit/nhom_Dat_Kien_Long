@@ -5,6 +5,16 @@ enum AuthError {
   emailTaken, // đăng ký: email đã được dùng
   emailNotFound, // đăng nhập: không có tài khoản với email này
   wrongPassword, // đăng nhập: sai mật khẩu
+  // Các lỗi chủ yếu đến từ Firebase Auth (bản Mock không phát sinh):
+  invalidCredential, // email hoặc mật khẩu không đúng (Firebase không nói rõ cái nào)
+  weakPassword, // mật khẩu quá yếu
+  invalidEmail, // email không hợp lệ
+  network, // mất mạng hoặc không kết nối được máy chủ
+  tooManyRequests, // thử quá nhiều lần
+  userDisabled, // tài khoản bị vô hiệu hoá
+  notAllowed, // phương thức đăng nhập chưa được bật
+  permissionDenied, // không có quyền (luật bảo mật của Firestore)
+  unknown, // lỗi khác
 }
 
 class AuthException implements Exception {

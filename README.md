@@ -2,7 +2,7 @@
 
 Ứng dụng di động (Flutter) giúp bạn **chọn món Việt và hẹn ăn cùng người khác ngay tại quán**: chọn món, xem các bàn theo giờ hẹn và số chỗ còn trống, rồi tham gia hoặc mở bàn mới. Đây **không** phải dịch vụ giao đồ ăn. Khẩu hiệu: "Món ngon • Bạn mới • Kết nối thật".
 
-Dự án là đồ án môn Lập trình thiết bị di động. Ứng dụng chạy hoàn toàn với **dữ liệu mẫu** trong bộ nhớ (chưa có máy chủ thật), xem mục "Phần giả lập" bên dưới.
+Dự án là đồ án môn Lập trình thiết bị di động. Ứng dụng có **hai chế độ**: mặc định chạy bằng **dữ liệu mẫu** trong bộ nhớ (không cần mạng, xem mục "Dữ liệu mẫu và phần giả lập"), hoặc chạy với **Firebase** (đăng ký/đăng nhập thật và bàn ăn trên Cloud Firestore) bằng `--dart-define=USE_FIREBASE=true`, xem mục "Kết nối Firebase".
 
 ## Chức năng
 
@@ -14,13 +14,13 @@ Dự án là đồ án môn Lập trình thiết bị di động. Ứng dụng c
 - **Chi tiết bàn:** thành viên (chỉ hiện khi đã đăng nhập), tham gia, rời bàn, huỷ bàn (chủ bàn), trò chuyện trong bàn (chỉ thành viên).
 - **An toàn:** báo cáo bàn, người dùng, tin nhắn; chặn và bỏ chặn người dùng (bàn và tin nhắn của người bị chặn bị ẩn).
 - **Hồ sơ:** "Bàn của tôi" (sắp tới / đã qua), phản hồi riêng tư, báo cáo đã gửi, danh sách chặn, đăng xuất, các trang thông tin.
-- **Đăng ký giả lập:** tạo tài khoản bằng họ tên, email, mật khẩu (kiểm tra hợp lệ ngay dưới từng ô, không cho trùng email); đăng ký xong quay về màn đăng nhập với email điền sẵn, không tự đăng nhập.
+- **Đăng ký:** tạo tài khoản bằng họ tên, email, mật khẩu (kiểm tra hợp lệ ngay dưới từng ô, không cho trùng email); đăng ký xong quay về màn đăng nhập với email điền sẵn, không tự đăng nhập. Ở chế độ mặc định đây là giả lập; ở chế độ Firebase, đăng ký và đăng nhập là thật.
 - **Hai ngôn ngữ:** tiếng Việt và tiếng Anh, đổi bằng nút EN/VI ở thanh trên.
 - Khách chưa đăng nhập vẫn xem, lọc và điền form; các thao tác cần quyền sẽ mở bảng đăng nhập (đăng nhập xong không tự tham gia hay tự mở bàn).
 
 ## Cài đặt và chạy
 
-Yêu cầu: Flutter SDK (Dart ^3.13), và Chrome hoặc thiết bị/máy ảo Android.
+Yêu cầu: Flutter SDK (Dart ^3.13), và Chrome hoặc thiết bị/máy ảo Android. Trên Windows, build Android/Windows với plugin cần bật **Developer Mode** của hệ điều hành (để tạo liên kết tượng trưng).
 
 ```bash
 flutter pub get
@@ -43,28 +43,36 @@ flutter analyze
 flutter test
 ```
 
-Bộ test gồm test thuần cho các quy tắc nghiệp vụ, test repository mẫu và test giao diện (cả tiếng Việt và tiếng Anh, khổ 360/412 và chữ phóng 1,3 lần). Có test kiểm tra không còn chuỗi chữ viết cứng trong giao diện và không còn khoá chuỗi mồ côi. Danh sách kiểm thử thủ công nằm ở `docs/CHECKLIST.md`.
+Bộ test gồm test thuần cho các quy tắc nghiệp vụ, test repository mẫu, test ORM/Firestore và ánh xạ lỗi Firebase (dùng `fake_cloud_firestore`, không cần mạng) và test giao diện (cả tiếng Việt và tiếng Anh, khổ 360/412 và chữ phóng 1,3 lần). Có test kiểm tra không còn chuỗi chữ viết cứng trong giao diện và không còn khoá chuỗi mồ côi. Danh sách kiểm thử thủ công nằm ở `docs/CHECKLIST.md`.
 
 ## Cấu trúc thư mục
 
 ```
 lib/
   main.dart               điểm vào, MaterialApp, AppScope
+  firebase_options.dart   cấu hình Firebase (do FlutterFire sinh ra)
+  core/                   Entity, MemoryRepo, FirestoreRepo (generic), map_utils, config (cờ USE_FIREBASE)
   state/                  AppState (ChangeNotifier) và AppScope (InheritedNotifier)
   l10n/                   chuỗi chữ VI/EN (strings.dart) và hàm định dạng ngày giờ
   navigation/             khung chính và thanh dưới
   data/
     models/               model: món, bàn, quán, người dùng, tin nhắn, báo cáo...
-    repositories/         các interface (abstract) và bản Mock tương ứng
+    repositories/         interface (abstract), bản Mock và bản Firebase/Firestore
+                          (firebase_auth_repository, firestore_table_repository,
+                          firestore_location_repository, firebase_errors)
     logic/                quy tắc nghiệp vụ thuần: lọc bàn, kiểm tra giờ/số chỗ, tìm không dấu...
     mock/                 dữ liệu mẫu và độ trễ giả
     mock_dishes.dart      56 món mẫu và MockDishRepository
+    firebase_seed.dart    đưa dữ liệu mẫu lên Firestore (nhấn giữ logo)
+    firebase_wiring.dart  nối các repository Firebase vào AppState
   ui/
     theme/                màu và theme
     components/           thành phần dùng chung (thẻ món, thẻ bàn, bảng lọc, chat...)
     screens/              các màn hình
-test/                     test thuần, repository và giao diện
+test/                     test thuần, repository, ORM/Firestore và giao diện
 design/                   ảnh thiết kế tham chiếu
+assets/images/            logo.png và dishes/ (56 ảnh món)
+docs/                     CHECKLIST.md (kiểm thử thủ công)
 ```
 
 ## Dữ liệu mẫu và phần giả lập
@@ -77,26 +85,19 @@ Những phần sau là **giả lập để demo**, không phải dịch vụ th�
 - **Phản hồi chat tự động:** sau khi bạn gửi tin trong bàn, một thành viên khác của bàn tự trả lời bằng một câu có sẵn sau 1–2 giây (chỉ để demo, nằm trong `MockChatRepository`).
 - **Độ trễ:** mỗi thao tác có độ trễ ngẫu nhiên 300–600 ms để thấy trạng thái đang tải.
 - **Vị trí:** chưa dùng vị trí thật; "Cho phép vị trí" chỉ báo sẽ có ở bản sau. Khu vực chọn thủ công.
-- **Ảnh món và logo:** là ô màu kèm biểu tượng tạm, chưa có ảnh thật.
+- **Ảnh món và logo:** `assets/images/dishes` có 56 ảnh món (tìm trên mạng) và `assets/images/logo.png` là logo của nhóm.
 - **Các trang thông tin** (Giới thiệu, Liên hệ, Chính sách quyền riêng tư, Điều khoản sử dụng): nội dung mẫu ngắn, có ghi chú trên màn. Nhóm Facebook/Threads chỉ hiện chữ, không có liên kết.
 - Tên món giữ tiếng Việt ở cả hai ngôn ngữ; mô tả món có bản tiếng Anh (bản dịch tự soạn, chưa được người bản ngữ kiểm tra).
 
-## Thay bằng API thật
+## Thay bằng API khác
 
-Giao diện chỉ làm việc với các **interface** trong `lib/data/repositories/` (`DishRepository`, `TableRepository`, `AuthRepository`, `ChatRepository`, `SafetyRepository`, `LocationRepository`) và với `AppState`. Để nối máy chủ thật:
-
-1. Viết lớp mới implement từng interface (ví dụ `ApiTableRepository`) gọi API hoặc Firebase, ném `TableException`/`SafetyException` với đúng mã lỗi khi vi phạm quy tắc.
-2. Trong `AppState` (hàm tạo `AppState.mock` và `main.dart`), truyền các lớp mới vào thay cho bản `Mock...`.
-3. Giữ các quy tắc ở `lib/data/logic/` ở phía máy chủ hoặc dùng lại; giờ của bàn được hiểu là giờ Việt Nam, bản API thật cần quy đổi trước khi trả về.
-4. Việc ẩn bàn/tin nhắn của người bị chặn và quyền xem chat hiện do repository thực hiện (tham số `viewerId`), máy chủ thật cần làm tương tự.
-
-Các bản `Mock...` vẫn dùng được cho test.
+Giao diện chỉ làm việc với các **interface** trong `lib/data/repositories/` (`DishRepository`, `TableRepository`, `AuthRepository`, `ChatRepository`, `SafetyRepository`, `LocationRepository`) và với `AppState`. Bản Firebase (xem mục "Kết nối Firebase") đã thay Mock cho đăng nhập, bàn ăn, khu vực và quán. Muốn nối một máy chủ khác, viết lớp mới implement interface tương ứng, ném `TableException`/`SafetyException` đúng mã lỗi và nối vào `firebase_wiring.dart` hoặc `AppState`. Giờ của bàn được hiểu là giờ Việt Nam; việc ẩn bàn/tin nhắn của người bị chặn và quyền xem chat do repository thực hiện (tham số `viewerId`). Các bản `Mock...` vẫn dùng được cho test.
 
 ## Tổng quát hóa bằng Generics, extends, Object và Type
 
 Các đối tượng trong app (món, quán, khu vực, người dùng, bàn, tin nhắn, báo cáo, phản hồi) đều có một **id** và một **tên hiển thị**. Thay vì mỗi lớp tự viết lại, chúng cùng kế thừa một lớp cha tổng quát:
 
-- **Generics:** `Entity<ID>` ([lib/core/entity.dart](lib/core/entity.dart)) mô tả chung mọi đối tượng có danh tính; `ID` là kiểu của khoá nhận dạng (ở đây là `String`). `MemoryRepo<E extends Entity<ID>, ID>` ([lib/core/memory_repo.dart](lib/core/memory_repo.dart)) là kho lưu trong bộ nhớ dùng chung cho mọi `Entity`.
+- **Generics:** `Entity<ID>` ([lib/core/entity.dart](lib/core/entity.dart)) mô tả chung mọi đối tượng có danh tính; `ID` là kiểu của khoá nhận dạng (ở đây là `String`). `MemoryRepo<E extends Entity<ID>, ID>` ([lib/core/memory_repo.dart](lib/core/memory_repo.dart)) là kho lưu trong bộ nhớ dùng chung cho mọi `Entity`. `FirestoreRepo<E extends Entity<String>>` ([lib/core/firestore_repo.dart](lib/core/firestore_repo.dart)) là lớp generic thứ hai, ánh xạ một collection Firestore với một kiểu `Entity`.
 - **extends:** 8 lớp model (`Dish`, `Restaurant`, `Area`, `User`, `DiningTable`, `ChatMessage`, `Report`, `UserFeedback`) đều `extends Entity<String>` và chỉ giữ phần riêng của mình. `AppSettings` và `BlockEntry` không có id riêng nên không kế thừa.
 - **Object:** hai hàm `describe(Object o)` và `groupByType(Iterable<Object>)` nhận **bất kỳ đối tượng nào** (kiểu `Object`), và toán tử `==` của `Entity` so sánh với một `Object`.
 - **Type:** `runtimeType` (lớp thật của đối tượng lúc chạy, tương đương "Class class" của Java) được dùng để so sánh hai `Entity` (khác lớp thì không bằng nhau dù cùng id), để tính `hashCode`, để `toString`/`describe` ghi tên lớp, và để `groupByType` gom theo lớp. `MemoryRepo.kind` trả về `Type` của phần tử trong kho (ví dụ `Dish`).
@@ -109,6 +110,7 @@ classDiagram
     <<abstract>>
     +ID id
     +String label
+    +toMap() Map
     +operator ==(Object other) bool
     +hashCode int
     +toString() String
@@ -143,6 +145,9 @@ abstract class Entity<ID> {
 
   // Tên ngắn để hiển thị/ghi log; mỗi lớp con tự định nghĩa.
   String get label;
+
+  // Các trường dưới dạng Map (không gồm id), dùng để ghi lên Firestore.
+  Map<String, dynamic> toMap();
 
   @override
   bool operator ==(Object other) =>
@@ -262,4 +267,3 @@ flowchart LR
 - **Bàn ăn:** các quy tắc (2–8 chỗ, khung 15 phút, giờ ở tương lai, không trùng giờ, chuyển chủ bàn khi chủ rời, tự huỷ khi chỉ còn một mình) nằm ở `table_rules.dart` và được kiểm tra trước khi ghi; tham gia/rời/huỷ chạy trong transaction.
 - **Lỗi:** mọi lời gọi Firebase được bọc `try/catch`. Lỗi của Firebase Auth (email đã dùng, mật khẩu yếu, sai thông tin, mất mạng, quá nhiều lần thử...) được đổi thành thông báo tiếng Việt/Anh; lỗi đọc dữ liệu hiện trạng thái lỗi kèm nút "Thử lại", không làm app sập khi mất mạng.
 - **Giới hạn:** `FirestoreTableRepository.getTables` đọc cả collection rồi lọc trong bộ nhớ (đủ cho vài trăm bàn). Test dùng `fake_cloud_firestore` nên không kiểm chứng được tính nguyên tử của transaction khi nhiều người cùng ghi, chỉ kiểm chứng logic.
-- Trên Windows, build Android/Windows với plugin cần bật **Developer Mode** của hệ điều hành (để tạo liên kết tượng trưng).
